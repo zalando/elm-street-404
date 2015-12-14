@@ -1,27 +1,21 @@
 module AnimationState (AnimationState, animate) where
-import Time
+import Time exposing (Time)
 
 type alias AnimationState =
-  Maybe { prevClockTime : Time.Time, elapsedFrames : Float }
+  Maybe { prevClockTime : Time, elapsedTime : Time }
 
-
-framesSince : Time.Time -> Time.Time -> Float
-framesSince prevTime time =
-  min ((time - prevTime) * 60 / 1000) 1.5
-
-
-animate : Time.Time -> AnimationState -> (Float, AnimationState)
+animate : Time -> AnimationState -> (Time, AnimationState)
 animate time animationState =
   let
-    elapsedFrames =
+    elapsedTime =
       case animationState of
         Nothing ->
           0
         Just {prevClockTime} ->
-          framesSince prevClockTime time
+          min (time - prevClockTime) 25
   in
-    ( elapsedFrames
+    ( elapsedTime
     , Just { prevClockTime = time
-           , elapsedFrames = elapsedFrames
+           , elapsedTime = elapsedTime
            }
     )

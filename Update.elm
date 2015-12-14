@@ -22,5 +22,6 @@ update action model =
         ({model | animationState = Nothing}, Effects.none)
 
 
-animate : Float -> Model -> Model
-animate frames model = model
+animate : Time -> Model -> Model
+animate elapsed model =
+  { model | fountain = animateFountain elapsed model.fountain }
