@@ -5,6 +5,7 @@ import Html.Attributes exposing (style)
 import Html.Events exposing (onClick)
 import Model exposing (Model)
 import Sprite
+import Pathfinder
 
 (=>) : a -> b -> (a, b)
 (=>) = (,)
@@ -115,4 +116,5 @@ view address model =
   [ div
     []
     (List.map (Sprite.render model.tileSize) (Sprite.sort (boxes model)))
+  , Pathfinder.render model.tileSize  (Pathfinder.find [] (5, 5) (10, 15)) (5, 5) 
   ]
