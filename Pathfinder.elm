@@ -8,29 +8,13 @@ type alias Obstacle a =
       , size : (Int, Int)
   }
 
-find : List (Obstacle a) -> (Int, Int) -> (Int, Int) -> List (Int, Int)
-find obstacles source destination =
+find : (Int, Int) -> List (Obstacle a) -> (Int, Int) -> (Int, Int) -> List (Int, Int)
+find gridSize obstacles source destination =
   [ ( (fst destination - fst source) // 2 + fst source
     , (snd destination - snd source) // 2 + snd source
     )
   , destination
   ]
-
-connectPoints : Int -> (Int, Int) -> (Int, Int) -> Html
-connectPoints tileSize p1 p2 =
-  Svg.line
-  [
-    x1 (toString (fst p1 * tileSize)),
-    y1 (toString (snd p1 * tileSize)),
-    x2 (toString (fst p2 * tileSize)),
-    y2 (toString (snd p2 * tileSize)),
-    strokeLinejoin "round",
-    strokeLinecap "round",
-    stroke "#bdab82",
-    strokeWidth "40",
-    opacity "0.5"
-  ]
-  []
 
 
 pointToSring : Int -> (Int, Int) -> String

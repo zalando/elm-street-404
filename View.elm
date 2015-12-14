@@ -116,5 +116,5 @@ view address model =
   [ div
     []
     (List.map (Sprite.render model.tileSize) (Sprite.sort (boxes model)))
-  , Pathfinder.render model.tileSize  (Pathfinder.find [] (5, 5) (10, 15)) (5, 5) 
+  , Pathfinder.render model.tileSize  (Pathfinder.find (32, 14) [] (5, 5) (10, 15)) (5, 5) 
   ]
