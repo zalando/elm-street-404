@@ -4,21 +4,72 @@ import Html exposing (div, br, Html, text, button)
 import Html.Attributes exposing (style)
 import Html.Events exposing (onClick)
 import Model exposing (Model)
+import Sprite
 
 (=>) : a -> b -> (a, b)
 (=>) = (,)
+
+
+houseSprite : Sprite.Sprite
+houseSprite =
+  { size = (80, 120)
+  , offset = (0, 0)
+  , align = Sprite.Bottom
+  , frames = 1
+  , src = "img/house.png"
+  }
+
+
+houseShadowSprite : Sprite.Sprite
+houseShadowSprite =
+  { size = (120, 80)
+  , offset = (0, 0)
+  , align = Sprite.Top
+  , frames = 1
+  , src = "img/house-shadow.png"
+  }
+
+
+boxes : List Sprite.Box
+boxes =
+  [ { sprite = houseSprite
+    , position = (360, 400)
+    , layer = 2
+    , frame = 0
+    , attributes = []
+    }
+  , { sprite = houseShadowSprite
+    , position = (360, 360)
+    , layer = 1
+    , frame = 0
+    , attributes = []
+    }
+  , { sprite = houseSprite
+    , position = (280, 320)
+    , layer = 2
+    , frame = 0
+    , attributes = []
+    }
+  , { sprite = houseShadowSprite
+    , position = (280, 280)
+    , layer = 1
+    , frame = 0
+    , attributes = []
+    }
+  ]
 
 
 view : Signal.Address Action -> Model -> Html
 view address model =
   div
   [ style
-    [ "height" => "590px"
+    [ "height" => "560px"
     , "margin" => "auto"
     , "position" => "relative"
     , "width" => "960px"
-    , "background" => "lightgrey"
+    , "background-image" => "url(img/bg-grid.jpg)"
+    , "background-size" => "960px 560px"
     ]
   ]
-  [ text ("404 Elm Street")
+  [ div [] (List.map Sprite.render (Sprite.sort boxes))
   ]

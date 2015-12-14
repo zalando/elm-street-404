@@ -22,8 +22,8 @@ initial =
 
 
 animate : Time.Time -> (Float -> Model -> Model) -> Model -> Model
-animate time func model =
+animate time animationFunc model =
   let
     (elapsedFrames, animationState) = AnimationState.animate time model.animationState
   in
-    func elapsedFrames {model | animationState = animationState}
+    animationFunc elapsedFrames {model | animationState = animationState}
