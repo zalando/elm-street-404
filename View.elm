@@ -12,9 +12,8 @@ import Sprite
 
 houseSprite : Sprite.Sprite
 houseSprite =
-  { size = (80, 120)
-  , offset = (0, 0)
-  , align = Sprite.Bottom
+  { size = (2, 3)
+  , offset = (0, -1)
   , frames = 1
   , src = "img/house.png"
   }
@@ -22,36 +21,32 @@ houseSprite =
 
 houseShadowSprite : Sprite.Sprite
 houseShadowSprite =
-  { size = (120, 80)
-  , offset = (0, 0)
-  , align = Sprite.Top
+  { size = (3, 2)
+  , offset = (0, 1)
   , frames = 1
   , src = "img/house-shadow.png"
   }
 
 fountainShadowSprite : Sprite.Sprite
 fountainShadowSprite =
-  { size = (160, 80)
-  , offset = (0, -40)
-  , align = Sprite.Top
+  { size = (4, 2)
+  , offset = (0, 1)
   , frames = 1
   , src = "img/fountain-shadow.png"
   }
 
 fountainSprite : Sprite.Sprite
 fountainSprite =
-  { size = (120, 80)
+  { size = (3, 2)
   , offset = (0, 0)
-  , align = Sprite.Bottom
   , frames = 1
   , src = "img/fountain.png"
   }
 
 fountainSpringSprite : Sprite.Sprite
 fountainSpringSprite =
-  { size = (40, 80)
-  , offset = (40, -40)
-  , align = Sprite.Bottom
+  { size = (1, 2)
+  , offset = (1, -1)
   , frames = 4
   , src = "img/fountain-spring.png"
   }
@@ -61,43 +56,43 @@ fountainSpringSprite =
 boxes : Model -> List Sprite.Box
 boxes model =
   [ { sprite = houseSprite
-    , position = (360, 400)
+    , position = (8, 10)
     , layer = 2
     , frame = 0
     , attributes = []
     }
   , { sprite = houseShadowSprite
-    , position = (360, 360)
+    , position = (8, 10)
     , layer = 1
     , frame = 0
     , attributes = []
     }
   , { sprite = houseSprite
-    , position = (280, 320)
+    , position = (7, 7)
     , layer = 2
     , frame = 0
     , attributes = []
     }
   , { sprite = houseShadowSprite
-    , position = (280, 280)
+    , position = (7, 7)
     , layer = 1
     , frame = 0
     , attributes = []
     }
   , { sprite = fountainSprite
-    , position = (440, 280)
+    , position = (11, 7)
     , layer = 2
     , frame = 0
     , attributes = []
     }
   , { sprite = fountainSpringSprite
-    , position = (440, 280)
+    , position = (11, 7)
     , layer = 3
     , frame = Maybe.withDefault 0 (List.head model.fountain.frames)
     , attributes = []
     }
   , { sprite = fountainShadowSprite
-    , position = (440, 280)
+    , position = (11, 7)
     , layer = 1
     , frame = 0
     , attributes = []
@@ -117,5 +112,7 @@ view address model =
     , "background-size" => "960px 560px"
     ]
   ]
-  [ div [] (List.map Sprite.render (Sprite.sort (boxes model)))
+  [ div
+    []
+    (List.map (Sprite.render model.tileSize) (Sprite.sort (boxes model)))
   ]

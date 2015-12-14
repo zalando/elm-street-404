@@ -17,6 +17,7 @@ type alias Model =
   , state : State
   , seed : Random.Seed
   , fountain : Fountain
+  , tileSize : Int
   }
 
 
@@ -26,6 +27,7 @@ initial =
   , state = Stopped
   , seed = Random.initialSeed 0
   , fountain = Fountain 0 [0, 1, 2, 3]
+  , tileSize = 40
   }
 
 

@@ -1,15 +1,12 @@
-module Sprite (Sprite, Box, Align(..), sort, render) where
+module Sprite (Sprite, Box, sort, render) where
 import Html.Attributes exposing (style)
 import Html exposing (div)
 
-
-type Align = Top | Bottom
 
 
 type alias Sprite =
   { size : (Int, Int)
   , offset : (Int, Int)
-  , align : Align
   , frames : Int
   , src : String
   }
@@ -33,32 +30,26 @@ sort boxes =
   List.sortBy (\box -> snd box.position) boxes
 
 
-render : Box -> Html.Html
-render box =
+render : Int -> Box -> Html.Html
+render tileSize box =
   let
     (width, height) = box.sprite.size
-    offsetPosition = ( fst box.position + fst box.sprite.offset
-                     , snd box.position + snd box.sprite.offset
-                     )
-    (left, top) =
-      case box.sprite.align of
-        Top ->
-          offsetPosition
-        Bottom ->
-          (fst offsetPosition, snd offsetPosition - snd box.sprite.size)
+    (left, top) = ( fst box.position + fst box.sprite.offset
+                  , snd box.position + snd box.sprite.offset
+                  )
   in
     div
     ([ style
-       [ "left" => (toString left ++ "px")
-       , "top" => (toString top ++ "px")
+       [ "left" => (toString (left * tileSize) ++ "px")
+       , "top" => (toString (top * tileSize) ++ "px")
        , "position" => "absolute"
        , "overflow" => "hidden"
        , "background-image" => ("url(" ++ box.sprite.src ++ ")")
-       , "background-position" => (toString (-box.frame * width) ++ "px 0")
+       , "background-position" => (toString (-box.frame * width * tileSize) ++ "px 0")
        , "background-repeat" => "no-repeat"
-       , "background-size" => (toString (width * box.sprite.frames) ++ "px " ++ (toString height) ++ "px")
-       , "width" => (toString width ++ "px")
-       , "height" => (toString height ++ "px")
+       , "background-size" => (toString (width * box.sprite.frames * tileSize) ++ "px " ++ (toString (height * tileSize)) ++ "px")
+       , "width" => (toString (width * tileSize) ++ "px")
+       , "height" => (toString (height * tileSize) ++ "px")
        , "z-index" => (toString box.layer)
        ]
     ] ++ box.attributes)
