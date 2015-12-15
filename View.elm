@@ -113,8 +113,5 @@ view address model =
     , "background-size" => "960px 560px"
     ]
   ]
-  [ div
-    []
-    (List.map (Sprite.render model.tileSize) (Sprite.sort (boxes model)))
-  , Pathfinder.render model.tileSize  (Pathfinder.find (32, 14) [] (5, 5) (10, 15)) (5, 5) 
+  [ div [] (List.map (Sprite.render model.tileSize) (Sprite.sort (boxes model)))
   ]
