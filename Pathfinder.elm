@@ -2,6 +2,7 @@ module Pathfinder (Obstacle, find, render) where
 import Svg exposing (svg, polyline)
 import Svg.Attributes exposing (..)
 import Html exposing (Html)
+import Astar exposing (astar)
 
 type alias Obstacle a =
   { a | position : (Int, Int)
@@ -9,12 +10,13 @@ type alias Obstacle a =
   }
 
 find : (Int, Int) -> List (Obstacle a) -> (Int, Int) -> (Int, Int) -> List (Int, Int)
-find gridSize obstacles source destination =
-  [ ( (fst destination - fst source) // 2 + fst source
-    , (snd destination - snd source) // 2 + snd source
-    )
-  , destination
-  ]
+find gridSize obstacles start destination =
+  astar gridSize (List.map (\ o -> o.size) obstacles) start destination
+  -- [ ( (fst destination - fst source) // 2 + fst source
+  --   , (snd destination - snd source) // 2 + snd source
+  --   )
+  -- , destination
+  -- ]
 
 
 pointToSring : Int -> (Int, Int) -> String
