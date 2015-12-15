@@ -35,9 +35,7 @@ removeDelivered house category articles =
   {- TODO: remove only the first occurence -}
   let
     notInHouse house article =
-      case article.state of
-        Delivered house -> False
-        _ -> True
+      not (article.state == Delivered house)
   in
     List.filter (notInHouse house) articles
 

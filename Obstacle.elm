@@ -33,7 +33,7 @@ fountainSpringSprite =
 treeSprite : Sprite.Sprite
 treeSprite =
   { size = (3, 5)
-  , offset = (0, 0)
+  , offset = (0, -3)
   , frames = 1
   , src = "img/tree.png"
   }
@@ -74,6 +74,7 @@ fountain position =
   , elapsed = 0
   , frames = [0, 1, 2, 3]
   }
+
 
 tree : (Int, Int) -> Obstacle
 tree position =
