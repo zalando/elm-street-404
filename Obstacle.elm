@@ -1,4 +1,4 @@
-module Obstacle (Obstacle, animate, render, fountain) where
+module Obstacle (Obstacle, animate, render, fountain, tree) where
 import Time exposing (Time)
 import AnimationState exposing (animateObject)
 import Sprite
@@ -30,6 +30,13 @@ fountainSpringSprite =
   , src = "img/fountain-spring.png"
   }
 
+treeSprite : Sprite.Sprite
+treeSprite =
+  { size = (3, 5)
+  , offset = (0, 0)
+  , frames = 1
+  , src = "img/tree.png"
+  }
 
 
 rotateFrames : List Int -> List Int
@@ -68,6 +75,15 @@ fountain position =
   , frames = [0, 1, 2, 3]
   }
 
+tree : (Int, Int) -> Obstacle
+tree position =
+  { category = Tree
+  , position = position
+  , size = (3, 2)
+  , elapsed = 0
+  , frames = [0]
+  }
+
 
 render : Obstacle -> List Sprite.Box
 render obstacle =
@@ -92,4 +108,11 @@ render obstacle =
         , attributes = []
         }
       ]
-    _ -> []
+    Tree ->
+      [ { sprite = treeSprite
+        , position = obstacle.position
+        , layer = 2
+        , frame = 0
+        , attributes = []
+        }
+      ]

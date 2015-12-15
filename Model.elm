@@ -30,7 +30,7 @@ initial =
   , deliveryPerson = DeliveryPerson.initial (10, 10)
   , articles = []
   , requests = []
-  , obstacles = [Obstacle.fountain (10, 5), Obstacle.fountain (15, 10)]
+  , obstacles = [Obstacle.fountain (10, 5), Obstacle.fountain (15, 10), Obstacle.tree (2, 3), Obstacle.tree (15, 3)]
   }
 
 

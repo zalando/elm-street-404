@@ -51,6 +51,7 @@ render tileSize box =
        , "width" => (toString (width * tileSize) ++ "px")
        , "height" => (toString (height * tileSize) ++ "px")
        , "z-index" => (toString box.layer)
+       , "transform" => "translateZ(0)"
        ]
     ] ++ box.attributes)
     []
