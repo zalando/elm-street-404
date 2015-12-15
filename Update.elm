@@ -7,6 +7,8 @@ import Random
 import DeliveryPerson exposing (Location(..))
 import Article exposing (State(..), Article)
 import Request
+import Obstacle exposing (Obstacle)
+
 
 update : Action -> Model -> (Model, Effects Action)
 update action model =
@@ -28,7 +30,12 @@ update action model =
 
 animate : Time -> Model -> Model
 animate elapsed model =
-  { model | fountain = animateFountain elapsed model.fountain }
+  { model | obstacles = animateObstacles elapsed model.obstacles }
+
+
+animateObstacles : Time -> List Obstacle -> List Obstacle
+animateObstacles elapsed obstacles =
+  List.map (Obstacle.animate elapsed) obstacles
 
 
 onArticleClick : Model -> Article -> Model

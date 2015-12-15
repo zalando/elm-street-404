@@ -1,8 +1,23 @@
-module AnimationState (AnimationState, animate) where
+module AnimationState (AnimationState, AnimatedObject, animateObject, animate) where
 import Time exposing (Time)
 
 type alias AnimationState =
   Maybe { prevClockTime : Time, elapsedTime : Time }
+
+type alias AnimatedObject a =
+  { a | elapsed: Time }
+
+
+animateObject : Time -> Time -> (AnimatedObject a -> AnimatedObject a) -> AnimatedObject a -> AnimatedObject a
+animateObject limit elapsed animationFunc state =
+  let
+    elapsed' = state.elapsed + elapsed
+  in
+    if elapsed' > limit then
+      animationFunc {state | elapsed = elapsed' - limit}
+    else
+      {state | elapsed = elapsed'}
+
 
 animate : Time -> AnimationState -> (Time, AnimationState)
 animate time animationState =
