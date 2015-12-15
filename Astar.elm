@@ -1,7 +1,5 @@
 module Astar (astar) where
 
-import Debug
-
 type alias Node =
   { tile: (Int, Int)
   , obstacle: Bool
@@ -36,7 +34,7 @@ nodeEq a b = ((nodex a) == (nodex b)) && ((nodey a) == (nodey b))
 
 absDistance : Node -> Node -> Float
 absDistance a b =
-  -- if nodex a == nodex b && nodey a == nodey b then 
+  -- if nodex a == nodex b && nodey a == nodey b then
     (((toFloat (nodex a) - toFloat (nodex b)) ^ 2) +
     ((toFloat (nodey a) - toFloat (nodey b)) ^ 2))
 
@@ -100,7 +98,7 @@ getRowNode row tile =
   case row of
     [] -> Nothing
     n :: rest ->
-      if (nodex n) == (fst tile) && (nodey n) == (snd tile) then 
+      if (nodex n) == (fst tile) && (nodey n) == (snd tile) then
         Just n
       else
         getRowNode rest tile
@@ -132,7 +130,7 @@ pathToTileList grid tile =
 smallestF : NodeList -> Maybe Node
 smallestF nodes =
   List.foldl
-    (\ el current -> 
+    (\ el current ->
       case current of
         Nothing -> (Just el)
         Just c -> Just (if el.f < c.f then el else c))
@@ -248,5 +246,9 @@ astar gridSize obstacles start destination =
   let
     obstacleNodes = List.map toNode obstacles
     grid = createGrid gridSize obstacleNodes
+    insideObstacle = contains obstacleNodes (toNode destination)
   in
-    List.reverse (astarIter grid obstacleNodes [toNode start] [] (toNode destination))
+    if insideObstacle then
+      []
+    else
+      List.reverse (astarIter grid obstacleNodes [toNode start] [] (toNode destination))
