@@ -2,6 +2,9 @@ module Model (Model, initial, animate, State(..), animateFountain) where
 import Random
 import Time exposing (Time)
 import AnimationState
+import DeliveryPerson exposing (DeliveryPerson)
+import Article exposing (Article)
+import Request exposing (Request)
 
 type State = Paused | Playing | Stopped
 
@@ -18,6 +21,9 @@ type alias Model =
   , seed : Random.Seed
   , fountain : Fountain
   , tileSize : Int
+  , deliveryPerson : DeliveryPerson
+  , articles : List Article
+  , requests : List Request
   }
 
 
@@ -28,6 +34,9 @@ initial =
   , seed = Random.initialSeed 0
   , fountain = Fountain 0 [0, 1, 2, 3]
   , tileSize = 40
+  , deliveryPerson = DeliveryPerson.initial (10, 10)
+  , articles = []
+  , requests = []
   }
 
 
