@@ -1,9 +1,6 @@
-module Warehouse (Warehouse, warehouse, render) where
+module Warehouse (Warehouse, warehouse, warehouseSprite, warehouseShadowSprite, warehouseBubbleSprite) where
 
 import Sprite exposing (Sprite)
-import Actions exposing (Action)
-import Html.Events exposing (onClick)
-import Layers exposing (layers)
 
 
 type alias Warehouse =
@@ -44,27 +41,3 @@ warehouse position =
   { position = position
   , size = (3, 3)
   }
-
-
-render : Signal.Address Action -> Warehouse -> List Sprite.Box
-render address warehouse =
-  [ { sprite = warehouseSprite
-    , position = warehouse.position
-    , layer = layers.obstacle
-    , frame = 0
-    , attributes =
-      [ onClick address (Actions.GoTo (round (fst warehouse.position) + 1, round (snd warehouse.position + snd warehouse.size))) ]
-    }
-  , { sprite = warehouseShadowSprite
-    , position = warehouse.position
-    , layer = layers.shadow
-    , frame = 0
-    , attributes = []
-    }
-  , { sprite = warehouseBubbleSprite
-    , position = warehouse.position
-    , layer = layers.bubble
-    , frame = 0
-    , attributes = []
-    }
-  ]
