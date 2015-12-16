@@ -90,25 +90,21 @@ renderObstacleTest tileSize position =
     ]
     []
 
-renderObstacle : Int -> Obstacle a -> Html
-renderObstacle tileSize obstacle =
-  rect
-    [ x (toString (fst obstacle.position * tileSize))
-    , y (toString (snd obstacle.position * tileSize))
-    , width (toString (fst obstacle.size * tileSize))
-    , height (toString (snd obstacle.size * tileSize))
-    , stroke "#9b8960"
-    , strokeWidth "2"
-    , fill "transparent"
-    ]
-    []
 
-
-render : Int -> List (Obstacle a) -> List (Int, Int) -> (Int, Int) -> Html
-render tileSize obstacles points source =
+render' : Int -> List (Obstacle a) -> List (Int, Int) -> (Int, Int) -> Html
+render' tileSize obstacles points source =
   svg
     [version "1.1", viewBox "0 0 960 560"]
     (renderPoints tileSize (source :: points) :: List.map (renderObstacleTest tileSize) (Debug.log "obstacles" (obstacleTiles obstacles)))
+
+
+render : (Int, Int) -> Int -> List (Int, Int) -> Html
+render (width, height) tileSize route =
+  svg
+    [ version "1.1"
+    , viewBox ("0 0 " ++ (toString (width * tileSize)) ++ " " ++ (toString (height * tileSize)))
+    ]
+    [ renderPoints tileSize route]
 
 
 (=>) : a -> b -> (a, b)
@@ -143,4 +139,4 @@ renderMain click =
       , "background-size" => "960px 560px"
       ]
     ]
-    [ render tileSize obstacles (find (36, 36) (obstacleTiles obstacles) source dest) source ]
+    [ render' tileSize obstacles (find (36, 36) (obstacleTiles obstacles) source dest) source ]

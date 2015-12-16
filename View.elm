@@ -8,6 +8,7 @@ import Obstacle
 import House
 import Warehouse
 import DeliveryPerson
+import Pathfinder
 
 (=>) : a -> b -> (a, b)
 (=>) = (,)
@@ -33,5 +34,9 @@ view address model =
     , "background-size" => "960px 560px"
     ]
   ]
-  [ div [] (List.map (Sprite.render model.tileSize) (Sprite.sort (boxes address model)))
+  [ div
+      []
+      ( Pathfinder.render model.gridSize model.tileSize model.deliveryPerson.route ::
+        List.map (Sprite.render model.tileSize) (Sprite.sort (boxes address model))
+      )
   ]
