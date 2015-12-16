@@ -1,5 +1,6 @@
 module Actions (Action(..)) where
 
+import Article exposing (Article)
 import Time exposing (Time)
 
 type Action
@@ -7,4 +8,4 @@ type Action
   | Tick Time
   | Start
   | GoTo (Int, Int)
-  | ClickArticle
+  | ClickArticle Article
