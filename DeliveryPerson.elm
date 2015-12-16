@@ -35,15 +35,17 @@ initial position =
 
 
 -- returns 0 to 7
-calculateDirection : (Float, Float) -> (Float, Float) -> Int
-calculateDirection destination source =
+calculateDirection : (Float, Float) -> Int
+calculateDirection vector =
   0
 
 
 direction : DeliveryPerson -> Int
 direction deliveryPerson =
   case deliveryPerson.route of
-    first :: rest -> calculateDirection (toFloat (fst first), toFloat (snd first)) deliveryPerson.position
+    first :: rest -> calculateDirection ( toFloat (fst first) - fst deliveryPerson.position
+                                        , toFloat (snd first) - snd deliveryPerson.position
+                                        )
     _ -> 0
 
 
