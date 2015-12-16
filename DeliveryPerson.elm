@@ -7,7 +7,7 @@ import Basics exposing (atan2)
 import Pathfinder exposing (find)
 import Time exposing (Time)
 import AnimationState exposing (animateObject, rotateFrames)
-import Debug
+import List exposing (head)
 
 
 onTheWaySprite : Sprite
@@ -40,7 +40,9 @@ animate time deliveryPerson =
     updateDeliveryPerson deliveryPerson =
       {deliveryPerson | frames = rotateFrames deliveryPerson.frames}
   in
-    animateObject 150 time updateDeliveryPerson deliveryPerson
+    case deliveryPerson.location of
+      OnTheWay -> animateObject 250 time updateDeliveryPerson deliveryPerson
+      _ -> deliveryPerson
 
 initial : (Int, Int) -> DeliveryPerson
 initial position =
@@ -77,7 +79,7 @@ render deliveryPerson =
             , floor (snd deliveryPerson.position)
             )
         , layer = 2
-        , frame = (direction deliveryPerson) * 3
+        , frame =  direction deliveryPerson * 3 + Maybe.withDefault 0 (head deliveryPerson.frames)
         , attributes = []
         }
       ]
@@ -115,5 +117,5 @@ navigateTo gridSize obstacles destination deliveryPerson =
     start = navigationStart deliveryPerson
   in
     { deliveryPerson |
-        route = Debug.log "path" 
+        route = []
     }
