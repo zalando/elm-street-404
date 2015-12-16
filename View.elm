@@ -9,6 +9,7 @@ import House
 import Warehouse
 import DeliveryPerson
 import Pathfinder
+import Inventory
 
 (=>) : a -> b -> (a, b)
 (=>) = (,)
@@ -20,7 +21,8 @@ boxes address model =
     DeliveryPerson.render model.deliveryPerson ::
     List.map (House.render address) model.houses ++
     List.map (Warehouse.render address) model.warehouses ++
-    List.map Obstacle.render model.obstacles
+    List.map Obstacle.render model.obstacles ++
+    [Inventory.render address model.articles]
   )
 
 
