@@ -51,8 +51,7 @@ inWarehouse warehouse article =
 
 
 inDelivery : Article -> Bool
-inDelivery article =
-  article.state == Picked
+inDelivery {state} = state == Picked
 
 
 dispatch : Warehouse -> Random.Seed -> (Article, Random.Seed)

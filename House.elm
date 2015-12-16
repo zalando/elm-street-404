@@ -70,7 +70,8 @@ render address house =
     , position = house.position
     , layer = layers.obstacle
     , frame = 0
-    , attributes = [onClick address (Actions.GoTo (round (fst house.position), round (snd house.position + snd house.size)))]
+    , attributes =
+      [ onClick address (Actions.GoTo (round (fst house.position), round (snd house.position + snd house.size))) ]
     }
   , { sprite = shadowSprite
     , position = house.position

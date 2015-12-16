@@ -52,7 +52,8 @@ render address warehouse =
     , position = warehouse.position
     , layer = layers.obstacle
     , frame = 0
-    , attributes = [onClick address (Actions.GoTo (round (fst warehouse.position) + 1, round (snd warehouse.position + snd warehouse.size)))]
+    , attributes =
+      [ onClick address (Actions.GoTo (round (fst warehouse.position) + 1, round (snd warehouse.position + snd warehouse.size))) ]
     }
   , { sprite = warehouseShadowSprite
     , position = warehouse.position

@@ -23,7 +23,7 @@ categorySprite =
   { size = (1, 1)
   , offset = (0, 0)
   , frames = 13
-  , src = "img/category.png"
+  , src = "img/categories.png"
   }
 
 

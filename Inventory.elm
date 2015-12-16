@@ -19,10 +19,10 @@ render : Signal.Address Action -> List Article -> List Sprite.Box
 render address articles =
   let
     renderArticle number article =
-      Category.render (toFloat number + 16, 13) article.category
+      Category.render (toFloat number + 2, 1) article.category
   in
     { sprite = bubbleSprite
-    , position = (16, 13)
+    , position = (0, 0)
     , layer = layers.bubble
     , frame = 0
     , attributes = []
