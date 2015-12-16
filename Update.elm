@@ -24,14 +24,11 @@ update action model =
         (Model.animate time animate model, Effects.tick Tick)
       else
         ({model | animationState = Nothing}, Effects.none)
-    ClickArticle article ->
-        (onArticleClick article model, Effects.none)
-    ClickHouse house ->
-        (onBuildingClick house model, Effects.none)
-    ClickWarehouse warehouse ->
-        (onBuildingClick warehouse model, Effects.none)
-    ClickRequest request ->
-        (onRequestClick request model, Effects.none)
+    -- ClickArticle article ->
+    --     (onArticleClick article model, Effects.none)
+    GoTo destination ->
+      (onGoTo destination model, Effects.none)
+      
 
 
 animate : Time -> Model -> Model
@@ -50,9 +47,9 @@ animateDeliveryPerson elapsed model =
   { model | deliveryPerson = DeliveryPerson.animate elapsed model.deliveryPerson }
 
 
-onBuildingClick : {a | position : (Int, Int), size : (Int, Int)} -> Model -> Model
-onBuildingClick {position, size} model =
-  Model.navigateTo (fst position, snd position + snd size) model
+onGoTo : (Int, Int) -> Model -> Model
+onGoTo destination model =
+  Model.navigateTo destination model
 
 
 onRequestClick : Request -> Model -> Model

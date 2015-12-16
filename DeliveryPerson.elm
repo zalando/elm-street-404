@@ -7,6 +7,7 @@ import Basics exposing (atan2)
 import Pathfinder exposing (find)
 import Time exposing (Time)
 import AnimationState exposing (animateObject, rotateFrames)
+import Debug
 
 
 onTheWaySprite : Sprite
@@ -45,7 +46,7 @@ initial : (Int, Int) -> DeliveryPerson
 initial position =
   { location = OnTheWay
   , position = (toFloat (fst position), toFloat (snd position))
-  , route = [(0, 0)]
+  , route = []
   , elapsed = 0
   , frames = [0, 1, 2]
   }
@@ -84,7 +85,28 @@ render deliveryPerson =
 
 
 navigationStart : DeliveryPerson -> (Int, Int)
-navigationStart deliveryPerson = (0, 0)
+navigationStart deliveryPerson =
+  Maybe.withDefault 
+    
+    (List.head deliveryPerson.route)
+
+
+appendPath : (Int, Int) -> List (Int, Int) -> List (Int, Int)
+appendPath start deliveryPerson
+  let
+    path = 
+  in
+    case deliverPerson.route of
+      [] ->
+        Pathfinder.find
+          gridSize
+          obstacles
+          ( round (fst deliveryPerson.position)
+          , round (snd deliveryPerson.position)
+          )
+          start
+          destination
+      first :: rest -> first :: path
 
 
 navigateTo : (Int, Int) -> List (Int, Int) -> (Int, Int) -> DeliveryPerson -> DeliveryPerson
@@ -93,5 +115,5 @@ navigateTo gridSize obstacles destination deliveryPerson =
     start = navigationStart deliveryPerson
   in
     { deliveryPerson |
-        route = Pathfinder.find gridSize obstacles start destination
+        route = Debug.log "path" 
     }

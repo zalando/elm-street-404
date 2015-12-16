@@ -1,5 +1,9 @@
 module House (House, house, render) where
+
 import Sprite exposing (Sprite)
+import Actions exposing (Action)
+import Html.Events exposing (onClick)
+
 
 type alias House =
   { position : (Int, Int)
@@ -59,13 +63,13 @@ house position =
   }
 
 
-render : House -> List Sprite.Box
-render house =
+render : Signal.Address Action -> House -> List Sprite.Box
+render address house =
   [ { sprite = sprite
     , position = house.position
     , layer = 2
     , frame = 0
-    , attributes = []
+    , attributes = [onClick address (Actions.GoTo (fst house.position, snd house.position + snd house.size))]
     }
   , { sprite = shadowSprite
     , position = house.position

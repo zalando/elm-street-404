@@ -12,12 +12,12 @@ import DeliveryPerson
 (=>) : a -> b -> (a, b)
 (=>) = (,)
 
-boxes : Model -> List Sprite.Box
-boxes model =
+boxes : Signal.Address Action -> Model -> List Sprite.Box
+boxes address model =
   List.concat (
     DeliveryPerson.render model.deliveryPerson ::
-    List.map House.render model.houses ++
-    List.map Warehouse.render model.warehouses ++
+    List.map (House.render address) model.houses ++
+    List.map (Warehouse.render address) model.warehouses ++
     List.map Obstacle.render model.obstacles
   )
 
@@ -33,5 +33,5 @@ view address model =
     , "background-size" => "960px 560px"
     ]
   ]
-  [ div [] (List.map (Sprite.render model.tileSize) (Sprite.sort (boxes model)))
+  [ div [] (List.map (Sprite.render model.tileSize) (Sprite.sort (boxes address model)))
   ]

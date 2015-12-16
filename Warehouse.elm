@@ -1,5 +1,8 @@
 module Warehouse (Warehouse, warehouse, render) where
+
 import Sprite exposing (Sprite)
+import Actions exposing (Action)
+import Html.Events exposing (onClick)
 
 
 type alias Warehouse =
@@ -42,13 +45,13 @@ warehouse position =
   }
 
 
-render : Warehouse -> List Sprite.Box
-render warehouse =
+render : Signal.Address Action -> Warehouse -> List Sprite.Box
+render address warehouse =
   [ { sprite = warehouseSprite
     , position = warehouse.position
     , layer = 2
     , frame = 0
-    , attributes = []
+    , attributes = [onClick address (Actions.GoTo (fst warehouse.position, snd warehouse.position + snd warehouse.size))]
     }
   , { sprite = warehouseShadowSprite
     , position = warehouse.position

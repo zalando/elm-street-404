@@ -241,6 +241,14 @@ astarIter grid obstacles open closed dest =
           in
             astarIter nextGrid obstacles nextOpen nextClosed dest
 
+
+clipFirst : List a -> List a
+clipFirst list =
+  case list of
+    [] -> []
+    _ :: rest -> rest
+
+
 astar : (Int, Int) -> List (Int, Int) -> (Int, Int) -> (Int, Int) -> List (Int, Int)
 astar gridSize obstacles start destination =
   let
@@ -252,3 +260,4 @@ astar gridSize obstacles start destination =
       []
     else
       List.reverse (astarIter grid obstacleNodes [toNode start] [] (toNode destination))
+      |> clipFirst
