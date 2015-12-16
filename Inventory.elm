@@ -3,6 +3,7 @@ import Article exposing (Article)
 import Sprite exposing (Sprite)
 import Actions exposing (Action)
 import Category
+import CategoryView
 import Layers exposing (layers)
 
 
@@ -21,7 +22,7 @@ render address articles =
     articlesInDelivery = List.filter Article.inDelivery articles
     placeholders = List.repeat (4 - List.length  articlesInDelivery) Category.Placeholder
     renderCategory number category =
-      Category.render (toFloat number + 2, 1) category
+      CategoryView.render (toFloat number + 2, 1) [] category
   in
     { sprite = bubbleSprite
     , position = (0, 0)

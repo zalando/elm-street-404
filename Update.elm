@@ -9,6 +9,7 @@ import Article exposing (State(..), Article)
 import Request
 import Obstacle exposing (Obstacle)
 import Request exposing (Request)
+import Debug
 
 update : Action -> Model -> (Model, Effects Action)
 update action model =
@@ -24,11 +25,11 @@ update action model =
         (Model.animate time animate model, Effects.tick Tick)
       else
         ({model | animationState = Nothing}, Effects.none)
-    -- ClickArticle article ->
-    --     (onArticleClick article model, Effects.none)
+    ClickArticle ->
+        Debug.log "asd" (model, Effects.none)
     GoTo destination ->
       (onGoTo destination model, Effects.none)
-      
+
 
 
 animate : Time -> Model -> Model
@@ -88,7 +89,7 @@ onArticleClick article model =
           else
             model
         Picked ->
-          if List.length (Article.filterInWarehouse warehouse' model.articles) < 6 then
+          if List.length (List.filter (Article.inWarehouse warehouse') model.articles) < 6 then
             {model | articles = Article.updateState (InStock warehouse') article model.articles}
           else
             model

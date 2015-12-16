@@ -49,7 +49,6 @@ render tileSize {sprite, position, frame, layer, attributes} =
        , "width" => (toString (width * tileSize) ++ "px")
        , "height" => (toString (height * tileSize) ++ "px")
        , "z-index" => (toString layer)
-       , "transform" => "translateZ(0)"
        ]
     ] ++ attributes)
     []
