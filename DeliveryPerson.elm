@@ -35,8 +35,8 @@ type alias DeliveryPerson =
   }
 
 
-animate: Time -> DeliveryPerson -> DeliveryPerson
-animate time deliveryPerson =
+pushThePedals : Time -> DeliveryPerson -> DeliveryPerson
+pushThePedals time deliveryPerson =
   let
     updateDeliveryPerson deliveryPerson =
       {deliveryPerson | frames = rotateFrames deliveryPerson.frames}
@@ -44,6 +44,9 @@ animate time deliveryPerson =
     case deliveryPerson.location of
       OnTheWay -> animateObject 250 time updateDeliveryPerson deliveryPerson
       _ -> deliveryPerson
+
+animate: Time -> DeliveryPerson -> DeliveryPerson
+animate time deliveryPerson = pushThePedals time deliveryPerson
 
 initial : (Int, Int) -> DeliveryPerson
 initial position =
