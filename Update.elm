@@ -11,6 +11,7 @@ import Obstacle exposing (Obstacle)
 import Request exposing (Request)
 import Debug
 
+
 update : Action -> Model -> (Model, Effects Action)
 update action model =
   case action of
@@ -26,7 +27,9 @@ update action model =
       else
         ({model | animationState = Nothing}, Effects.none)
     ClickArticle article ->
-        (onArticleClick (Debug.log "click" article) model, Effects.none)
+      (onArticleClick (Debug.log "ClickArticle" article) model, Effects.none)
+    ClickRequest request ->
+      (onRequestClick (Debug.log "ClickRequest" request) model, Effects.none)
     GoTo destination ->
       (onGoTo destination model, Effects.none)
 
@@ -54,7 +57,17 @@ onGoTo destination model =
 
 onRequestClick : Request -> Model -> Model
 onRequestClick request model =
-  model
+  case request of
+    Request.OrderRequest house category _ ->
+      let
+        -- find articles from the inventory with the same category
+        articles = List.filter (\a -> a.category == category && Article.inDelivery a) model.articles
+      in
+        case articles of
+          article :: _ -> onArticleClick article model
+          _ -> model
+    Request.ReturnRequest house article _ ->
+      onArticleClick article model
 
 
 onArticleClick : Article -> Model -> Model
@@ -64,16 +77,18 @@ onArticleClick article model =
       case article.state of
         AwaitingReturn house' ->
           if house' == house then
-            { model | requests = Request.removeReturns house article model.requests
-                    , articles = Article.updateState Picked article model.articles
+            { model
+            | requests = Request.removeReturns house article model.requests
+            , articles = Article.updateState Picked article model.articles
             }
           else
             model
         Picked ->
           if Request.hasOrder house article.category model.requests then
-            { model | requests = Request.removeOrders house article.category model.requests
-                    , articles = Article.removeDelivered house article.category model.articles
-                                |> Article.updateState (Delivered house) article
+            { model
+            | requests = Request.removeOrders house article.category model.requests
+            , articles = Article.removeDelivered house article.category model.articles
+                         |> Article.updateState (Delivered house) article
             }
           else
             model
