@@ -9,7 +9,7 @@ import HouseView
 import WarehouseView
 import DeliveryPerson
 import Pathfinder
-import Inventory
+import InventoryView
 
 (=>) : a -> b -> (a, b)
 (=>) = (,)
@@ -22,7 +22,7 @@ boxes address model =
     List.map (HouseView.render address model.requests) model.houses ++
     List.map (WarehouseView.render address model.articles) model.warehouses ++
     List.map Obstacle.render model.obstacles ++
-    [Inventory.render address model.articles]
+    [InventoryView.render address model.articles]
   )
 
 

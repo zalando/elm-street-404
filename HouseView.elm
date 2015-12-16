@@ -67,7 +67,10 @@ render address requests house =
   let
     requestsFromHouse = List.filter (Request.inHouse house) requests
     renderRequest number request =
-      CategoryView.render (fst house.position - 1, snd house.position - toFloat number) [] (Request.category request)
+      CategoryView.render
+        (fst house.position - 1, snd house.position - toFloat number)
+        [onClick address (Actions.ClickRequest request)]
+        (Request.category request)
     renderBubble =
       case getBubbleSprite (List.length requestsFromHouse) of
         Just sprite ->
@@ -85,7 +88,7 @@ render address requests house =
       , layer = layers.obstacle
       , frame = 0
       , attributes =
-        [ onClick address (Actions.GoTo (round (fst house.position), round (snd house.position + snd house.size))) ]
+        [ onClick address (Actions.ClickHouse house)]
       }
     , { sprite = shadowSprite
       , position = house.position

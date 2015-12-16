@@ -40,21 +40,31 @@ warehouseBubbleSprite =
 render : Signal.Address Action -> List Article -> Warehouse ->  List Sprite.Box
 render address articles warehouse =
   let
-    warehouseCoordinates = warehouse.position
+    (x, y) = warehouse.position
     articlesInWarehouse = List.filter (Article.inWarehouse warehouse) articles
-    placeholders = List.repeat (6 - List.length articlesInWarehouse) Category.Placeholder
+    numberOfArticles = List.length articlesInWarehouse
+    placeholders = List.repeat (6 - numberOfArticles) Category.Placeholder
     renderArticle number article =
       CategoryView.render
-        (toFloat (number % 2) + fst warehouseCoordinates - 1, toFloat (number // 2) + snd warehouseCoordinates - 2)
-        [onClick address Actions.ClickArticle]
+        ( toFloat (number % 2) + x - 1
+        , toFloat (number // 2) + y - 2
+        )
+        [onClick address (Actions.ClickArticle article)]
         article.category
+    renderCategory number category =
+      CategoryView.render
+        ( toFloat ((numberOfArticles + number) % 2) + x - 1
+        , toFloat ((numberOfArticles + number) // 2) + y - 2
+        )
+        []
+        category
   in
     [ { sprite = warehouseSprite
       , position = warehouse.position
       , layer = layers.obstacle
       , frame = 0
       , attributes =
-        [ onClick address (Actions.GoTo (round (fst warehouse.position) + 1, round (snd warehouse.position + snd warehouse.size))) ]
+        [ onClick address (Actions.ClickWarehouse warehouse) ]
       }
     , { sprite = warehouseShadowSprite
       , position = warehouse.position
@@ -68,4 +78,4 @@ render address articles warehouse =
       , frame = 0
       , attributes = []
       }
-    ] ++ List.indexedMap renderArticle (articlesInWarehouse)
+    ] ++ List.indexedMap renderArticle (articlesInWarehouse) ++ List.indexedMap renderCategory placeholders
