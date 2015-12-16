@@ -2,6 +2,7 @@ module Obstacle (Obstacle, animate, render, fountain, tree) where
 import Time exposing (Time)
 import AnimationState exposing (animateObject, rotateFrames)
 import Sprite
+import Layers exposing (layers)
 
 type Category = Fountain | Tree
 
@@ -52,14 +53,14 @@ animate time obstacle =
 
 type alias Obstacle =
   { category : Category
-  , position : (Int, Int)
-  , size : (Int, Int)
+  , position : (Float, Float)
+  , size : (Float, Float)
   , elapsed: Time
   , frames : List (Int)
   }
 
 
-fountain : (Int, Int) -> Obstacle
+fountain : (Float, Float) -> Obstacle
 fountain position =
   { category = Fountain
   , position = position
@@ -69,7 +70,7 @@ fountain position =
   }
 
 
-tree : (Int, Int) -> Obstacle
+tree : (Float, Float) -> Obstacle
 tree position =
   { category = Tree
   , position = position
@@ -85,19 +86,19 @@ render obstacle =
     Fountain ->
       [ { sprite = fountainSprite
         , position = obstacle.position
-        , layer = 2
+        , layer = layers.obstacle
         , frame = 0
         , attributes = []
         }
       , { sprite = fountainSpringSprite
         , position = obstacle.position
-        , layer = 3
+        , layer = layers.fountainSpring
         , frame = Maybe.withDefault 0 (List.head obstacle.frames)
         , attributes = []
         }
       , { sprite = fountainShadowSprite
         , position = obstacle.position
-        , layer = 1
+        , layer = layers.shadow
         , frame = 0
         , attributes = []
         }
@@ -105,7 +106,7 @@ render obstacle =
     Tree ->
       [ { sprite = treeSprite
         , position = obstacle.position
-        , layer = 2
+        , layer = layers.obstacle
         , frame = 0
         , attributes = []
         }

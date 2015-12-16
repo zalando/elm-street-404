@@ -3,11 +3,12 @@ module House (House, house, render) where
 import Sprite exposing (Sprite)
 import Actions exposing (Action)
 import Html.Events exposing (onClick)
+import Layers exposing (layers)
 
 
 type alias House =
-  { position : (Int, Int)
-  , size : (Int, Int)
+  { position : (Float, Float)
+  , size : (Float, Float)
   }
 
 
@@ -56,7 +57,7 @@ bubbleSprite3 =
   }
 
 
-house : (Int, Int) -> House
+house : (Float, Float) -> House
 house position =
   { position = position
   , size = (3, 2)
@@ -67,13 +68,14 @@ render : Signal.Address Action -> House -> List Sprite.Box
 render address house =
   [ { sprite = sprite
     , position = house.position
-    , layer = 2
+    , layer = layers.obstacle
     , frame = 0
-    , attributes = [onClick address (Actions.GoTo (fst house.position, snd house.position + snd house.size))]
+    , attributes =
+      [ onClick address (Actions.GoTo (round (fst house.position), round (snd house.position + snd house.size))) ]
     }
   , { sprite = shadowSprite
     , position = house.position
-    , layer = 1
+    , layer = layers.shadow
     , frame = 0
     , attributes = []
     }

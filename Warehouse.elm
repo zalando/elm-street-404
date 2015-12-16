@@ -3,11 +3,12 @@ module Warehouse (Warehouse, warehouse, render) where
 import Sprite exposing (Sprite)
 import Actions exposing (Action)
 import Html.Events exposing (onClick)
+import Layers exposing (layers)
 
 
 type alias Warehouse =
-  { position : (Int, Int)
-  , size : (Int, Int)
+  { position : (Float, Float)
+  , size : (Float, Float)
   }
 
 
@@ -38,10 +39,10 @@ warehouseBubbleSprite =
   }
 
 
-warehouse : (Int, Int) -> Warehouse
+warehouse : (Float, Float) -> Warehouse
 warehouse position =
   { position = position
-  , size = (3, 2)
+  , size = (3, 3)
   }
 
 
@@ -49,19 +50,20 @@ render : Signal.Address Action -> Warehouse -> List Sprite.Box
 render address warehouse =
   [ { sprite = warehouseSprite
     , position = warehouse.position
-    , layer = 2
+    , layer = layers.obstacle
     , frame = 0
-    , attributes = [onClick address (Actions.GoTo (fst warehouse.position, snd warehouse.position + snd warehouse.size))]
+    , attributes =
+      [ onClick address (Actions.GoTo (round (fst warehouse.position) + 1, round (snd warehouse.position + snd warehouse.size))) ]
     }
   , { sprite = warehouseShadowSprite
     , position = warehouse.position
-    , layer = 1
+    , layer = layers.shadow
     , frame = 0
     , attributes = []
     }
   , { sprite = warehouseBubbleSprite
     , position = warehouse.position
-    , layer = 3
+    , layer = layers.bubble
     , frame = 0
     , attributes = []
     }

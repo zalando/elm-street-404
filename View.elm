@@ -8,9 +8,12 @@ import Obstacle
 import House
 import Warehouse
 import DeliveryPerson
+import Pathfinder
+import Inventory
 
 (=>) : a -> b -> (a, b)
 (=>) = (,)
+
 
 boxes : Signal.Address Action -> Model -> List Sprite.Box
 boxes address model =
@@ -18,8 +21,10 @@ boxes address model =
     DeliveryPerson.render model.deliveryPerson ::
     List.map (House.render address) model.houses ++
     List.map (Warehouse.render address) model.warehouses ++
-    List.map Obstacle.render model.obstacles
+    List.map Obstacle.render model.obstacles ++
+    [Inventory.render address model.articles]
   )
+
 
 view : Signal.Address Action -> Model -> Html
 view address model =
@@ -33,5 +38,6 @@ view address model =
     , "background-size" => "960px 560px"
     ]
   ]
-  [ div [] (List.map (Sprite.render model.tileSize) (Sprite.sort (boxes address model)))
-  ]
+  ( Pathfinder.render model.gridSize model.tileSize model.deliveryPerson.route ::
+    List.map (Sprite.render model.tileSize) (Sprite.sort (boxes address model))
+  )

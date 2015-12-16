@@ -1,7 +1,8 @@
 module Request (..) where
 
 import House exposing (House)
-import Article exposing (Article, Category)
+import Article exposing (Article)
+import Category exposing (Category)
 import Time exposing (Time)
 
 

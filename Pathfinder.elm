@@ -7,11 +7,11 @@ import Astar exposing (astar)
 import Html exposing (div, Html)
 import Html.Attributes exposing (style)
 import Mouse
-import Debug
+import Layers exposing (layers)
 
 type alias Obstacle a =
-  { a | position : (Int, Int)
-      , size : (Int, Int)
+  { a | position : (Float, Float)
+      , size : (Float, Float)
   }
 
 obstacleRow : (Int, Int) -> Int -> Int -> List (Int, Int)
@@ -28,33 +28,16 @@ obstacleToTiles position size =
     _ -> obstacleRow position (fst size - 1) (snd size) ++
       obstacleToTiles position (fst size - 1, snd size)
 
+
+toIntTuple : (Float, Float) -> (Int, Int)
+toIntTuple (a, b) = (round a, round b)
+
 obstacleTiles : List (Obstacle a) -> List (Int, Int)
 obstacleTiles obstacles =
-  List.concat (List.map (\ {position, size} -> obstacleToTiles position size) obstacles)
+  List.concat (List.map (\ {position, size} -> obstacleToTiles (toIntTuple position) (toIntTuple size)) obstacles)
 
 find : (Int, Int) -> List (Int, Int) -> (Int, Int) -> (Int, Int) -> List (Int, Int)
-find gridSize obstacles start destination =
-  astar gridSize obstacles start destination
-  -- [ ( (fst destination - fst source) // 2 + fst source
-  --   , (snd destination - snd source) // 2 + snd source
-  --   )
-  -- , destination
-  -- ]
-
--- find gridSize obstacles source destination =
---   Debug.watch
---     "route"
---     [ ( (fst destination - fst source) // 4 + fst source
---       , (snd destination - snd source) // 4 + snd source
---       )
---     , ( (fst destination - fst source) // 2 + fst source
---       , (snd destination - snd source) // 2 + snd source
---       )
---     , ( (fst destination - fst source) // 4 * 3 + fst source
---       , (snd destination - snd source) // 4 * 3 + snd source
---       )
---     , destination
---     ]
+find = astar
 
 
 pointToSring : Int -> (Int, Int) -> String
@@ -90,25 +73,31 @@ renderObstacleTest tileSize position =
     ]
     []
 
-renderObstacle : Int -> Obstacle a -> Html
-renderObstacle tileSize obstacle =
-  rect
-    [ x (toString (fst obstacle.position * tileSize))
-    , y (toString (snd obstacle.position * tileSize))
-    , width (toString (fst obstacle.size * tileSize))
-    , height (toString (snd obstacle.size * tileSize))
-    , stroke "#9b8960"
-    , strokeWidth "2"
-    , fill "transparent"
-    ]
-    []
 
-
-render : Int -> List (Obstacle a) -> List (Int, Int) -> (Int, Int) -> Html
-render tileSize obstacles points source =
+render' : Int -> List (Obstacle a) -> List (Int, Int) -> (Int, Int) -> Html
+render' tileSize obstacles points source =
   svg
-    [version "1.1", viewBox "0 0 960 560"]
-    (renderPoints tileSize (source :: points) :: List.map (renderObstacleTest tileSize) (Debug.log "obstacles" (obstacleTiles obstacles)))
+    [ version "1.1"
+    , viewBox "0 0 960 560"
+    ]
+    ( renderPoints tileSize (source :: points) ::
+      List.map (renderObstacleTest tileSize) (obstacleTiles obstacles)
+    )
+
+
+render : (Int, Int) -> Int -> List (Int, Int) -> Html
+render (w, h) tileSize route =
+  svg
+    [ version "1.1"
+    , viewBox ("0 0 " ++ (toString (w * tileSize)) ++ " " ++ (toString (h * tileSize)))
+    , width (toString (w * tileSize))
+    , height (toString (h * tileSize))
+    , Html.Attributes.style
+      [ "z-index" => toString layers.route
+      , "position" => "absolute"
+      ]
+    ]
+    [ renderPoints tileSize route]
 
 
 (=>) : a -> b -> (a, b)
@@ -143,4 +132,4 @@ renderMain click =
       , "background-size" => "960px 560px"
       ]
     ]
-    [ render tileSize obstacles (find (36, 36) (obstacleTiles obstacles) source dest) source ]
+    [ render' tileSize obstacles (find (36, 36) (obstacleTiles obstacles) source dest) source ]

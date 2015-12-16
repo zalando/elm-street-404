@@ -8,7 +8,7 @@ import Time exposing (Time)
 import AnimationState exposing (animateObject, rotateFrames)
 import List exposing (head)
 import Pathfinder
-import Debug
+import Layers exposing (layers)
 
 
 onTheWaySprite : Sprite
@@ -78,11 +78,8 @@ render deliveryPerson =
   case deliveryPerson.location of
     OnTheWay ->
       [ { sprite = onTheWaySprite
-        , position =
-            ( floor (fst deliveryPerson.position)
-            , floor (snd deliveryPerson.position)
-            )
-        , layer = 2
+        , position = deliveryPerson.position
+        , layer = layers.deliveryPerson
         , frame =  direction deliveryPerson * 3 + Maybe.withDefault 0 (head deliveryPerson.frames)
         , attributes = []
         }
@@ -113,8 +110,8 @@ appendPath current new =
 
 navigateTo : (Int, Int) -> List (Int, Int) -> (Int, Int) -> DeliveryPerson -> DeliveryPerson
 navigateTo gridSize obstacles destination deliveryPerson =
-  { deliveryPerson |
-      route =
-        Debug.log "new path" (appendPath deliveryPerson.route
-          (findPath gridSize obstacles destination deliveryPerson))
+  { deliveryPerson
+  | route = appendPath
+      deliveryPerson.route
+      (findPath gridSize obstacles destination deliveryPerson)
   }

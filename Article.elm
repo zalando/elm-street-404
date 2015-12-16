@@ -1,9 +1,8 @@
-module Article (Article, State(..), Category(..), dispatch, updateState, removeDelivered, filterInWarehouse) where
+module Article (Article, State(..), dispatch, updateState, removeDelivered, filterInWarehouse, inDelivery) where
 import Random
-import Array
 import House exposing (House)
 import Warehouse exposing (Warehouse)
-
+import Category exposing (Category)
 
 type State
   = InStock Warehouse
@@ -12,22 +11,11 @@ type State
   | Picked
 
 
-type Category
-  = Pants Int
-  | Shirt Int
-  | Shoes Int
-  | Scarf Int
-
-
 type alias Article =
   { category : Category
   , state : State
   , id : Random.Seed
   }
-
-
-categories : Array.Array (Int -> Category)
-categories = Array.fromList [Pants, Shirt, Shoes, Scarf]
 
 
 removeDelivered : House -> Category -> List Article -> List Article
@@ -57,26 +45,23 @@ filterInWarehouse warehouse articles =
   List.filter (inWarehouse warehouse) articles
 
 
-filterInDelivery : List Article -> List Article
-filterInDelivery articles =
-  List.filter inDelivery articles
-
-
 inWarehouse : Warehouse -> Article -> Bool
 inWarehouse warehouse article =
   article.state == InStock warehouse
 
 
 inDelivery : Article -> Bool
-inDelivery article =
-  article.state == Picked
+inDelivery {state} = state == Picked
 
 
 dispatch : Warehouse -> Random.Seed -> (Article, Random.Seed)
 dispatch warehouse seed =
   let
-    (color, seed') = Random.generate (Random.int 0 3) seed
-    (categoryIndex, seed'') = Random.generate (Random.int 0 (Array.length categories)) seed'
-    category = (Maybe.withDefault Scarf (Array.get categoryIndex categories)) color
+    (category, seed') = Category.random seed
   in
-    ({category = category, state = InStock warehouse, id = seed}, seed'')
+    ( { category = category
+      , state = InStock warehouse
+      , id = seed
+      }
+    , seed'
+    )
