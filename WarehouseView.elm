@@ -42,12 +42,20 @@ render address articles warehouse =
   let
     warehouseCoordinates = warehouse.position
     articlesInWarehouse = List.filter (Article.inWarehouse warehouse) articles
-    placeholders = List.repeat (6 - List.length articlesInWarehouse) Category.Placeholder
+    numberOfArticles = List.length articlesInWarehouse
+    placeholders = List.repeat (6 - numberOfArticles) Category.Placeholder
     renderArticle number article =
       CategoryView.render
-        (toFloat (number % 2) + fst warehouseCoordinates - 1, toFloat (number // 2) + snd warehouseCoordinates - 2)
+        ( toFloat (number % 2) + fst warehouseCoordinates - 1
+        , toFloat (number // 2) + snd warehouseCoordinates - 2
+        )
         [onClick address Actions.ClickArticle]
         article.category
+    renderCategory number category =
+      CategoryView.render
+        (toFloat ((numberOfArticles + number) % 2) + fst warehouseCoordinates - 1, toFloat (( numberOfArticles + number) // 2) + snd warehouseCoordinates - 2)
+        []
+        category
   in
     [ { sprite = warehouseSprite
       , position = warehouse.position
@@ -68,4 +76,4 @@ render address articles warehouse =
       , frame = 0
       , attributes = []
       }
-    ] ++ List.indexedMap renderArticle (articlesInWarehouse)
+    ] ++ List.indexedMap renderArticle (articlesInWarehouse) ++ List.indexedMap renderCategory placeholders
