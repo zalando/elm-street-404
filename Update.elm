@@ -47,7 +47,7 @@ animateObstacles elapsed model =
 
 animateDeliveryPerson : Time -> Model -> Model
 animateDeliveryPerson elapsed model =
-  model
+  { model | deliveryPerson = DeliveryPerson.animate elapsed model.deliveryPerson }
 
 
 onBuildingClick : {a | position : (Int, Int), size : (Int, Int)} -> Model -> Model

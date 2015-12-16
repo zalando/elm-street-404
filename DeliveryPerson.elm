@@ -1,10 +1,12 @@
-module DeliveryPerson (DeliveryPerson, Location(..), initial, render, navigateTo) where
+module DeliveryPerson (DeliveryPerson, Location(..), initial, render, animate, navigateTo) where
 
 import House exposing (House)
 import Warehouse exposing (Warehouse)
 import Sprite exposing (Sprite)
 import Basics exposing (atan2)
 import Pathfinder exposing (find)
+import Time exposing (Time)
+import AnimationState exposing (animateObject, rotateFrames)
 
 
 onTheWaySprite : Sprite
@@ -26,14 +28,26 @@ type alias DeliveryPerson =
   { location : Location
   , position : (Float, Float)
   , route : List (Int, Int)
+  , elapsed: Time
+  , frames : List (Int)
   }
 
+
+animate: Time -> DeliveryPerson -> DeliveryPerson
+animate time deliveryPerson =
+  let
+    updateDeliveryPerson deliveryPerson =
+      {deliveryPerson | frames = rotateFrames deliveryPerson.frames}
+  in
+    animateObject 150 time updateDeliveryPerson deliveryPerson
 
 initial : (Int, Int) -> DeliveryPerson
 initial position =
   { location = OnTheWay
   , position = (toFloat (fst position), toFloat (snd position))
   , route = [(0, 0)]
+  , elapsed = 0
+  , frames = [0, 1, 2]
   }
 
 

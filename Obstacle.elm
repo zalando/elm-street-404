@@ -1,6 +1,6 @@
 module Obstacle (Obstacle, animate, render, fountain, tree) where
 import Time exposing (Time)
-import AnimationState exposing (animateObject)
+import AnimationState exposing (animateObject, rotateFrames)
 import Sprite
 
 type Category = Fountain | Tree
@@ -37,13 +37,6 @@ treeSprite =
   , frames = 1
   , src = "img/tree.png"
   }
-
-
-rotateFrames : List Int -> List Int
-rotateFrames frames =
-  case frames of
-    frame :: list -> list ++ [frame]
-    [] -> []
 
 
 animate : Time -> Obstacle -> Obstacle
