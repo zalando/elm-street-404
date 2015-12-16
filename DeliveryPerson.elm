@@ -45,8 +45,75 @@ pushThePedals time deliveryPerson =
       OnTheWay -> animateObject 250 time updateDeliveryPerson deliveryPerson
       _ -> deliveryPerson
 
+
+currentDestination : DeliveryPerson -> Maybe (Float, Float)
+currentDestination deliveryPerson =
+  case deliveryPerson.route of
+    [] -> Nothing
+    first :: _ -> Just (toFloat (fst first), toFloat (snd first))
+
+
+absValue : (Float, Float) -> Float
+absValue v = sqrt ((fst v) ^ 2 + (snd v) ^ 2)
+
+
+diff : (Float, Float) -> (Float, Float) -> (Float, Float)
+diff a b = ((fst a) - (fst b), (snd a) - (snd b))
+
+
+add : (Float, Float) -> (Float, Float) -> (Float, Float)
+add a b = ((fst a) + (fst b), (snd a) + (snd b))
+
+
+scale : Float -> (Float, Float) -> (Float, Float)
+scale a b = (a * (fst b), a * (snd b))
+
+
+speed : Float
+speed = 0.06
+
+
+clipFirst : List a -> List a
+clipFirst list =
+  case list of
+    [] -> []
+    _ :: rest -> rest
+
+
+moveToNext : Time -> (Float, Float) -> DeliveryPerson -> DeliveryPerson
+moveToNext time dest deliveryPerson =
+  let
+    maxDelta = diff dest deliveryPerson.position
+    absMax = absValue maxDelta
+    dvect = scale (1 / absMax) maxDelta
+    speedDelta = scale speed dvect
+    absSpeed = absValue speedDelta
+    actualDelta = if absSpeed > absMax then maxDelta else speedDelta
+    remainderTime = if absSpeed > absMax then time - time * absMax / absSpeed else 0
+    nextPosition = add deliveryPerson.position actualDelta
+    nextRoute = if absSpeed >= absMax then clipFirst deliveryPerson.route else deliveryPerson.route
+    updatedPerson =
+      { deliveryPerson
+      | position = nextPosition
+      , route = nextRoute
+      }
+  in
+    if remainderTime > 0 then
+      moveOnPath (Debug.log "remainder time" remainderTime) updatedPerson
+    else
+      updatedPerson
+
+
+moveOnPath : Time -> DeliveryPerson -> DeliveryPerson
+moveOnPath time deliveryPerson =
+  case currentDestination deliveryPerson of
+    Nothing -> deliveryPerson
+    Just d -> moveToNext time d deliveryPerson
+
+
 animate: Time -> DeliveryPerson -> DeliveryPerson
-animate time deliveryPerson = pushThePedals time deliveryPerson
+animate time deliveryPerson = pushThePedals time deliveryPerson |> moveOnPath time
+
 
 initial : (Int, Int) -> DeliveryPerson
 initial position =
