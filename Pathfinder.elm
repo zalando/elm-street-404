@@ -33,28 +33,7 @@ obstacleTiles obstacles =
   List.concat (List.map (\ {position, size} -> obstacleToTiles position size) obstacles)
 
 find : (Int, Int) -> List (Int, Int) -> (Int, Int) -> (Int, Int) -> List (Int, Int)
-find gridSize obstacles start destination =
-  astar gridSize obstacles start destination
-  -- [ ( (fst destination - fst source) // 2 + fst source
-  --   , (snd destination - snd source) // 2 + snd source
-  --   )
-  -- , destination
-  -- ]
-
--- find gridSize obstacles source destination =
---   Debug.watch
---     "route"
---     [ ( (fst destination - fst source) // 4 + fst source
---       , (snd destination - snd source) // 4 + snd source
---       )
---     , ( (fst destination - fst source) // 2 + fst source
---       , (snd destination - snd source) // 2 + snd source
---       )
---     , ( (fst destination - fst source) // 4 * 3 + fst source
---       , (snd destination - snd source) // 4 * 3 + snd source
---       )
---     , destination
---     ]
+find = astar
 
 
 pointToSring : Int -> (Int, Int) -> String
@@ -109,7 +88,10 @@ render (w, h) tileSize route =
     , viewBox ("0 0 " ++ (toString (w * tileSize)) ++ " " ++ (toString (h * tileSize)))
     , width (toString (w * tileSize))
     , height (toString (h * tileSize))
-    , Html.Attributes.style ["z-index" => toString layers.route, "position" => "absolute"]
+    , Html.Attributes.style
+      [ "z-index" => toString layers.route
+      , "position" => "absolute"
+      ]
     ]
     [ renderPoints tileSize route]
 
