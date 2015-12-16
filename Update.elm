@@ -9,7 +9,7 @@ import Article exposing (State(..), Article)
 import Request
 import Obstacle exposing (Obstacle)
 import Request exposing (Request)
-
+import Debug
 
 update : Action -> Model -> (Model, Effects Action)
 update action model =
@@ -26,7 +26,7 @@ update action model =
       else
         ({model | animationState = Nothing}, Effects.none)
     ClickArticle article ->
-        (onArticleClick article model, Effects.none)
+        (onArticleClick (Debug.log "click" article) model, Effects.none)
     GoTo destination ->
       (onGoTo destination model, Effects.none)
 
