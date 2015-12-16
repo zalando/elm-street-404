@@ -18,12 +18,14 @@ bubbleSprite =
 render : Signal.Address Action -> List Article -> List Sprite.Box
 render address articles =
   let
-    renderArticle number article =
-      Category.render (toFloat number + 2, 1) article.category
+    articlesInDelivery = List.filter Article.inDelivery articles
+    placeholders = List.repeat (4 - List.length  articlesInDelivery) Category.Placeholder
+    renderCategory number category =
+      Category.render (toFloat number + 2, 1) category
   in
     { sprite = bubbleSprite
     , position = (0, 0)
     , layer = layers.bubble
     , frame = 0
     , attributes = []
-    } :: List.indexedMap renderArticle (List.filter Article.inDelivery articles)
+    } :: List.indexedMap renderCategory (List.map .category articlesInDelivery ++ placeholders)
