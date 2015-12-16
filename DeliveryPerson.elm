@@ -31,14 +31,13 @@ initial : (Int, Int) -> DeliveryPerson
 initial position =
   { location = OnTheWay
   , position = (toFloat (fst position), toFloat (snd position))
-  , route = []
+  , route = [(0, 0)]
   }
 
 
 calculateDirection : (Float, Float) -> Int
 calculateDirection (x, y) =
-  (10 - floor (atan2 y x * 4 / pi)) % 8
-
+  (2 + round (atan2 y x * 4 / pi)) % 8
 
 
 direction : DeliveryPerson -> Int
@@ -49,7 +48,6 @@ direction deliveryPerson =
       , toFloat (snd first) - snd deliveryPerson.position
       )
     _ -> 0
-
 
 
 render : DeliveryPerson -> List Sprite.Box
