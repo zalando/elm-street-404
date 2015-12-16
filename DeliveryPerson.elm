@@ -44,8 +44,8 @@ pushThePedals time deliveryPerson =
       {deliveryPerson | frames = rotateFrames deliveryPerson.frames}
   in
     case deliveryPerson.location of
-      OnTheWayToHouse _ -> animateObject 250 time updateDeliveryPerson deliveryPerson
-      OnTheWayToWarehouse _ -> animateObject 250 time updateDeliveryPerson deliveryPerson
+      OnTheWayToHouse _ -> animateObject 125 time updateDeliveryPerson deliveryPerson
+      OnTheWayToWarehouse _ -> animateObject 125 time updateDeliveryPerson deliveryPerson
       _ -> deliveryPerson
 
 
