@@ -16,6 +16,13 @@ type Request
   | ReturnRequest House Article RequestData
 
 
+category : Request -> Category
+category request =
+  case request of
+    OrderRequest _ category _ -> category
+    ReturnRequest _ {category} _ -> category
+
+
 removeReturns : House -> Article -> List Request -> List Request
 removeReturns house article requests =
   {- TODO: remove only the first occurence -}
