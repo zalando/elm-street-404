@@ -6,7 +6,7 @@ import Model exposing (Model)
 import Sprite
 import Obstacle
 import House
-import Warehouse
+import WarehouseView
 import DeliveryPerson
 import Pathfinder
 import Inventory
@@ -20,7 +20,7 @@ boxes address model =
   List.concat (
     DeliveryPerson.render model.deliveryPerson ::
     List.map (House.render address) model.houses ++
-    List.map (Warehouse.render address) model.warehouses ++
+    List.map (WarehouseView.render address model.articles) model.warehouses ++
     List.map Obstacle.render model.obstacles ++
     [Inventory.render address model.articles]
   )

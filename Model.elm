@@ -42,6 +42,10 @@ initial =
       , state = Article.Picked
       , id = Random.initialSeed 0
       }
+    , fst (Article.dispatch (Warehouse.warehouse (19, 4)) (Random.initialSeed 2))
+    , fst (Article.dispatch (Warehouse.warehouse (19, 4)) (Random.initialSeed 3))
+    , fst (Article.dispatch (Warehouse.warehouse (19, 4)) (Random.initialSeed 5))
+    , fst (Article.dispatch (Warehouse.warehouse (1, 10)) (Random.initialSeed 1))
     ]
   , requests = []
   , obstacles = [ Obstacle.fountain (10, 5)

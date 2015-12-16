@@ -1,4 +1,4 @@
-module Article (Article, State(..), dispatch, updateState, removeDelivered, filterInWarehouse, inDelivery) where
+module Article (Article, State(..), dispatch, updateState, removeDelivered, inWarehouse, inDelivery) where
 import Random
 import House exposing (House)
 import Warehouse exposing (Warehouse)
@@ -38,11 +38,6 @@ updateState state article articles =
         article'
   in
     List.map update articles
-
-
-filterInWarehouse : Warehouse -> List Article -> List Article
-filterInWarehouse warehouse articles =
-  List.filter (inWarehouse warehouse) articles
 
 
 inWarehouse : Warehouse -> Article -> Bool
