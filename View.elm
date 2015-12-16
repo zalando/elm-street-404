@@ -25,10 +25,10 @@ view : Signal.Address Action -> Model -> Html
 view address model =
   div
   [ style
-    [ "height" => (toString (model.gridSize * snd model.tileSize) ++ "px")
+    [ "height" => (toString (snd model.gridSize * model.tileSize) ++ "px")
     , "margin" => "auto"
     , "position" => "relative"
-    , "width" => (toString (model.gridSize * fst model.tileSize) ++ "px")
+    , "width" => (toString (fst model.gridSize * model.tileSize) ++ "px")
     , "background-image" => "url(img/bg-grid.jpg)"
     , "background-size" => "960px 560px"
     ]

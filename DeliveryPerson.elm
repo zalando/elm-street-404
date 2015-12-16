@@ -4,7 +4,6 @@ import House exposing (House)
 import Warehouse exposing (Warehouse)
 import Sprite exposing (Sprite)
 import Basics exposing (atan2)
-import Pathfinder exposing (find)
 import Time exposing (Time)
 import AnimationState exposing (animateObject, rotateFrames)
 import List exposing (head)
@@ -88,7 +87,7 @@ render deliveryPerson =
 
 navigationStart : DeliveryPerson -> (Int, Int)
 navigationStart deliveryPerson =
-  Maybe.withDefault 
+  Maybe.withDefault
     ( round (fst deliveryPerson.position)
     , round (snd deliveryPerson.position)
     )
