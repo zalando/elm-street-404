@@ -39,11 +39,17 @@ update action model =
 animate : Time -> Model -> Model
 animate elapsed model =
   model |> animateObstacles elapsed
+        |> animateDeliveryPerson elapsed
 
 
 animateObstacles : Time -> Model -> Model
 animateObstacles elapsed model =
   { model | obstacles = List.map (Obstacle.animate elapsed) model.obstacles }
+
+
+animateDeliveryPerson : Time -> Model -> Model
+animateDeliveryPerson elapsed model =
+  model
 
 
 -- calculate the route
