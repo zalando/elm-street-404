@@ -6,7 +6,6 @@ import Time exposing (Time)
 import Random
 import DeliveryPerson exposing (Location(..))
 import Article exposing (State(..), Article)
-import Request
 import Obstacle exposing (Obstacle)
 import Request exposing (Request)
 import Debug
@@ -30,8 +29,10 @@ update action model =
       (onArticleClick (Debug.log "ClickArticle" article) model, Effects.none)
     ClickRequest request ->
       (onRequestClick (Debug.log "ClickRequest" request) model, Effects.none)
-    GoTo destination ->
-      (onGoTo destination model, Effects.none)
+    ClickWarehouse warehouse ->
+      (Model.navigateToWarehouse warehouse model, Effects.none)
+    ClickHouse house ->
+      (Model.navigateToHouse house model, Effects.none)
 
 
 animate : Time -> Model -> Model
@@ -48,11 +49,6 @@ animateObstacles elapsed model =
 animateDeliveryPerson : Time -> Model -> Model
 animateDeliveryPerson elapsed model =
   { model | deliveryPerson = DeliveryPerson.animate elapsed model.deliveryPerson }
-
-
-onGoTo : (Int, Int) -> Model -> Model
-onGoTo destination model =
-  Model.navigateTo destination model
 
 
 onRequestClick : Request -> Model -> Model
@@ -109,4 +105,4 @@ onArticleClick article model =
             model
         _ -> model
 
-    OnTheWay -> model
+    _ -> model

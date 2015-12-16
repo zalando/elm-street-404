@@ -88,7 +88,7 @@ render address requests house =
       , layer = layers.obstacle
       , frame = 0
       , attributes =
-        [ onClick address (Actions.GoTo (round (fst house.position), round (snd house.position + snd house.size))) ]
+        [ onClick address (Actions.ClickHouse house)]
       }
     , { sprite = shadowSprite
       , position = house.position

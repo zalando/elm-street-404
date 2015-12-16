@@ -23,7 +23,9 @@ onTheWaySprite =
 type Location
   = AtHouse House
   | AtWarehouse Warehouse
-  | OnTheWay
+  | OnTheWayToHouse House
+  | OnTheWayToWarehouse Warehouse
+  | Initial
 
 
 type alias DeliveryPerson =
@@ -42,7 +44,8 @@ pushThePedals time deliveryPerson =
       {deliveryPerson | frames = rotateFrames deliveryPerson.frames}
   in
     case deliveryPerson.location of
-      OnTheWay -> animateObject 250 time updateDeliveryPerson deliveryPerson
+      OnTheWayToHouse _ -> animateObject 250 time updateDeliveryPerson deliveryPerson
+      OnTheWayToWarehouse _ -> animateObject 250 time updateDeliveryPerson deliveryPerson
       _ -> deliveryPerson
 
 
@@ -80,6 +83,17 @@ clipFirst list =
     _ :: rest -> rest
 
 
+nextLocation : List (Int, Int) -> Location -> Location
+nextLocation route location =
+  case route of
+    [] ->
+      case location of
+        OnTheWayToHouse house -> AtHouse house
+        OnTheWayToWarehouse warehouse -> AtWarehouse warehouse
+        _ -> location
+    _ -> location
+
+
 moveToNext : Time -> (Float, Float) -> DeliveryPerson -> DeliveryPerson
 moveToNext time dest deliveryPerson =
   let
@@ -95,6 +109,7 @@ moveToNext time dest deliveryPerson =
     updatedPerson =
       { deliveryPerson
       | position = nextPosition
+      , location = nextLocation nextRoute deliveryPerson.location
       , route = nextRoute
       }
   in
@@ -117,7 +132,7 @@ animate time deliveryPerson = pushThePedals time deliveryPerson |> moveOnPath ti
 
 initial : (Int, Int) -> DeliveryPerson
 initial position =
-  { location = OnTheWay
+  { location = Initial
   , position = (toFloat (fst position), toFloat (snd position))
   , route = []
   , elapsed = 0
@@ -142,16 +157,20 @@ direction deliveryPerson =
 
 render : DeliveryPerson -> List Sprite.Box
 render deliveryPerson =
-  case deliveryPerson.location of
-    OnTheWay ->
-      [ { sprite = onTheWaySprite
-        , position = deliveryPerson.position
-        , layer = layers.deliveryPerson
-        , frame =  direction deliveryPerson * 3 + Maybe.withDefault 0 (head deliveryPerson.frames)
-        , attributes = []
-        }
-      ]
-    _ -> []
+  let
+    box =
+    [ { sprite = onTheWaySprite
+      , position = deliveryPerson.position
+      , layer = layers.deliveryPerson
+      , frame = direction deliveryPerson * 3 + Maybe.withDefault 0 (head deliveryPerson.frames)
+      , attributes = []
+      }
+    ]
+  in
+    case deliveryPerson.location of
+      OnTheWayToHouse _ -> box
+      OnTheWayToWarehouse _ -> box
+      _ -> box
 
 
 navigationStart : DeliveryPerson -> (Int, Int)
@@ -175,10 +194,11 @@ appendPath current new =
     first :: rest -> first :: new
 
 
-navigateTo : (Int, Int) -> List (Int, Int) -> (Int, Int) -> DeliveryPerson -> DeliveryPerson
-navigateTo gridSize obstacles destination deliveryPerson =
+navigateTo : Location -> (Int, Int) -> List (Int, Int) -> (Int, Int) -> DeliveryPerson -> DeliveryPerson
+navigateTo location gridSize obstacles destination deliveryPerson =
   { deliveryPerson
-  | route = appendPath
+  | location = location
+  , route = appendPath
       deliveryPerson.route
       (findPath gridSize obstacles destination deliveryPerson)
   }

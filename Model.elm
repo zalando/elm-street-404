@@ -1,4 +1,4 @@
-module Model (Model, initial, animate, navigateTo, State(..)) where
+module Model (Model, initial, animate, navigateToWarehouse, navigateToHouse, State(..)) where
 
 import Random
 import Time exposing (Time)
@@ -78,10 +78,33 @@ modelObstacles model =
   obstacleTiles model.warehouses
 
 
-navigateTo : (Int, Int) -> Model -> Model
-navigateTo destination model =
+
+placeToLocation : {a | position : (Float, Float), size : (Float, Float )} -> (Int, Int)
+placeToLocation {position, size} =
+  (round (fst position), round (snd position + snd size))
+
+
+navigateToWarehouse : Warehouse -> Model -> Model
+navigateToWarehouse warehouse model =
+  navigateTo
+    (DeliveryPerson.OnTheWayToWarehouse warehouse)
+    (placeToLocation warehouse)
+    model
+
+
+navigateToHouse : House -> Model -> Model
+navigateToHouse house model =
+  navigateTo
+    (DeliveryPerson.OnTheWayToWarehouse house)
+    (placeToLocation house)
+    model
+
+
+navigateTo : DeliveryPerson.Location -> (Int, Int) -> Model -> Model
+navigateTo location destination model =
   { model |
       deliveryPerson = DeliveryPerson.navigateTo
+        location
         model.gridSize
         (modelObstacles model)
         destination

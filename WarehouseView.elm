@@ -64,7 +64,7 @@ render address articles warehouse =
       , layer = layers.obstacle
       , frame = 0
       , attributes =
-        [ onClick address (Actions.GoTo (round x + 1, round (y + snd warehouse.size))) ]
+        [ onClick address (Actions.ClickWarehouse warehouse) ]
       }
     , { sprite = warehouseShadowSprite
       , position = warehouse.position
