@@ -7,8 +7,8 @@ import Layers exposing (layers)
 
 
 type alias Warehouse =
-  { position : (Int, Int)
-  , size : (Int, Int)
+  { position : (Float, Float)
+  , size : (Float, Float)
   }
 
 
@@ -39,7 +39,7 @@ warehouseBubbleSprite =
   }
 
 
-warehouse : (Int, Int) -> Warehouse
+warehouse : (Float, Float) -> Warehouse
 warehouse position =
   { position = position
   , size = (3, 3)
@@ -52,7 +52,7 @@ render address warehouse =
     , position = warehouse.position
     , layer = layers.obstacle
     , frame = 0
-    , attributes = [onClick address (Actions.GoTo (fst warehouse.position + 1, snd warehouse.position + snd warehouse.size))]
+    , attributes = [onClick address (Actions.GoTo (round (fst warehouse.position) + 1, round (snd warehouse.position + snd warehouse.size)))]
     }
   , { sprite = warehouseShadowSprite
     , position = warehouse.position

@@ -7,8 +7,8 @@ import Layers exposing (layers)
 
 
 type alias House =
-  { position : (Int, Int)
-  , size : (Int, Int)
+  { position : (Float, Float)
+  , size : (Float, Float)
   }
 
 
@@ -57,7 +57,7 @@ bubbleSprite3 =
   }
 
 
-house : (Int, Int) -> House
+house : (Float, Float) -> House
 house position =
   { position = position
   , size = (3, 2)
@@ -70,7 +70,7 @@ render address house =
     , position = house.position
     , layer = layers.obstacle
     , frame = 0
-    , attributes = [onClick address (Actions.GoTo (fst house.position, snd house.position + snd house.size))]
+    , attributes = [onClick address (Actions.GoTo (round (fst house.position), round (snd house.position + snd house.size)))]
     }
   , { sprite = shadowSprite
     , position = house.position

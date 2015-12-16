@@ -75,10 +75,7 @@ render deliveryPerson =
   case deliveryPerson.location of
     OnTheWay ->
       [ { sprite = onTheWaySprite
-        , position =
-            ( floor (fst deliveryPerson.position)
-            , floor (snd deliveryPerson.position)
-            )
+        , position = deliveryPerson.position
         , layer = layers.deliveryPerson
         , frame =  direction deliveryPerson * 3 + Maybe.withDefault 0 (head deliveryPerson.frames)
         , attributes = []

@@ -3,17 +3,16 @@ import Html.Attributes exposing (style)
 import Html exposing (div)
 
 
-
 type alias Sprite =
   { size : (Int, Int)
-  , offset : (Int, Int)
+  , offset : (Float, Float)
   , frames : Int
   , src : String
   }
 
 
 type alias Box =
-  { position : (Int, Int)
+  { position : (Float, Float)
   , sprite : Sprite
   , frame : Int
   , layer : Int
@@ -31,27 +30,26 @@ sort boxes =
 
 
 render : Int -> Box -> Html.Html
-render tileSize box =
+render tileSize {sprite, position, frame, layer, attributes} =
   let
-    (width, height) = box.sprite.size
-    (left, top) = ( fst box.position + fst box.sprite.offset
-                  , snd box.position + snd box.sprite.offset
-                  )
+    (width, height) = sprite.size
+    left = round ((fst position + fst sprite.offset) * toFloat tileSize)
+    top = round ((snd position + snd sprite.offset) * toFloat tileSize)
   in
     div
     ([ style
-       [ "left" => (toString (left * tileSize) ++ "px")
-       , "top" => (toString (top * tileSize) ++ "px")
+       [ "left" => (toString left ++ "px")
+       , "top" => (toString top ++ "px")
        , "position" => "absolute"
        , "overflow" => "hidden"
-       , "background-image" => ("url(" ++ box.sprite.src ++ ")")
-       , "background-position" => (toString (-box.frame * width * tileSize) ++ "px 0")
+       , "background-image" => ("url(" ++ sprite.src ++ ")")
+       , "background-position" => (toString (-frame * width * tileSize) ++ "px 0")
        , "background-repeat" => "no-repeat"
-       , "background-size" => (toString (width * box.sprite.frames * tileSize) ++ "px " ++ (toString (height * tileSize)) ++ "px")
+       , "background-size" => (toString (width * sprite.frames * tileSize) ++ "px " ++ (toString (height * tileSize)) ++ "px")
        , "width" => (toString (width * tileSize) ++ "px")
        , "height" => (toString (height * tileSize) ++ "px")
-       , "z-index" => (toString box.layer)
+       , "z-index" => (toString layer)
        , "transform" => "translateZ(0)"
        ]
-    ] ++ box.attributes)
+    ] ++ attributes)
     []

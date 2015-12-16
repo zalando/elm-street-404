@@ -10,8 +10,8 @@ import Mouse
 import Layers exposing (layers)
 
 type alias Obstacle a =
-  { a | position : (Int, Int)
-      , size : (Int, Int)
+  { a | position : (Float, Float)
+      , size : (Float, Float)
   }
 
 obstacleRow : (Int, Int) -> Int -> Int -> List (Int, Int)
@@ -28,9 +28,13 @@ obstacleToTiles position size =
     _ -> obstacleRow position (fst size - 1) (snd size) ++
       obstacleToTiles position (fst size - 1, snd size)
 
+
+toIntTuple : (Float, Float) -> (Int, Int)
+toIntTuple (a, b) = (round a, round b)
+
 obstacleTiles : List (Obstacle a) -> List (Int, Int)
 obstacleTiles obstacles =
-  List.concat (List.map (\ {position, size} -> obstacleToTiles position size) obstacles)
+  List.concat (List.map (\ {position, size} -> obstacleToTiles (toIntTuple position) (toIntTuple size)) obstacles)
 
 find : (Int, Int) -> List (Int, Int) -> (Int, Int) -> (Int, Int) -> List (Int, Int)
 find = astar

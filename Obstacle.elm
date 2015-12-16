@@ -53,14 +53,14 @@ animate time obstacle =
 
 type alias Obstacle =
   { category : Category
-  , position : (Int, Int)
-  , size : (Int, Int)
+  , position : (Float, Float)
+  , size : (Float, Float)
   , elapsed: Time
   , frames : List (Int)
   }
 
 
-fountain : (Int, Int) -> Obstacle
+fountain : (Float, Float) -> Obstacle
 fountain position =
   { category = Fountain
   , position = position
@@ -70,7 +70,7 @@ fountain position =
   }
 
 
-tree : (Int, Int) -> Obstacle
+tree : (Float, Float) -> Obstacle
 tree position =
   { category = Tree
   , position = position
