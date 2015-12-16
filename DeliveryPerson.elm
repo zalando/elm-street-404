@@ -7,6 +7,8 @@ import Basics exposing (atan2)
 import Time exposing (Time)
 import AnimationState exposing (animateObject, rotateFrames)
 import List exposing (head)
+import Pathfinder
+import Debug
 
 
 onTheWaySprite : Sprite
@@ -95,7 +97,8 @@ navigationStart deliveryPerson =
 
 
 findPath : (Int, Int) -> List (Int, Int) -> (Int, Int) -> DeliveryPerson -> List (Int, Int)
-findPath gridSize obstacles destination deliveryPerson = []
+findPath gridSize obstacles destination deliveryPerson =
+  Pathfinder.find gridSize obstacles (navigationStart deliveryPerson) destination
 
 
 appendPath : List (Int, Int) -> List (Int, Int) -> List (Int, Int)
@@ -109,6 +112,6 @@ navigateTo : (Int, Int) -> List (Int, Int) -> (Int, Int) -> DeliveryPerson -> De
 navigateTo gridSize obstacles destination deliveryPerson =
   { deliveryPerson |
       route =
-        appendPath deliveryPerson.route
-          (findPath gridSize obstacles destination deliveryPerson)
+        Debug.log "new path" (appendPath deliveryPerson.route
+          (findPath gridSize obstacles destination deliveryPerson))
   }
