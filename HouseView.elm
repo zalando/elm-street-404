@@ -6,7 +6,7 @@ import Layers exposing (layers)
 import Sprite exposing (Sprite)
 import House exposing (House)
 import Request exposing (Request)
-import Category
+import CategoryView
 
 sprite : Sprite
 sprite =
@@ -67,7 +67,7 @@ render address requests house =
   let
     requestsFromHouse = List.filter (Request.inHouse house) requests
     renderRequest number request =
-      Category.render (fst house.position - 1, snd house.position - toFloat number) (Request.category request)
+      CategoryView.render (fst house.position - 1, snd house.position - toFloat number) [] (Request.category request)
     renderBubble =
       case getBubbleSprite (List.length requestsFromHouse) of
         Just sprite ->
