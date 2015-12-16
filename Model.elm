@@ -78,10 +78,11 @@ modelObstacles model =
   obstacleTiles model.warehouses
 
 
-
 placeToLocation : {a | position : (Float, Float), size : (Float, Float )} -> (Int, Int)
 placeToLocation {position, size} =
-  (round (fst position), round (snd position + snd size))
+  ( round (fst position + snd size / 2 - 1)
+  , round (snd position + snd size)
+  )
 
 
 navigateToWarehouse : Warehouse -> Model -> Model
