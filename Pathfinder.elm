@@ -128,6 +128,8 @@ renderMain click =
       [ {position = (3, 5), size = (3, 3)}
       , {position = (9, 6), size = (3, 3)}
       , {position = (15, 6), size = (3, 3)}
+      , {position = (5, 2), size = (1, 3)}
+      , {position = (3, 1), size = (3, 1)}
       ]
     source = (1, 1)
   in
