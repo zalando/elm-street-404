@@ -89,33 +89,27 @@ render deliveryPerson =
 navigationStart : DeliveryPerson -> (Int, Int)
 navigationStart deliveryPerson =
   Maybe.withDefault 
-    
+    ( round (fst deliveryPerson.position)
+    , round (snd deliveryPerson.position)
+    )
     (List.head deliveryPerson.route)
 
 
-appendPath : (Int, Int) -> List (Int, Int) -> List (Int, Int)
-appendPath start deliveryPerson
-  let
-    path = 
-  in
-    case deliverPerson.route of
-      [] ->
-        Pathfinder.find
-          gridSize
-          obstacles
-          ( round (fst deliveryPerson.position)
-          , round (snd deliveryPerson.position)
-          )
-          start
-          destination
-      first :: rest -> first :: path
+findPath : (Int, Int) -> List (Int, Int) -> (Int, Int) -> DeliveryPerson -> List (Int, Int)
+findPath gridSize obstacles destination deliveryPerson = []
+
+
+appendPath : List (Int, Int) -> List (Int, Int) -> List (Int, Int)
+appendPath current new =
+  case current of
+    [] -> new
+    first :: rest -> first :: new
 
 
 navigateTo : (Int, Int) -> List (Int, Int) -> (Int, Int) -> DeliveryPerson -> DeliveryPerson
 navigateTo gridSize obstacles destination deliveryPerson =
-  let
-    start = navigationStart deliveryPerson
-  in
-    { deliveryPerson |
-        route = []
-    }
+  { deliveryPerson |
+      route =
+        appendPath deliveryPerson.route
+          (findPath gridSize obstacles destination deliveryPerson)
+  }
