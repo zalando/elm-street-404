@@ -7,7 +7,6 @@ import Astar exposing (astar)
 import Html exposing (div, Html)
 import Html.Attributes exposing (style)
 import Mouse
-import Debug
 import Layers exposing (layers)
 
 type alias Obstacle a =
@@ -95,8 +94,12 @@ renderObstacleTest tileSize position =
 render' : Int -> List (Obstacle a) -> List (Int, Int) -> (Int, Int) -> Html
 render' tileSize obstacles points source =
   svg
-    [version "1.1", viewBox "0 0 960 560"]
-    (renderPoints tileSize (source :: points) :: List.map (renderObstacleTest tileSize) (Debug.log "obstacles" (obstacleTiles obstacles)))
+    [ version "1.1"
+    , viewBox "0 0 960 560"
+    ]
+    ( renderPoints tileSize (source :: points) ::
+      List.map (renderObstacleTest tileSize) (obstacleTiles obstacles)
+    )
 
 
 render : (Int, Int) -> Int -> List (Int, Int) -> Html

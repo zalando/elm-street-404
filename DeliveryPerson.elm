@@ -8,7 +8,6 @@ import Time exposing (Time)
 import AnimationState exposing (animateObject, rotateFrames)
 import List exposing (head)
 import Pathfinder
-import Debug
 import Layers exposing (layers)
 
 
@@ -111,8 +110,8 @@ appendPath current new =
 
 navigateTo : (Int, Int) -> List (Int, Int) -> (Int, Int) -> DeliveryPerson -> DeliveryPerson
 navigateTo gridSize obstacles destination deliveryPerson =
-  { deliveryPerson |
-      route =
-        Debug.log "new path" (appendPath deliveryPerson.route
-          (findPath gridSize obstacles destination deliveryPerson))
+  { deliveryPerson
+  | route = appendPath
+      deliveryPerson.route
+      (findPath gridSize obstacles destination deliveryPerson)
   }
