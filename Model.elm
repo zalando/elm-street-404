@@ -37,25 +37,37 @@ initial =
   , tileSize = 40
   , gridSize = (24, 14)
   , deliveryPerson = DeliveryPerson.initial (10, 10)
-  , articles = [
-      { category = fst (Category.random (Random.initialSeed 0))
+  , articles =
+    [ { category = fst (Category.random (Random.initialSeed 0))
       , state = Article.Picked
       , id = Random.initialSeed 0
       }
+    , fst (Article.dispatch (Warehouse.warehouse (19, 4)) (Random.initialSeed 2))
+    , fst (Article.dispatch (Warehouse.warehouse (19, 4)) (Random.initialSeed 3))
+    , fst (Article.dispatch (Warehouse.warehouse (19, 4)) (Random.initialSeed 5))
+    , fst (Article.dispatch (Warehouse.warehouse (1, 10)) (Random.initialSeed 1))
     ]
-  , requests = []
-  , obstacles = [ Obstacle.fountain (10, 5)
-                , Obstacle.fountain (20, 1)
-                , Obstacle.tree (1, 5)
-                , Obstacle.tree (15, 3)
-                ]
-  , houses = [ House.house (8, 10)
-             , House.house (12, 7)
-             , House.house (4, 3)
-             ]
-  , warehouses = [ Warehouse.warehouse (19, 4)
-                 , Warehouse.warehouse (1, 10)
-                 ]
+  , requests =
+    [ Request.OrderRequest (House.house (8, 10)) (Category.Shirt 1) {elapsed = 0}
+    , Request.OrderRequest (House.house (8, 10)) (Category.Shirt 2) {elapsed = 0}
+    , Request.OrderRequest (House.house (8, 10)) (Category.Shirt 3) {elapsed = 0}
+    ]
+  , obstacles =
+    [ Obstacle.fountain (10, 5)
+    , Obstacle.fountain (20, 1)
+    , Obstacle.tree (1, 5)
+    , Obstacle.tree (15, 3)
+    ]
+  , houses =
+    [ House.house (8, 10)
+    , House.house (12, 7)
+    , House.house (16, 10)
+    , House.house (5, 5)
+    ]
+  , warehouses =
+    [ Warehouse.warehouse (19, 4)
+    , Warehouse.warehouse (1, 10)
+    ]
   }
 
 

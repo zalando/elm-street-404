@@ -16,6 +16,20 @@ type Request
   | ReturnRequest House Article RequestData
 
 
+inHouse : House -> Request -> Bool
+inHouse house request =
+  case request of
+    OrderRequest house'' _ _ -> house'' == house
+    ReturnRequest house'' _ _ -> house'' == house
+
+
+category : Request -> Category
+category request =
+  case request of
+    OrderRequest _ category _ -> category
+    ReturnRequest _ {category} _ -> category
+
+
 removeReturns : House -> Article -> List Request -> List Request
 removeReturns house article requests =
   {- TODO: remove only the first occurence -}
