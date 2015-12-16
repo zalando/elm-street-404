@@ -70,7 +70,7 @@ scale a b = (a * (fst b), a * (snd b))
 
 
 speed : Float
-speed = 0.06
+speed = 0.036
 
 
 clipFirst : List a -> List a
@@ -99,7 +99,7 @@ moveToNext time dest deliveryPerson =
       }
   in
     if remainderTime > 0 then
-      moveOnPath (Debug.log "remainder time" remainderTime) updatedPerson
+      moveOnPath remainderTime updatedPerson
     else
       updatedPerson
 
