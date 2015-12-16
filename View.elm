@@ -5,7 +5,7 @@ import Html.Attributes exposing (style)
 import Model exposing (Model)
 import Sprite
 import Obstacle
-import House
+import HouseView
 import WarehouseView
 import DeliveryPerson
 import Pathfinder
@@ -19,7 +19,7 @@ boxes : Signal.Address Action -> Model -> List Sprite.Box
 boxes address model =
   List.concat (
     DeliveryPerson.render model.deliveryPerson ::
-    List.map (House.render address) model.houses ++
+    List.map (HouseView.render address model.requests) model.houses ++
     List.map (WarehouseView.render address model.articles) model.warehouses ++
     List.map Obstacle.render model.obstacles ++
     [Inventory.render address model.articles]
