@@ -99,10 +99,13 @@ render' tileSize obstacles points source =
 
 
 render : (Int, Int) -> Int -> List (Int, Int) -> Html
-render (width, height) tileSize route =
+render (w, h) tileSize route =
   svg
     [ version "1.1"
-    , viewBox ("0 0 " ++ (toString (width * tileSize)) ++ " " ++ (toString (height * tileSize)))
+    , viewBox ("0 0 " ++ (toString (w * tileSize)) ++ " " ++ (toString (h * tileSize)))
+    , width (toString (w * tileSize))
+    , height (toString (h * tileSize))
+    , Html.Attributes.style ["z-index" => "2", "position" => "absolute"]
     ]
     [ renderPoints tileSize route]
 

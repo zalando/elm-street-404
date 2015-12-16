@@ -41,7 +41,7 @@ warehouseBubbleSprite =
 warehouse : (Int, Int) -> Warehouse
 warehouse position =
   { position = position
-  , size = (3, 2)
+  , size = (3, 3)
   }
 
 
@@ -51,7 +51,7 @@ render address warehouse =
     , position = warehouse.position
     , layer = 2
     , frame = 0
-    , attributes = [onClick address (Actions.GoTo (fst warehouse.position, snd warehouse.position + snd warehouse.size))]
+    , attributes = [onClick address (Actions.GoTo (fst warehouse.position + 1, snd warehouse.position + snd warehouse.size))]
     }
   , { sprite = warehouseShadowSprite
     , position = warehouse.position

@@ -13,6 +13,7 @@ import Pathfinder
 (=>) : a -> b -> (a, b)
 (=>) = (,)
 
+
 boxes : Signal.Address Action -> Model -> List Sprite.Box
 boxes address model =
   List.concat (
@@ -21,6 +22,7 @@ boxes address model =
     List.map (Warehouse.render address) model.warehouses ++
     List.map Obstacle.render model.obstacles
   )
+
 
 view : Signal.Address Action -> Model -> Html
 view address model =
@@ -34,9 +36,6 @@ view address model =
     , "background-size" => "960px 560px"
     ]
   ]
-  [ div
-      []
-      ( Pathfinder.render model.gridSize model.tileSize model.deliveryPerson.route ::
-        List.map (Sprite.render model.tileSize) (Sprite.sort (boxes address model))
-      )
-  ]
+  ( Pathfinder.render model.gridSize model.tileSize model.deliveryPerson.route ::
+    List.map (Sprite.render model.tileSize) (Sprite.sort (boxes address model))
+  )
