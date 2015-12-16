@@ -10,6 +10,7 @@ import Obstacle exposing (Obstacle)
 import House exposing (House)
 import Warehouse exposing (Warehouse)
 import Pathfinder exposing (obstacleTiles)
+import Category
 
 type State = Paused | Playing | Stopped
 
@@ -36,7 +37,12 @@ initial =
   , tileSize = 40
   , gridSize = (24, 14)
   , deliveryPerson = DeliveryPerson.initial (10, 10)
-  , articles = []
+  , articles = [
+      { category = fst (Category.random (Random.initialSeed 0))
+      , state = Article.Picked
+      , id = Random.initialSeed 0
+      }
+    ]
   , requests = []
   , obstacles = [ Obstacle.fountain (10, 5)
                 , Obstacle.fountain (20, 1)
