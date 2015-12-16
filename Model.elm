@@ -1,4 +1,4 @@
-module Model (Model, initial, animate, State(..)) where
+module Model (Model, initial, animate, navigateTo, State(..)) where
 import Random
 import Time exposing (Time)
 import AnimationState
@@ -47,6 +47,11 @@ initial =
                  , Warehouse.warehouse (1, 10)
                  ]
   }
+
+
+navigateTo : (Int, Int) -> Model -> Model
+navigateTo destination model =
+  model
 
 
 animate : Time -> (Time -> Model -> Model) -> Model -> Model

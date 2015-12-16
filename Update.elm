@@ -8,8 +8,6 @@ import DeliveryPerson exposing (Location(..))
 import Article exposing (State(..), Article)
 import Request
 import Obstacle exposing (Obstacle)
-import Warehouse exposing (Warehouse)
-import House exposing (House)
 import Request exposing (Request)
 
 update : Action -> Model -> (Model, Effects Action)
@@ -29,9 +27,9 @@ update action model =
     ClickArticle article ->
         (onArticleClick article model, Effects.none)
     ClickHouse house ->
-        (onHouseClick house model, Effects.none)
+        (onBuildingClick house model, Effects.none)
     ClickWarehouse warehouse ->
-        (onWarehouseClick warehouse model, Effects.none)
+        (onBuildingClick warehouse model, Effects.none)
     ClickRequest request ->
         (onRequestClick request model, Effects.none)
 
@@ -52,16 +50,9 @@ animateDeliveryPerson elapsed model =
   { model | deliveryPerson = DeliveryPerson.animate elapsed model.deliveryPerson }
 
 
--- calculate the route
-onWarehouseClick : Warehouse -> Model -> Model
-onWarehouseClick warehouse model =
-  model
-
-
--- calculate the route
-onHouseClick : House -> Model -> Model
-onHouseClick house model =
-  model
+onBuildingClick : {a | position : (Int, Int), size : (Int, Int)} -> Model -> Model
+onBuildingClick {position, size} model =
+  Model.navigateTo (fst position, snd position + snd size) model
 
 
 onRequestClick : Request -> Model -> Model
