@@ -8,6 +8,7 @@ import Html exposing (div, Html)
 import Html.Attributes exposing (style)
 import Mouse
 import Debug
+import Layers exposing (layers)
 
 type alias Obstacle a =
   { a | position : (Int, Int)
@@ -105,7 +106,7 @@ render (w, h) tileSize route =
     , viewBox ("0 0 " ++ (toString (w * tileSize)) ++ " " ++ (toString (h * tileSize)))
     , width (toString (w * tileSize))
     , height (toString (h * tileSize))
-    , Html.Attributes.style ["z-index" => "2", "position" => "absolute"]
+    , Html.Attributes.style ["z-index" => toString layers.route, "position" => "absolute"]
     ]
     [ renderPoints tileSize route]
 

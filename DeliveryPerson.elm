@@ -9,6 +9,7 @@ import AnimationState exposing (animateObject, rotateFrames)
 import List exposing (head)
 import Pathfinder
 import Debug
+import Layers exposing (layers)
 
 
 onTheWaySprite : Sprite
@@ -79,7 +80,7 @@ render deliveryPerson =
             ( floor (fst deliveryPerson.position)
             , floor (snd deliveryPerson.position)
             )
-        , layer = 2
+        , layer = layers.deliveryPerson
         , frame =  direction deliveryPerson * 3 + Maybe.withDefault 0 (head deliveryPerson.frames)
         , attributes = []
         }
