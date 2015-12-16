@@ -8,7 +8,9 @@ import DeliveryPerson exposing (Location(..))
 import Article exposing (State(..), Article)
 import Request
 import Obstacle exposing (Obstacle)
-
+import Warehouse exposing (Warehouse)
+import House exposing (House)
+import Request exposing (Request)
 
 update : Action -> Model -> (Model, Effects Action)
 update action model =
@@ -24,22 +26,45 @@ update action model =
         (Model.animate time animate model, Effects.tick Tick)
       else
         ({model | animationState = Nothing}, Effects.none)
-    Click article ->
-        (onArticleClick model article, Effects.none)
+    ClickArticle article ->
+        (onArticleClick article model, Effects.none)
+    ClickHouse house ->
+        (onHouseClick house model, Effects.none)
+    ClickWarehouse warehouse ->
+        (onWarehouseClick warehouse model, Effects.none)
+    ClickRequest request ->
+        (onRequestClick request model, Effects.none)
 
 
 animate : Time -> Model -> Model
 animate elapsed model =
-  { model | obstacles = animateObstacles elapsed model.obstacles }
+  model |> animateObstacles elapsed
 
 
-animateObstacles : Time -> List Obstacle -> List Obstacle
-animateObstacles elapsed obstacles =
-  List.map (Obstacle.animate elapsed) obstacles
+animateObstacles : Time -> Model -> Model
+animateObstacles elapsed model =
+  { model | obstacles = List.map (Obstacle.animate elapsed) model.obstacles }
 
 
-onArticleClick : Model -> Article -> Model
-onArticleClick model article =
+-- calculate the route
+onWarehouseClick : Warehouse -> Model -> Model
+onWarehouseClick warehouse model =
+  model
+
+
+-- calculate the route
+onHouseClick : House -> Model -> Model
+onHouseClick house model =
+  model
+
+
+onRequestClick : Request -> Model -> Model
+onRequestClick request model =
+  model
+
+
+onArticleClick : Article -> Model -> Model
+onArticleClick article model =
   case model.deliveryPerson.location of
     AtHouse house ->
       case article.state of

@@ -43,9 +43,10 @@ calculateDirection vector =
 direction : DeliveryPerson -> Int
 direction deliveryPerson =
   case deliveryPerson.route of
-    first :: rest -> calculateDirection ( toFloat (fst first) - fst deliveryPerson.position
-                                        , toFloat (snd first) - snd deliveryPerson.position
-                                        )
+    first :: rest -> calculateDirection
+      ( toFloat (fst first) - fst deliveryPerson.position
+      , toFloat (snd first) - snd deliveryPerson.position
+      )
     _ -> 0
 
 
@@ -55,9 +56,10 @@ render deliveryPerson =
   case deliveryPerson.location of
     OnTheWay ->
       [ { sprite = onTheWaySprite
-        , position = ( floor (fst deliveryPerson.position)
-                     , floor (snd deliveryPerson.position)
-                     )
+        , position =
+            ( floor (fst deliveryPerson.position)
+            , floor (snd deliveryPerson.position)
+            )
         , layer = 2
         , frame = (direction deliveryPerson) * 3
         , attributes = []
