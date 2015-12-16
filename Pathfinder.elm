@@ -1,4 +1,5 @@
-module Pathfinder (Obstacle, find, render, main) where
+module Pathfinder (Obstacle, obstacleTiles, find, render, main) where
+
 import Svg exposing (svg, polyline, rect)
 import Svg.Attributes exposing (..)
 import Html exposing (Html)
@@ -31,9 +32,9 @@ obstacleTiles : List (Obstacle a) -> List (Int, Int)
 obstacleTiles obstacles =
   List.concat (List.map (\ {position, size} -> obstacleToTiles position size) obstacles)
 
-find : (Int, Int) -> List (Obstacle a) -> (Int, Int) -> (Int, Int) -> List (Int, Int)
+find : (Int, Int) -> List (Int, Int) -> (Int, Int) -> (Int, Int) -> List (Int, Int)
 find gridSize obstacles start destination =
-  astar gridSize (obstacleTiles obstacles) start destination
+  astar gridSize obstacles start destination
   -- [ ( (fst destination - fst source) // 2 + fst source
   --   , (snd destination - snd source) // 2 + snd source
   --   )
@@ -142,4 +143,4 @@ renderMain click =
       , "background-size" => "960px 560px"
       ]
     ]
-    [ render tileSize obstacles (find (36, 36) obstacles source dest) source ]
+    [ render tileSize obstacles (find (36, 36) (obstacleTiles obstacles) source dest) source ]

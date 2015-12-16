@@ -1,4 +1,5 @@
 module Model (Model, initial, animate, navigateTo, State(..)) where
+
 import Random
 import Time exposing (Time)
 import AnimationState
@@ -8,6 +9,7 @@ import Request exposing (Request)
 import Obstacle exposing (Obstacle)
 import House exposing (House)
 import Warehouse exposing (Warehouse)
+import Pathfinder exposing (obstacleTiles)
 
 type State = Paused | Playing | Stopped
 
@@ -16,6 +18,7 @@ type alias Model =
   , state : State
   , seed : Random.Seed
   , tileSize : Int
+  , gridSize : (Int, Int)
   , deliveryPerson : DeliveryPerson
   , articles : List Article
   , requests : List Request
@@ -31,6 +34,7 @@ initial =
   , state = Stopped
   , seed = Random.initialSeed 0
   , tileSize = 40
+  , gridSize = (32, 18)
   , deliveryPerson = DeliveryPerson.initial (10, 10)
   , articles = []
   , requests = []
@@ -49,9 +53,22 @@ initial =
   }
 
 
+modelObstacles : Model -> List (Int, Int)
+modelObstacles model =
+  obstacleTiles model.obstacles ++
+  obstacleTiles model.houses ++
+  obstacleTiles model.warehouses
+
+
 navigateTo : (Int, Int) -> Model -> Model
 navigateTo destination model =
-  model
+  { model |
+      deliveryPerson = DeliveryPerson.navigateTo
+        model.gridSize
+        (modelObstacles model)
+        destination
+        model.deliveryPerson
+  }
 
 
 animate : Time -> (Time -> Model -> Model) -> Model -> Model
