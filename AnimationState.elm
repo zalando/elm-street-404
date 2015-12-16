@@ -1,4 +1,4 @@
-module AnimationState (AnimationState, AnimatedObject, animateObject, animate) where
+module AnimationState (AnimationState, AnimatedObject, animateObject, animate, rotateFrames) where
 import Time exposing (Time)
 
 type alias AnimationState =
@@ -34,3 +34,9 @@ animate time animationState =
            , elapsedTime = elapsedTime
            }
     )
+
+rotateFrames : List Int -> List Int
+rotateFrames frames =
+  case frames of
+    frame :: list -> list ++ [frame]
+    [] -> []

@@ -49,7 +49,7 @@ animateObstacles elapsed model =
 
 animateDeliveryPerson : Time -> Model -> Model
 animateDeliveryPerson elapsed model =
-  model
+  { model | deliveryPerson = DeliveryPerson.animate elapsed model.deliveryPerson }
 
 
 -- calculate the route
