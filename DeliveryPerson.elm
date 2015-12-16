@@ -2,6 +2,7 @@ module DeliveryPerson (DeliveryPerson, Location(..), initial, render) where
 import House exposing (House)
 import Warehouse exposing (Warehouse)
 import Sprite exposing (Sprite)
+import Basics exposing (atan2)
 
 
 onTheWaySprite : Sprite
@@ -34,10 +35,10 @@ initial position =
   }
 
 
--- returns 0 to 7
 calculateDirection : (Float, Float) -> Int
-calculateDirection vector =
-  0
+calculateDirection (x, y) =
+  (10 - floor (atan2 y x * 4 / pi)) % 8
+
 
 
 direction : DeliveryPerson -> Int
