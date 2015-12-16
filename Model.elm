@@ -47,7 +47,11 @@ initial =
     , fst (Article.dispatch (Warehouse.warehouse (19, 4)) (Random.initialSeed 5))
     , fst (Article.dispatch (Warehouse.warehouse (1, 10)) (Random.initialSeed 1))
     ]
-  , requests = []
+  , requests =
+    [ Request.OrderRequest (House.house (8, 10)) (Category.Shirt 1) {elapsed = 0}
+    , Request.OrderRequest (House.house (8, 10)) (Category.Shirt 2) {elapsed = 0}
+    , Request.OrderRequest (House.house (8, 10)) (Category.Shirt 3) {elapsed = 0}
+    ]
   , obstacles =
     [ Obstacle.fountain (10, 5)
     , Obstacle.fountain (20, 1)

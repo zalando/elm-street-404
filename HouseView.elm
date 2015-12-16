@@ -6,7 +6,7 @@ import Layers exposing (layers)
 import Sprite exposing (Sprite)
 import House exposing (House)
 import Request exposing (Request)
-
+import Category
 
 sprite : Sprite
 sprite =
@@ -53,19 +53,44 @@ bubbleSprite3 =
   }
 
 
+getBubbleSprite : Int -> Maybe Sprite
+getBubbleSprite number =
+  case number of
+    0 -> Nothing
+    1 -> Just bubbleSprite1
+    2 -> Just bubbleSprite2
+    _ -> Just bubbleSprite3
+
+
 render : Signal.Address Action -> List Request -> House -> List Sprite.Box
 render address requests house =
-  [ { sprite = sprite
-    , position = house.position
-    , layer = layers.obstacle
-    , frame = 0
-    , attributes =
-      [ onClick address (Actions.GoTo (round (fst house.position), round (snd house.position + snd house.size))) ]
-    }
-  , { sprite = shadowSprite
-    , position = house.position
-    , layer = layers.shadow
-    , frame = 0
-    , attributes = []
-    }
-  ]
+  let
+    requestsFromHouse = List.filter (Request.inHouse house) requests
+    renderRequest number request =
+      Category.render (fst house.position - 1, snd house.position - toFloat number) (Request.category request)
+    renderBubble =
+      case getBubbleSprite (List.length requestsFromHouse) of
+        Just sprite ->
+          [ { sprite = sprite
+            , position = house.position
+            , layer = layers.bubble
+            , frame = 0
+            , attributes = []
+            }
+          ]
+        _ -> []
+  in
+    [ { sprite = sprite
+      , position = house.position
+      , layer = layers.obstacle
+      , frame = 0
+      , attributes =
+        [ onClick address (Actions.GoTo (round (fst house.position), round (snd house.position + snd house.size))) ]
+      }
+    , { sprite = shadowSprite
+      , position = house.position
+      , layer = layers.shadow
+      , frame = 0
+      , attributes = []
+      }
+    ] ++ List.indexedMap renderRequest requestsFromHouse ++ renderBubble
