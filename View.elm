@@ -7,6 +7,7 @@ import Sprite
 import Obstacle
 import House
 import Warehouse
+import DeliveryPerson
 
 (=>) : a -> b -> (a, b)
 (=>) = (,)
@@ -14,6 +15,7 @@ import Warehouse
 boxes : Model -> List Sprite.Box
 boxes model =
   List.concat (
+    DeliveryPerson.render model.deliveryPerson ::
     List.map House.render model.houses ++
     List.map Warehouse.render model.warehouses ++
     List.map Obstacle.render model.obstacles
