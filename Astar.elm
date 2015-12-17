@@ -232,8 +232,8 @@ processNeighbors grid open neighbors current dest =
         processNeighbors nextGrid nextOpen rest current dest
 
 
-estimateNext : Grid -> NodeList -> NodeList -> Node -> List (Int, Int)
-estimateNext grid open closed current =
+estimateNext : Grid -> NodeList -> NodeList -> Node -> Node -> List (Int, Int)
+estimateNext grid open closed dest current =
   let
     nextOpen = removeNode open current
     nextClosed = current :: closed
@@ -241,10 +241,10 @@ estimateNext grid open closed current =
     freeNeighbors = filter (\ n -> not n.obstacle) neighbors
     openNeighbors = filter (\ n -> not (contains nextClosed n)) freeNeighbors
     gridAndOpen = processNeighbors grid nextOpen openNeighbors current dest
-    nextGrid = fst gridAndOpen
-    nextOpen = snd gridAndOpen
+    continueGrid = fst gridAndOpen
+    continueOpen = snd gridAndOpen
   in
-    astarIter nextGrid nextOpen nextClosed dest
+    astarIter continueGrid continueOpen nextClosed dest
 
 
 astarIter : Grid -> NodeList -> NodeList -> Node -> List (Int, Int)
@@ -255,7 +255,7 @@ astarIter grid open closed dest =
       if nodeEq c dest then
         pathToTileList grid (Just c.tile)
       else
-        estimateNext grid open closed c
+        estimateNext grid open closed dest c
 
 
 clipFirst : List a -> List a

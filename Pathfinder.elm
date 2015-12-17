@@ -42,8 +42,8 @@ obstacleTiles : List (Obstacle a) -> List (Int, Int)
 obstacleTiles obstacles =
   obstacles
   |> List.map
-    \ {position, size} ->
-      obstacleToTiles (toIntTuple position) (toIntTuple size)
+    (\ {position, size} ->
+      obstacleToTiles (toIntTuple position) (toIntTuple size))
   |> List.concat
 
 
@@ -53,9 +53,9 @@ find = astar
 
 pointToSring : Int -> (Int, Int) -> String
 pointToSring tileSize point =
-  fst point * tileSize + tileSize // 2 |> toString ++
+  (fst point * tileSize + tileSize // 2 |> toString) ++
   "," ++
-  snd point * tileSize + tileSize // 2 |> toString
+  (snd point * tileSize + tileSize // 2 |> toString)
 
 
 renderPoints : Int -> List (Int, Int) -> Html
