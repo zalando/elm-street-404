@@ -42,6 +42,10 @@ initial =
       , state = Article.Picked
       , id = Random.initialSeed 0
       }
+    , { category = fst (Category.random (Random.initialSeed 0))
+      , state = Article.AwaitingReturn (House.house (12, 7))
+      , id = Random.initialSeed 0
+      }
     , fst (Article.dispatch (Warehouse.warehouse (19, 4)) (Random.initialSeed 2))
     , fst (Article.dispatch (Warehouse.warehouse (19, 4)) (Random.initialSeed 3))
     , fst (Article.dispatch (Warehouse.warehouse (19, 4)) (Random.initialSeed 5))
