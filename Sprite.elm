@@ -1,4 +1,4 @@
-module Sprite (Sprite, Box, sort, render) where
+module Sprite (Sprite, Box, empty, sort, render) where
 import Html.Attributes exposing (style)
 import Html exposing (div)
 
@@ -19,6 +19,13 @@ type alias Box =
   , attributes : List Html.Attribute
   }
 
+empty : (Int, Int) -> (Float, Float)-> Sprite
+empty size offset =
+  { size = size
+  , offset = offset
+  , frames = 0
+  , src = ""
+  }
 
 (=>) : a -> b -> (a, b)
 (=>) = (,)

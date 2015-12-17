@@ -9,6 +9,7 @@ type alias Layers =
   , bubble : Int
   , article : Int
   , articleReturn : Int
+  , clickAbove : Int
   }
 
 layers : Layers
@@ -19,6 +20,7 @@ layers =
   , route = 2
   , fountainSpring = 3
   , bubble = 3
-  , article = 4
+  , article = 5
   , articleReturn = 5
+  , clickAbove = 4
   }

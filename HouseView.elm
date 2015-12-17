@@ -53,6 +53,9 @@ bubbleSprite3 =
   , src = "img/house-bubble-3.png"
   }
 
+emptySprite : Sprite
+emptySprite = Sprite.empty (2, 3) (0, -1)
+
 
 getBubbleSprite : Int -> Maybe Sprite
 getBubbleSprite number =
@@ -101,13 +104,19 @@ render address requests house =
       , position = house.position
       , layer = layers.obstacle
       , frame = 0
-      , attributes =
-        [ onClick address (Actions.ClickHouse house)]
+      , attributes = []
       }
     , { sprite = shadowSprite
       , position = house.position
       , layer = layers.shadow
       , frame = 0
       , attributes = []
+      }
+    , { sprite = emptySprite
+      , position = house.position
+      , layer = layers.clickAbove
+      , frame = 0
+      , attributes =
+        [ onClick address (Actions.ClickHouse house) ]
       }
     ] ++ List.concat (List.indexedMap renderRequest requestsFromHouse) ++ renderBubble
