@@ -10,7 +10,7 @@ categorySprite : Sprite
 categorySprite =
   { size = (1, 1)
   , offset = (0, 0)
-  , frames = 13
+  , frames = 14
   , src = "img/categories.png"
   }
 
@@ -20,6 +20,6 @@ render position attributes category =
   { sprite  = categorySprite
   , position  = position
   , frame = Category.getFrame category
-  , layer = layers.article
+  , layer = if category == Category.Return then layers.articleReturn else layers.article
   , attributes = attributes
   }

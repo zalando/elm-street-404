@@ -1,4 +1,4 @@
-module Request (..) where
+module Request (Request(..), removeOrders, removeReturns, category, inHouse, hasOrder) where
 
 import House exposing (House)
 import Article exposing (Article)
@@ -12,54 +12,53 @@ type alias RequestData =
 
 
 type Request
-  = OrderRequest House Category RequestData
-  | ReturnRequest House Article RequestData
+  = Order House Category RequestData
+  | Return House Article RequestData
 
 
 inHouse : House -> Request -> Bool
 inHouse house request =
   case request of
-    OrderRequest house'' _ _ -> house'' == house
-    ReturnRequest house'' _ _ -> house'' == house
+    Order house'' _ _ -> house'' == house
+    Return house'' _ _ -> house'' == house
 
 
 category : Request -> Category
 category request =
   case request of
-    OrderRequest _ category _ -> category
-    ReturnRequest _ {category} _ -> category
+    Order _ category _ -> category
+    Return _ {category} _ -> category
 
 
 removeReturns : House -> Article -> List Request -> List Request
 removeReturns house article requests =
   {- TODO: remove only the first occurence -}
-  let
-    notInRequest article request =
-      case request of
-        ReturnRequest house article _ -> False
-        _ -> True
-  in
-    List.filter (notInRequest article) requests
+  List.filter (\r -> not (isInReturn house article r)) requests
+
+
+isInReturn : House -> Article -> Request -> Bool
+isInReturn house article request =
+  case request of
+    Return house' article' _ ->
+      house' == house && article' == article
+    _ ->
+      False
+
+
+isOrdered : House -> Category -> Request -> Bool
+isOrdered house category request =
+  case request of
+    Order house' category' _ ->
+      house' == house && category' == category
+    _ -> False
 
 
 removeOrders : House -> Category -> List Request -> List Request
 removeOrders house category requests =
   {- TODO: remove only the first occurence -}
-  let
-    notInRequest category request =
-      case request of
-        OrderRequest house category _ -> False
-        _ -> True
-  in
-    List.filter (notInRequest category) requests
+  List.filter (\r -> not (isOrdered house category r)) requests
 
 
 hasOrder : House -> Category -> List Request -> Bool
 hasOrder house category requests =
-  let
-    inRequest category request =
-      case request of
-        OrderRequest house category _ -> True
-        _ -> False
-  in
-    List.any (inRequest category) requests
+  List.any (isOrdered house category) requests

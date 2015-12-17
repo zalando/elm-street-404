@@ -1,4 +1,4 @@
-module Article (Article, State(..), dispatch, updateState, removeDelivered, inWarehouse, inDelivery) where
+module Article (Article, State(..), dispatch, updateState, removeDelivered, inWarehouse, isPicked) where
 import Random
 import House exposing (House)
 import Warehouse exposing (Warehouse)
@@ -45,8 +45,8 @@ inWarehouse warehouse article =
   article.state == InStock warehouse
 
 
-inDelivery : Article -> Bool
-inDelivery {state} = state == Picked
+isPicked : Article -> Bool
+isPicked {state} = state == Picked
 
 
 dispatch : Warehouse -> Random.Seed -> (Article, Random.Seed)

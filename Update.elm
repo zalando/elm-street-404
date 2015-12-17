@@ -8,8 +8,7 @@ import DeliveryPerson exposing (Location(..))
 import Article exposing (State(..), Article)
 import Obstacle exposing (Obstacle)
 import Request exposing (Request)
-import Debug
-
+import Category exposing (Category)
 
 update : Action -> Model -> (Model, Effects Action)
 update action model =
@@ -26,9 +25,9 @@ update action model =
       else
         ({model | animationState = Nothing}, Effects.none)
     ClickArticle article ->
-      (onArticleClick (Debug.log "ClickArticle" article) model, Effects.none)
-    ClickRequest request ->
-      (onRequestClick (Debug.log "ClickRequest" request) model, Effects.none)
+      (onArticleClick article model, Effects.none)
+    ClickCategory category ->
+      (onCategoryClick category model, Effects.none)
     ClickWarehouse warehouse ->
       (Model.navigateToWarehouse warehouse model, Effects.none)
     ClickHouse house ->
@@ -51,19 +50,17 @@ animateDeliveryPerson elapsed model =
   { model | deliveryPerson = DeliveryPerson.animate elapsed model.deliveryPerson }
 
 
-onRequestClick : Request -> Model -> Model
-onRequestClick request model =
-  case request of
-    Request.OrderRequest house category _ ->
-      let
-        -- find articles from the inventory with the same category
-        articles = List.filter (\a -> a.category == category && Article.inDelivery a) model.articles
-      in
-        case articles of
-          article :: _ -> onArticleClick article model
-          _ -> model
-    Request.ReturnRequest house article _ ->
-      onArticleClick article model
+onCategoryClick : Category -> Model -> Model
+onCategoryClick category model =
+  let
+    -- find articles from the inventory with the same category
+    articles = List.filter
+      (\a -> a.category == category && Article.isPicked a)
+      model.articles
+  in
+    case articles of
+      article :: _ -> onArticleClick article model
+      _ -> model
 
 
 onArticleClick : Article -> Model -> Model
@@ -72,7 +69,7 @@ onArticleClick article model =
     AtHouse house ->
       case article.state of
         AwaitingReturn house' ->
-          if house' == house then
+          if house' == house && List.length (List.filter Article.isPicked model.articles) < model.deliveryPerson.capacity then
             { model
             | requests = Request.removeReturns house article model.requests
             , articles = Article.updateState Picked article model.articles
@@ -83,8 +80,9 @@ onArticleClick article model =
           if Request.hasOrder house article.category model.requests then
             { model
             | requests = Request.removeOrders house article.category model.requests
-            , articles = Article.removeDelivered house article.category model.articles
-                         |> Article.updateState (Delivered house) article
+            , articles = model.articles
+              |> Article.removeDelivered house article.category
+              |> Article.updateState (Delivered house) article
             }
           else
             model
@@ -94,12 +92,13 @@ onArticleClick article model =
     AtWarehouse warehouse' ->
       case article.state of
         InStock warehouse ->
-          if warehouse == warehouse' then
-            {model | articles = Article.updateState Picked article model.articles}
+          if warehouse == warehouse' &&
+            List.length (List.filter Article.isPicked model.articles) < model.deliveryPerson.capacity then
+              {model | articles = Article.updateState Picked article model.articles}
           else
             model
         Picked ->
-          if List.length (List.filter (Article.inWarehouse warehouse') model.articles) < 6 then
+          if List.length (List.filter (Article.inWarehouse warehouse') model.articles) < warehouse'.capacity then
             {model | articles = Article.updateState (InStock warehouse') article model.articles}
           else
             model
