@@ -53,16 +53,16 @@ initial =
     , fst (Article.dispatch (Warehouse.warehouse (1, 10)) (Random.initialSeed 1))
     ]
   , requests =
-    [ Request.Order (House.house (8, 10)) (Category.Shirt 1) {elapsed = 0, blinkHidden = False}
-    , Request.Order (House.house (8, 10)) (Category.Shirt 2) {elapsed = 0, blinkHidden = False}
-    , Request.Order (House.house (8, 10)) (Category.Shirt 3) {elapsed = 0, blinkHidden = False}
+    [ Request.Order (House.house (8, 10)) (Category.Shirt 1) Request.initData
+    , Request.Order (House.house (8, 10)) (Category.Shirt 2) Request.initData
+    , Request.Order (House.house (8, 10)) (Category.Shirt 3) Request.initData
     , Request.Return
         (House.house (12, 7))
         { category = fst (Category.random (Random.initialSeed 2))
         , state = Article.AwaitingReturn (House.house (12, 7))
         , id = Random.initialSeed 0
         }
-        {elapsed = 0, blinkHidden = False}
+        Request.initData
     ]
   , obstacles =
     [ Obstacle.fountain (10, 5)
