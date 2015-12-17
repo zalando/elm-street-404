@@ -19,7 +19,7 @@ bubbleSprite =
 render : Signal.Address Action -> List Article -> List Sprite.Box
 render address articles =
   let
-    articlesInDelivery = List.filter Article.inDelivery articles
+    articlesInDelivery = List.filter Article.isPicked articles
     articlesNumber = List.length articlesInDelivery
     placeholders = List.repeat (4 - articlesNumber) Category.Placeholder
 

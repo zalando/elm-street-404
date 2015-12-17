@@ -58,7 +58,7 @@ onRequestClick request model =
         -- find articles from the inventory with the same category
         articles =
           List.filter
-            (\a -> a.category == category && Article.inDelivery a)
+            (\a -> a.category == category && Article.isPicked a)
             model.articles
       in
         case articles of
@@ -74,7 +74,7 @@ onArticleClick article model =
     AtHouse house ->
       case article.state of
         AwaitingReturn house' ->
-          if house' == house then
+          if house' == house && List.length (List.filter Article.isPicked model.articles) < model.deliveryPerson.capacity then
             { model
             | requests = Request.removeReturns house article model.requests
             , articles = Article.updateState Picked article model.articles
@@ -97,12 +97,13 @@ onArticleClick article model =
     AtWarehouse warehouse' ->
       case article.state of
         InStock warehouse ->
-          if warehouse == warehouse' then
-            {model | articles = Article.updateState Picked article model.articles}
+          if warehouse == warehouse' &&
+            List.length (List.filter Article.isPicked model.articles) < model.deliveryPerson.capacity then
+              {model | articles = Article.updateState Picked article model.articles}
           else
             model
         Picked ->
-          if List.length (List.filter (Article.inWarehouse warehouse') model.articles) < 6 then
+          if List.length (List.filter (Article.inWarehouse warehouse') model.articles) < warehouse'.capacity then
             {model | articles = Article.updateState (InStock warehouse') article model.articles}
           else
             model

@@ -34,6 +34,7 @@ type alias DeliveryPerson =
   , route : List (Int, Int)
   , elapsed: Time
   , frames : List (Int)
+  , capacity : Int
   }
 
 
@@ -137,6 +138,7 @@ initial position =
   , route = []
   , elapsed = 0
   , frames = [0, 1, 2]
+  , capacity = 4
   }
 
 
