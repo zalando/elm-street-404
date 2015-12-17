@@ -107,10 +107,11 @@ moveToNext time dest deliveryPerson =
     remainderTime = if absSpeed > absMax then time - time * absMax / absSpeed else 0
     nextPosition = add deliveryPerson.position actualDelta
     nextRoute = if absSpeed >= absMax then clipFirst deliveryPerson.route else deliveryPerson.route
+    location = nextLocation nextRoute deliveryPerson.location
     updatedPerson =
       { deliveryPerson
       | position = nextPosition
-      , location = nextLocation nextRoute deliveryPerson.location
+      , location = location
       , route = nextRoute
       }
   in
@@ -120,10 +121,18 @@ moveToNext time dest deliveryPerson =
       updatedPerson
 
 
+stayThere : DeliveryPerson -> DeliveryPerson
+stayThere deliveryPerson =
+  { deliveryPerson
+  | location = nextLocation [] deliveryPerson.location
+  , route = []
+  }
+
+
 moveOnPath : Time -> DeliveryPerson -> DeliveryPerson
 moveOnPath time deliveryPerson =
   case currentDestination deliveryPerson of
-    Nothing -> deliveryPerson
+    Nothing -> stayThere deliveryPerson
     Just d -> moveToNext time d deliveryPerson
 
 
