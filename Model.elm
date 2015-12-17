@@ -11,7 +11,7 @@ import House exposing (House)
 import Customer exposing (Customer)
 import Warehouse exposing (Warehouse)
 import Pathfinder exposing (obstacleTiles)
-
+import IHopeItWorks
 
 type State = Paused | Playing | Stopped
 
@@ -67,7 +67,10 @@ start model =
   let
     (articles, seed) = dispatchInWarehouses model.warehouses model.seed
     categories = Article.availableCategories articles (Request.orderedCategories model.requests)
-    (orders, seed') = Request.orders 4 model.houses categories seed
+    places = IHopeItWorks.exclude
+      (List.concat (List.map (\h -> List.repeat h.capacity h) model.houses))
+      (List.map Request.house model.requests)
+    (orders, seed') = Request.orders 4 places categories seed
   in
     { model
     | articles = articles
