@@ -1,5 +1,7 @@
 # 404 Elm Street
 
+Work in progress, current demo can be [seen here](http://zalando.github.io/elm-street-404/).
+
 ![Screencast](screen.gif)
 
 You are Joe, the courier. It is your job, to deliver *all* the fashion to *all* the customers. Sometimes, you have to pick up stuff and return it to Zalando.

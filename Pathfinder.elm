@@ -1,4 +1,4 @@
-module Pathfinder (Obstacle, obstacleTiles, find, render, main) where
+module Pathfinder (Obstacle, obstacleTiles, find, render) where
 
 import Svg exposing (svg, polyline, rect)
 import Svg.Attributes exposing (..)
@@ -9,32 +9,43 @@ import Html.Attributes exposing (style)
 import Mouse
 import Layers exposing (layers)
 
+
 type alias Obstacle a =
   { a | position : (Float, Float)
       , size : (Float, Float)
   }
 
+
 obstacleRow : (Int, Int) -> Int -> Int -> List (Int, Int)
 obstacleRow position rowIndex columns =
   case columns of
     0 -> []
-    _ -> (fst position + rowIndex, snd position + columns - 1) ::
+    _ ->
+      (fst position + rowIndex, snd position + columns - 1) ::
       obstacleRow position rowIndex (columns - 1)
+
 
 obstacleToTiles : (Int, Int) -> (Int, Int) -> List (Int, Int)
 obstacleToTiles position size =
   case fst size of
     0 -> []
-    _ -> obstacleRow position (fst size - 1) (snd size) ++
+    _ ->
+      obstacleRow position (fst size - 1) (snd size) ++
       obstacleToTiles position (fst size - 1, snd size)
 
 
 toIntTuple : (Float, Float) -> (Int, Int)
 toIntTuple (a, b) = (round a, round b)
 
+
 obstacleTiles : List (Obstacle a) -> List (Int, Int)
 obstacleTiles obstacles =
-  List.concat (List.map (\ {position, size} -> obstacleToTiles (toIntTuple position) (toIntTuple size)) obstacles)
+  obstacles
+  |> List.map
+    (\ {position, size} ->
+      obstacleToTiles (toIntTuple position) (toIntTuple size))
+  |> List.concat
+
 
 find : (Int, Int) -> List (Int, Int) -> (Int, Int) -> (Int, Int) -> List (Int, Int)
 find = astar
@@ -42,7 +53,9 @@ find = astar
 
 pointToSring : Int -> (Int, Int) -> String
 pointToSring tileSize point =
-  toString (fst point * tileSize + tileSize // 2) ++ "," ++ toString (snd point * tileSize + tileSize // 2)
+  (fst point * tileSize + tileSize // 2 |> toString) ++
+  "," ++
+  (snd point * tileSize + tileSize // 2 |> toString)
 
 
 renderPoints : Int -> List (Int, Int) -> Html
@@ -89,7 +102,9 @@ render : (Int, Int) -> Int -> List (Int, Int) -> Html
 render (w, h) tileSize route =
   svg
     [ version "1.1"
-    , viewBox ("0 0 " ++ (toString (w * tileSize)) ++ " " ++ (toString (h * tileSize)))
+    , "0 0 " ++ (toString (w * tileSize)) ++
+      " " ++ (toString (h * tileSize))
+      |> viewBox
     , width (toString (w * tileSize))
     , height (toString (h * tileSize))
     , Html.Attributes.style
@@ -102,11 +117,6 @@ render (w, h) tileSize route =
 
 (=>) : a -> b -> (a, b)
 (=>) = (,)
-
-
-main : Signal Html
-main =
-  Signal.map renderMain (Signal.sampleOn Mouse.clicks Mouse.position)
 
 
 renderMain : (Int, Int) -> Html
@@ -132,4 +142,9 @@ renderMain click =
       , "background-size" => "960px 560px"
       ]
     ]
-    [ render' tileSize obstacles (find (36, 36) (obstacleTiles obstacles) source dest) source ]
+    [ render'
+        tileSize
+        obstacles
+        (find (36, 36) (obstacleTiles obstacles) source dest)
+        source
+    ]
