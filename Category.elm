@@ -11,6 +11,7 @@ type Category
   | Scarf Int
   | Placeholder
   | Return
+  | Empty
 
 
 categories : Array (Int -> Category)
@@ -26,6 +27,7 @@ getFrame category =
     Scarf color -> color + 9
     Placeholder -> 12
     Return -> 13
+    Empty -> 14
 
 
 random : Random.Seed -> (Category, Random.Seed)
