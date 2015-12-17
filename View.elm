@@ -1,4 +1,5 @@
 module View (view) where
+
 import Actions exposing (Action)
 import Html exposing (div, br, Html, text, button)
 import Html.Attributes exposing (style)
@@ -10,6 +11,7 @@ import WarehouseView
 import DeliveryPerson
 import Pathfinder
 import InventoryView
+
 
 (=>) : a -> b -> (a, b)
 (=>) = (,)

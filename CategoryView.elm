@@ -15,11 +15,12 @@ categorySprite =
   }
 
 
-render : (Float, Float) -> List Html.Attribute -> Category -> Sprite.Box
+render : (Float, Float) -> List Html.Attribute -> Category -> List Sprite.Box
 render position attributes category =
-  { sprite  = categorySprite
-  , position  = position
-  , frame = Category.getFrame category
-  , layer = if category == Category.Return then layers.articleReturn else layers.article
-  , attributes = attributes
-  }
+  [ { sprite  = categorySprite
+    , position  = position
+    , frame = Category.getFrame category
+    , layer = if category == Category.Return then layers.articleReturn else layers.article
+    , attributes = attributes
+    }
+  ]

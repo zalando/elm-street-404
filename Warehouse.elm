@@ -1,6 +1,5 @@
 module Warehouse (Warehouse, warehouse) where
 
-
 type alias Warehouse =
   { position : (Float, Float)
   , size : (Float, Float)
