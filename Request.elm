@@ -1,4 +1,4 @@
-module Request (Request(..), removeOrders, removeReturns, inHouse, hasOrder, animate) where
+module Request (Request(..), removeOrders, removeReturns, inHouse, hasOrder, animate, initData, inTime) where
 
 import House exposing (House)
 import Article exposing (Article)
@@ -6,12 +6,13 @@ import Category exposing (Category)
 import Time exposing (Time)
 
 
-maxWaitingTime : Time
-maxWaitingTime = 15000
+initialMaxWaitingTime : Time
+initialMaxWaitingTime = 60000
 
 
 type alias RequestData =
-  { elapsed : Time
+  { timeout : Time
+  , elapsed : Time
   , blinkHidden : Bool
   }
 
@@ -19,6 +20,14 @@ type alias RequestData =
 type Request
   = Order House Category RequestData
   | Return House Article RequestData
+
+
+initData : RequestData
+initData =
+ { timeout = initialMaxWaitingTime
+ , elapsed = 0
+ , blinkHidden = False
+ }
 
 
 inHouse : House -> Request -> Bool
@@ -64,24 +73,25 @@ hasOrder house category requests =
 
 -- time while it doesn't blink
 z : Float
-z = 1000
+z = 30000
 
 
 -- acceleration of blinking speed
 a : Float
-a = 0.000001
+a = 0.000000024
 
--- blinking speed
+-- initial blinking speed
 b : Float
-b = 0.000001
+b = 0.003
 
--- constant time shift (negative to make sure it starts with not blinking)
+-- constant time shift (positive to make sure it starts with not blinking)
 c : Float
-c = 0.0000001
+c = 0
 
 
--- -- max speed of blinking
--- m = 0.00000001
+-- max speed
+m : Float
+m = 0.015
 
 
 flash : Time -> Bool
@@ -90,10 +100,10 @@ flash elapsed =
     False
   else
     let
-      s = a * ((elapsed - z) ^ 2) + b * (elapsed - z) + c
-      -- sa = min s m
+      x = elapsed - z
+      s = if a * x + b > m then m else a * x + b
     in
-     0 < sin s
+     0 < sin (s * x + c) -- ((a * x * x) + (b * x) + c)
 
 
 animateRequestData : Time -> RequestData -> RequestData
@@ -109,3 +119,9 @@ animate time request =
   case request of
     Order house category data -> Order house category (animateRequestData time data)
     Return house article data -> Return house article (animateRequestData time data)
+
+inTime : Request -> Bool
+inTime request =
+  case request of
+    Order _ _ data -> data.elapsed < data.timeout
+    Return _ _ data -> data.elapsed < data.timeout
