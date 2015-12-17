@@ -1,4 +1,4 @@
-module Model (Model, initial, animate, navigateToWarehouse, navigateToHouse, State(..)) where
+module Model (Model, initial, start, animate, navigateToWarehouse, navigateToHouse, State(..)) where
 
 import Random
 import Time exposing (Time)
@@ -46,11 +46,6 @@ initial =
       , state = Article.AwaitingReturn (House.house (12, 7))
       , id = Random.initialSeed 0
       }
-    , fst (Article.dispatch (Warehouse.warehouse (19, 4)) (Random.initialSeed 2))
-    , fst (Article.dispatch (Warehouse.warehouse (19, 4)) (Random.initialSeed 3))
-    , fst (Article.dispatch (Warehouse.warehouse (19, 4)) (Random.initialSeed 5))
-    , fst (Article.dispatch (Warehouse.warehouse (19, 4)) (Random.initialSeed 4))
-    , fst (Article.dispatch (Warehouse.warehouse (1, 10)) (Random.initialSeed 1))
     ]
   , requests =
     [ Request.Order (House.house (8, 10)) (Category.Shirt 1) {elapsed = 0, blinkHidden = False}
@@ -83,6 +78,25 @@ initial =
   }
 
 
+start : Model -> Model
+start model =
+  let
+    (articles, seed) = dispatchInWarehouses model.warehouses model.seed
+  in
+    { model | articles = articles, seed = seed }
+
+
+dispatchInWarehouses : List Warehouse -> Random.Seed -> (List Article, Random.Seed)
+dispatchInWarehouses warehouses seed =
+  case warehouses of
+    [] -> ([], seed)
+    warehouse :: rest ->
+      let
+        (articles, seed') = Article.dispatch 4 warehouse seed
+      in
+        (articles ++ fst (dispatchInWarehouses rest seed'), seed')
+
+
 modelObstacles : Model -> List (Int, Int)
 modelObstacles model =
   obstacleTiles model.obstacles ++
@@ -98,19 +112,17 @@ placeToLocation {position, size} =
 
 
 navigateToWarehouse : Warehouse -> Model -> Model
-navigateToWarehouse warehouse model =
+navigateToWarehouse warehouse =
   navigateTo
     (DeliveryPerson.OnTheWayToWarehouse warehouse)
     (placeToLocation warehouse)
-    model
 
 
 navigateToHouse : House -> Model -> Model
-navigateToHouse house model =
+navigateToHouse house =
   navigateTo
     (DeliveryPerson.OnTheWayToHouse house)
     (placeToLocation house)
-    model
 
 
 navigateTo : DeliveryPerson.Location -> (Int, Int) -> Model -> Model

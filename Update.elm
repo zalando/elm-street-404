@@ -20,7 +20,7 @@ update action model =
       , Effects.tick (always Start)
       )
     Start ->
-      ({model | state = Playing }, Effects.tick Tick)
+      (Model.start { model | state = Playing} , Effects.tick Tick)
     Tick time ->
       if model.state == Playing then
         (Model.animate time animate model, Effects.tick Tick)
