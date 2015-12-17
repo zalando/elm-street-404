@@ -1,4 +1,4 @@
-module Request (Request(..), removeOrders, removeReturns, category, inHouse, hasOrder) where
+module Request (Request(..), removeOrders, removeReturns, category, inHouse, hasOrder, animate) where
 
 import House exposing (House)
 import Article exposing (Article)
@@ -6,8 +6,13 @@ import Category exposing (Category)
 import Time exposing (Time)
 
 
+maxWaitingTime : Time
+maxWaitingTime = 15000
+
+
 type alias RequestData =
   { elapsed : Time
+  , blinkHidden : Bool
   }
 
 
@@ -62,3 +67,32 @@ removeOrders house category requests =
 hasOrder : House -> Category -> List Request -> Bool
 hasOrder house category requests =
   List.any (isOrdered house category) requests
+
+
+a : Float
+a = 1
+
+b : Float
+b = 0
+
+c : Float
+c = 0
+
+
+flash : Time -> Bool
+flash elapsed = 0 < sin (a * (elapsed ^ 2) + b * elapsed + c)
+
+
+animateRequestData : Time -> RequestData -> RequestData
+animateRequestData time request =
+  { request
+  | elapsed = request.elapsed + time
+  , blinkHidden = Debug.log "hidden" (flash request.elapsed)
+  }
+
+
+animate : Time -> Request -> Request
+animate time request =
+  case request of
+    Order house category data -> Order house category (animateRequestData time data)
+    Return house article data -> Return house article (animateRequestData time data)

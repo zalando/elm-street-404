@@ -1,4 +1,5 @@
 module Update (update) where
+
 import Model exposing (..)
 import Actions exposing (..)
 import Effects exposing (Effects)
@@ -9,6 +10,7 @@ import Article exposing (State(..), Article)
 import Obstacle exposing (Obstacle)
 import Request exposing (Request)
 import Category exposing (Category)
+
 
 update : Action -> Model -> (Model, Effects Action)
 update action model =
@@ -38,6 +40,7 @@ animate : Time -> Model -> Model
 animate elapsed model =
   model |> animateObstacles elapsed
         |> animateDeliveryPerson elapsed
+        |> animateRequests elapsed
 
 
 animateObstacles : Time -> Model -> Model
@@ -48,6 +51,11 @@ animateObstacles elapsed model =
 animateDeliveryPerson : Time -> Model -> Model
 animateDeliveryPerson elapsed model =
   { model | deliveryPerson = DeliveryPerson.animate elapsed model.deliveryPerson }
+
+
+animateRequests : Time -> Model -> Model
+animateRequests elapsed model =
+ {model | requests = List.map (Request.animate elapsed) model.requests }
 
 
 onCategoryClick : Category -> Model -> Model
