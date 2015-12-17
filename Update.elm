@@ -1,4 +1,5 @@
 module Update (update) where
+
 import Model exposing (..)
 import Actions exposing (..)
 import Effects exposing (Effects)
@@ -9,6 +10,7 @@ import Article exposing (State(..), Article)
 import Obstacle exposing (Obstacle)
 import Request exposing (Request)
 import Category exposing (Category)
+
 
 update : Action -> Model -> (Model, Effects Action)
 update action model =
