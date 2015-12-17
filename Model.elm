@@ -170,12 +170,22 @@ decHappiness timeouted customer =
     customer
 
 
-timeoutRequests : Model -> Model
+countLives : Model -> Int
+  maxLives -
+  (model.customers
+    |> List.filter Customer.isLost
+    |> List.length)
+
+
+timeoutRequests : Model -> (Model, Bool)
 timeoutRequests model =
   let
+    livesBefore = countLives model
     (inTime, timeouted) = splitList Request.inTime model.requests
   in
-    { model
-    | requests = inTime
-    , customers = List.map (decHappiness timeouted) model.customers
-    }
+    ( { model
+      | requests = inTime
+      , customers = List.map (decHappiness timeouted) model.customers
+      }
+    , countLives model
+    )
