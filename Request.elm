@@ -69,25 +69,44 @@ hasOrder house category requests =
   List.any (isOrdered house category) requests
 
 
+-- time while it doesn't blink
+z : Float
+z = 1000
+
+
+-- acceleration of blinking speed
 a : Float
-a = 1
+a = 0.000001
 
+-- blinking speed
 b : Float
-b = 0
+b = 0.000001
 
+-- constant time shift (negative to make sure it starts with not blinking)
 c : Float
-c = 0
+c = -0.0000001
+
+
+-- -- max speed of blinking
+-- m = 0.00000001
 
 
 flash : Time -> Bool
-flash elapsed = 0 < sin (a * (elapsed ^ 2) + b * elapsed + c)
+flash elapsed =
+  if elapsed < z then
+    True
+  else
+    let
+      s = a * ((elapsed - z) ^ 2) + b * (elapsed - z) + c
+      -- sa = min s m
+    in
+     0 < sin s
 
 
 animateRequestData : Time -> RequestData -> RequestData
 animateRequestData time request =
   { request
   | elapsed = request.elapsed + time
-  -- , blinkHidden = Debug.log "hidden" (flash request.elapsed)
   , blinkHidden = flash request.elapsed
   }
 
