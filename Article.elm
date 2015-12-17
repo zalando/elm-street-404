@@ -49,14 +49,19 @@ isPicked : Article -> Bool
 isPicked {state} = state == Picked
 
 
-dispatch : Warehouse -> Random.Seed -> (Article, Random.Seed)
-dispatch warehouse seed =
-  let
-    (category, seed') = Category.random seed
-  in
-    ( { category = category
-      , state = InStock warehouse
-      , id = seed
-      }
-    , seed'
-    )
+dispatch : Int -> Warehouse -> Random.Seed -> (List Article, Random.Seed)
+dispatch number warehouse seed =
+  if number == 0 then
+    ([], seed)
+  else
+    let
+      (category, seed') = Category.random seed
+      (items, seed'') = dispatch (number - 1) warehouse seed'
+    in
+      ( { category = category
+        , state = InStock warehouse
+        , id = seed'
+        }
+        :: items
+      , seed''
+      )

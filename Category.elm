@@ -33,8 +33,8 @@ getFrame category =
 random : Random.Seed -> (Category, Random.Seed)
 random seed =
   let
-    (color, seed') = Random.generate (Random.int 0 3) seed
-    (categoryIndex, seed'') = Random.generate (Random.int 0 (Array.length categories)) seed'
+    (color, seed') = Random.generate (Random.int 0 2) seed
+    (categoryIndex, seed'') = Random.generate (Random.int 0 (Array.length categories - 1)) seed'
   in
     ( (Maybe.withDefault Scarf (Array.get categoryIndex categories)) color
     , seed''
