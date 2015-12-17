@@ -72,17 +72,17 @@ render address requests house =
         position = (fst house.position - 1, snd house.position - toFloat number)
       in
       case request of
-        Request.Return _ _ _ ->
+        Request.Return _ article _ ->
           [ CategoryView.render position [] (Request.category request)
           , CategoryView.render
               position
-              [onClick address (Actions.ClickRequest request)]
+              [onClick address (Actions.ClickArticle article)]
               Category.Return
           ]
-        Request.Order _ _ _ ->
+        Request.Order house category _ ->
           [ CategoryView.render
               position
-              [onClick address (Actions.ClickRequest request)]
+              [onClick address (Actions.ClickCategory category)]
               (Request.category request)
           ]
     renderBubble =
