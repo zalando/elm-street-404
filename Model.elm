@@ -42,7 +42,7 @@ initial =
       , state = Article.Picked
       , id = Random.initialSeed 0
       }
-    , { category = fst (Category.random (Random.initialSeed 0))
+    , { category = fst (Category.random (Random.initialSeed 2))
       , state = Article.AwaitingReturn (House.house (12, 7))
       , id = Random.initialSeed 0
       }
@@ -58,7 +58,7 @@ initial =
     , Request.Order (House.house (8, 10)) (Category.Shirt 3) {elapsed = 0}
     , Request.Return
         (House.house (12, 7))
-        { category = fst (Category.random (Random.initialSeed 0))
+        { category = fst (Category.random (Random.initialSeed 2))
         , state = Article.AwaitingReturn (House.house (12, 7))
         , id = Random.initialSeed 0
         }

@@ -8,6 +8,7 @@ type alias Layers =
   , fountainSpring : Int
   , bubble : Int
   , article : Int
+  , articleReturn : Int
   }
 
 layers : Layers
@@ -19,4 +20,5 @@ layers =
   , fountainSpring = 3
   , bubble = 3
   , article = 4
+  , articleReturn = 5
   }
