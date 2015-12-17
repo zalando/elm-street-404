@@ -25,7 +25,7 @@ update action model =
       if model.state == Playing then
         ( model
           |> Model.animate time animate
-          |> timeoutRequests
+          |> Model.timeoutRequests
         , Effects.tick Tick
         )
       else
@@ -38,13 +38,6 @@ update action model =
       (Model.navigateToWarehouse warehouse model, Effects.none)
     ClickHouse house ->
       (Model.navigateToHouse house model, Effects.none)
-
-
-timeoutRequests : Model -> Model
-timeoutRequests model =
-  { model
-  | requests = List.filter Request.inTime model.requests
-  }
 
 
 animate : Time -> Model -> Model

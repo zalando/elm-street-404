@@ -1,4 +1,4 @@
-module Request (Request(..), removeOrders, removeReturns, inHouse, hasOrder, animate, initData, inTime, orders, orderedCategories) where
+module Request (Request(..), removeOrders, removeReturns, inHouse, hasOrder, animate, initData, inTime, house, orders, orderedCategories) where
 
 import House exposing (House)
 import Article exposing (Article)
@@ -157,3 +157,24 @@ inTime request =
   case request of
     Order _ _ data -> data.elapsed < data.timeout
     Return _ _ data -> data.elapsed < data.timeout
+
+
+house : Request -> House
+house request =
+  case request of
+    Order house _ _ -> house
+    Return house _ _ -> house
+
+
+data : Request -> RequestData
+data request =
+  case request of
+    Order _ _ data -> data
+    Return _ _ data -> data
+
+
+updateData : RequestData -> Request -> Request
+updateData data request =
+  case request of
+    Order house category _ -> Order house category data
+    Return house article _ -> Return house article data

@@ -1,4 +1,4 @@
-module Model (Model, initial, start, animate, navigateToWarehouse, navigateToHouse, State(..)) where
+module Model (Model, initial, start, animate, navigateToWarehouse, navigateToHouse, State(..), timeoutRequests) where
 
 import Random
 import Time exposing (Time)
@@ -8,6 +8,7 @@ import Article exposing (Article)
 import Request exposing (Request)
 import Obstacle exposing (Obstacle)
 import House exposing (House)
+import Customer exposing (Customer)
 import Warehouse exposing (Warehouse)
 import Pathfinder exposing (obstacleTiles)
 
@@ -26,6 +27,7 @@ type alias Model =
   , requests : List Request
   , obstacles : List Obstacle
   , houses : List House
+  , customers : List Customer
   , warehouses : List Warehouse
   }
 
@@ -52,6 +54,7 @@ initial =
     , House.house (16, 10)
     , House.house (5, 5)
     ]
+  , customers = []
   , warehouses =
     [ Warehouse.warehouse (19, 4)
     , Warehouse.warehouse (1, 10)
@@ -130,3 +133,46 @@ animate time animationFunc model =
     (elapsed, animationState) = AnimationState.animate time model.animationState
   in
     animationFunc elapsed {model | animationState = animationState}
+
+
+splitList : (a -> Bool) -> List a -> (List a, List a)
+splitList predicate list =
+  case list of
+    [] -> ([], [])
+    first :: rest ->
+      let
+        restSplit = splitList predicate rest
+      in
+        if predicate first then
+          (first :: fst restSplit, snd restSplit)
+        else
+          (fst restSplit, first :: snd restSplit)
+
+
+decHappinessIfHome : List House -> Customer -> Customer
+decHappinessIfHome houses customer =
+  case houses of
+    [] -> customer
+    house :: rest ->
+      if Customer.livesHere house customer then
+        Customer.decHappiness customer
+      else
+        decHappinessIfHome rest customer
+
+
+decHappiness : List Request -> Customer -> Customer
+decHappiness timeouted customer =
+  decHappinessIfHome
+    (List.map Request.house timeouted)
+    customer
+
+
+timeoutRequests : Model -> Model
+timeoutRequests model =
+  let
+    (inTime, timeouted) = splitList Request.inTime model.requests
+  in
+    { model
+    | requests = inTime
+    , customers = List.map (decHappiness timeouted) model.customers
+    }
