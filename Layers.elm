@@ -21,6 +21,6 @@ layers =
   , fountainSpring = 3
   , bubble = 3
   , article = 5
-  , articleReturn = 5
+  , articleReturn = 6
   , clickAbove = 4
   }
