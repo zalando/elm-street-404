@@ -11,7 +11,7 @@ import WarehouseView
 import DeliveryPerson
 import Pathfinder
 import InventoryView
-
+import Article
 
 (=>) : a -> b -> (a, b)
 (=>) = (,)
@@ -20,7 +20,7 @@ import InventoryView
 boxes : Signal.Address Action -> Model -> List Sprite.Box
 boxes address model =
   List.concat (
-    DeliveryPerson.render model.deliveryPerson ::
+    DeliveryPerson.render (List.length (List.filter Article.isPicked model.articles)) model.deliveryPerson ::
     List.map (HouseView.render address model.requests) model.houses ++
     List.map (WarehouseView.render address model.articles) model.warehouses ++
     List.map Obstacle.render model.obstacles ++

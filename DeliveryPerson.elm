@@ -11,8 +11,8 @@ import Pathfinder
 import Layers exposing (layers)
 
 
-onTheWaySprite : Sprite
-onTheWaySprite =
+sprite : Sprite
+sprite =
   { size = (2, 3)
   , offset = (0, -1)
   , frames = 29
@@ -166,22 +166,25 @@ direction deliveryPerson =
     _ -> 0
 
 
-render : DeliveryPerson -> List Sprite.Box
-render deliveryPerson =
+render : Int -> DeliveryPerson -> List Sprite.Box
+render numberOfBoxes deliveryPerson =
   let
-    box =
-    [ { sprite = onTheWaySprite
+    box frame =
+    [ { sprite = sprite
       , position = deliveryPerson.position
       , layer = layers.deliveryPerson
-      , frame = direction deliveryPerson * 3 + Maybe.withDefault 0 (head deliveryPerson.frames)
+      , frame = frame
       , attributes = []
       }
     ]
   in
     case deliveryPerson.location of
-      OnTheWayToHouse _ -> box
-      OnTheWayToWarehouse _ -> box
-      _ -> box
+      OnTheWayToHouse _ ->
+        box (direction deliveryPerson * 3 + Maybe.withDefault 0 (head deliveryPerson.frames))
+      OnTheWayToWarehouse _ ->
+        box (direction deliveryPerson * 3 + Maybe.withDefault 0 (head deliveryPerson.frames))
+      _ ->
+        box (24 + numberOfBoxes)
 
 
 navigationStart : DeliveryPerson -> (Int, Int)
