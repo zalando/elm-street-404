@@ -1,4 +1,4 @@
-module Article (Article, State(..), dispatch, updateState, removeDelivered, inWarehouse, isPicked, availableCategories) where
+module Article (Article, State(..), dispatch, warehouses, updateState, removeDelivered, inWarehouse, isPicked, availableCategories) where
 import Random
 import House exposing (House)
 import Warehouse exposing (Warehouse)
@@ -17,6 +17,17 @@ type alias Article =
   , state : State
   , id : Random.Seed
   }
+
+
+warehouses : List Article -> List Warehouse
+warehouses articles =
+  case articles of
+    article :: rest ->
+      case article.state of
+        InStock warehouse ->
+          warehouse :: warehouses rest
+        _ -> warehouses rest
+    _ -> []
 
 
 availableCategories : List Article -> List Category -> List Category
@@ -65,19 +76,24 @@ isVacant {state} =
     _ -> False
 
 
-dispatch : Int -> Warehouse -> Random.Seed -> (List Article, Random.Seed)
-dispatch number warehouse seed =
+dispatch : Int -> List Warehouse -> Random.Seed -> (List Article, Random.Seed)
+dispatch number warehouses seed =
   if number == 0 then
     ([], seed)
   else
-    let
-      (category, seed') = Category.random seed
-      (items, seed'') = dispatch (number - 1) warehouse seed'
-    in
-      ( { category = category
-        , state = InStock warehouse
-        , id = seed'
-        }
-        :: items
-      , seed''
-      )
+    case IHopeItWorks.pickRandom warehouses seed of
+      (Just warehouse, seed') ->
+        let
+          restWarehouses = snd (IHopeItWorks.remove ((==) warehouse) warehouses)
+          (category, seed'') = Category.random seed'
+          (items, seed''') = dispatch (number - 1) restWarehouses seed''
+        in
+          ( { category = category
+            , state = InStock warehouse
+            , id = seed'''
+            }
+            :: items
+          , seed'''
+          )
+      (Nothing, seed') ->
+        ([], seed')

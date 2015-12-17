@@ -79,29 +79,21 @@ initial =
 start : Model -> Model
 start model =
   let
-    (articles, seed) = dispatchInWarehouses model.warehouses model.seed
+    warehouseSlots = IHopeItWorks.exclude
+      (List.concat (List.map (\w -> List.repeat w.capacity w) model.warehouses))
+      (Article.warehouses model.articles)
+    (articles, seed) = Article.dispatch 8 warehouseSlots model.seed
     categories = Article.availableCategories articles (Request.orderedCategories model.requests)
-    places = IHopeItWorks.exclude
+    houseSlots = IHopeItWorks.exclude
       (List.concat (List.map (\h -> List.repeat h.capacity h) model.houses))
       (List.map Request.house model.requests)
-    (orders, seed') = Request.orders 4 places categories seed
+    (orders, seed') = Request.orders 4 houseSlots categories seed
   in
     { model
     | articles = articles
     , seed = seed'
     , requests = orders
     }
-
-
-dispatchInWarehouses : List Warehouse -> Random.Seed -> (List Article, Random.Seed)
-dispatchInWarehouses warehouses seed =
-  case warehouses of
-    [] -> ([], seed)
-    warehouse :: rest ->
-      let
-        (articles, seed') = Article.dispatch 4 warehouse seed
-      in
-        (articles ++ fst (dispatchInWarehouses rest seed'), seed')
 
 
 modelObstacles : Model -> List (Int, Int)
