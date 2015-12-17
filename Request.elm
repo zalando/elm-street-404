@@ -84,7 +84,7 @@ b = 0.000001
 
 -- constant time shift (negative to make sure it starts with not blinking)
 c : Float
-c = -0.0000001
+c = 0.0000001
 
 
 -- -- max speed of blinking
@@ -94,7 +94,7 @@ c = -0.0000001
 flash : Time -> Bool
 flash elapsed =
   if elapsed < z then
-    True
+    False
   else
     let
       s = a * ((elapsed - z) ^ 2) + b * (elapsed - z) + c
