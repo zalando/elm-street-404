@@ -10,9 +10,10 @@ import Obstacle exposing (Obstacle)
 import House exposing (House)
 import Warehouse exposing (Warehouse)
 import Pathfinder exposing (obstacleTiles)
-import Category
+
 
 type State = Paused | Playing | Stopped
+
 
 type alias Model =
   { animationState : AnimationState.AnimationState
@@ -37,28 +38,8 @@ initial =
   , tileSize = 40
   , gridSize = (24, 14)
   , deliveryPerson = DeliveryPerson.initial (10, 10)
-  , articles =
-    [ { category = fst (Category.random (Random.initialSeed 0))
-      , state = Article.Picked
-      , id = Random.initialSeed 0
-      }
-    , { category = fst (Category.random (Random.initialSeed 2))
-      , state = Article.AwaitingReturn (House.house (12, 7))
-      , id = Random.initialSeed 0
-      }
-    ]
-  , requests =
-    [ Request.Order (House.house (8, 10)) (Category.Shirt 1) Request.initData
-    , Request.Order (House.house (8, 10)) (Category.Shirt 2) Request.initData
-    , Request.Order (House.house (8, 10)) (Category.Shirt 3) Request.initData
-    , Request.Return
-        (House.house (12, 7))
-        { category = fst (Category.random (Random.initialSeed 2))
-        , state = Article.AwaitingReturn (House.house (12, 7))
-        , id = Random.initialSeed 0
-        }
-        Request.initData
-    ]
+  , articles = []
+  , requests = []
   , obstacles =
     [ Obstacle.fountain (10, 5)
     , Obstacle.fountain (20, 1)
