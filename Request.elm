@@ -110,7 +110,7 @@ z = 30000
 
 -- acceleration of blinking speed
 a : Float
-a = 0.000000024
+a = 0.00000024
 
 -- initial blinking speed
 b : Float
