@@ -1,4 +1,4 @@
-module Request (..) where
+module Request (Request(..), removeOrders, removeReturns, category, inHouse, hasOrder) where
 
 import House exposing (House)
 import Article exposing (Article)

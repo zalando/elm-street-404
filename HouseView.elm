@@ -7,6 +7,7 @@ import Sprite exposing (Sprite)
 import House exposing (House)
 import Request exposing (Request)
 import CategoryView
+import Category
 
 sprite : Sprite
 sprite =
@@ -52,6 +53,9 @@ bubbleSprite3 =
   , src = "img/house-bubble-3.png"
   }
 
+emptySprite : Sprite
+emptySprite = Sprite.empty (2, 3) (0, -1)
+
 
 getBubbleSprite : Int -> Maybe Sprite
 getBubbleSprite number =
@@ -67,10 +71,23 @@ render address requests house =
   let
     requestsFromHouse = List.filter (Request.inHouse house) requests
     renderRequest number request =
-      CategoryView.render
-        (fst house.position - 1, snd house.position - toFloat number)
-        [onClick address (Actions.ClickRequest request)]
-        (Request.category request)
+      let
+        position = (fst house.position - 1, snd house.position - toFloat number)
+      in
+      case request of
+        Request.Return _ article _ ->
+          [ CategoryView.render position [] (Request.category request)
+          , CategoryView.render
+              position
+              [onClick address (Actions.ClickArticle article)]
+              Category.Return
+          ]
+        Request.Order house category _ ->
+          [ CategoryView.render
+              position
+              [onClick address (Actions.ClickCategory category)]
+              (Request.category request)
+          ]
     renderBubble =
       case getBubbleSprite (List.length requestsFromHouse) of
         Just sprite ->
@@ -87,8 +104,7 @@ render address requests house =
       , position = house.position
       , layer = layers.obstacle
       , frame = 0
-      , attributes =
-        [ onClick address (Actions.ClickHouse house)]
+      , attributes = []
       }
     , { sprite = shadowSprite
       , position = house.position
@@ -96,4 +112,11 @@ render address requests house =
       , frame = 0
       , attributes = []
       }
-    ] ++ List.indexedMap renderRequest requestsFromHouse ++ renderBubble
+    , { sprite = emptySprite
+      , position = house.position
+      , layer = layers.clickAbove
+      , frame = 0
+      , attributes =
+        [ onClick address (Actions.ClickHouse house) ]
+      }
+    ] ++ List.concat (List.indexedMap renderRequest requestsFromHouse) ++ renderBubble

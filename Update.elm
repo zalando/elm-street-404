@@ -8,7 +8,7 @@ import DeliveryPerson exposing (Location(..))
 import Article exposing (State(..), Article)
 import Obstacle exposing (Obstacle)
 import Request exposing (Request)
-
+import Category exposing (Category)
 
 update : Action -> Model -> (Model, Effects Action)
 update action model =
@@ -26,8 +26,8 @@ update action model =
         ({model | animationState = Nothing}, Effects.none)
     ClickArticle article ->
       (onArticleClick article model, Effects.none)
-    ClickRequest request ->
-      (onRequestClick request model, Effects.none)
+    ClickCategory category ->
+      (onCategoryClick category model, Effects.none)
     ClickWarehouse warehouse ->
       (Model.navigateToWarehouse warehouse model, Effects.none)
     ClickHouse house ->
@@ -50,22 +50,17 @@ animateDeliveryPerson elapsed model =
   { model | deliveryPerson = DeliveryPerson.animate elapsed model.deliveryPerson }
 
 
-onRequestClick : Request -> Model -> Model
-onRequestClick request model =
-  case request of
-    Request.Order house category _ ->
-      let
-        -- find articles from the inventory with the same category
-        articles =
-          List.filter
-            (\a -> a.category == category && Article.isPicked a)
-            model.articles
-      in
-        case articles of
-          article :: _ -> onArticleClick article model
-          _ -> model
-    Request.Return house article _ ->
-      onArticleClick article model
+onCategoryClick : Category -> Model -> Model
+onCategoryClick category model =
+  let
+    -- find articles from the inventory with the same category
+    articles = List.filter
+      (\a -> a.category == category && Article.isPicked a)
+      model.articles
+  in
+    case articles of
+      article :: _ -> onArticleClick article model
+      _ -> model
 
 
 onArticleClick : Article -> Model -> Model
