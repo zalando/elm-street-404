@@ -6,8 +6,8 @@ import Layers exposing (layers)
 import Sprite exposing (Sprite)
 import House exposing (House)
 import Request exposing (Request)
-import CategoryView
-import Category
+import RequestView
+
 
 sprite : Sprite
 sprite =
@@ -70,24 +70,13 @@ render : Signal.Address Action -> List Request -> House -> List Sprite.Box
 render address requests house =
   let
     requestsFromHouse = List.filter (Request.inHouse house) requests
-    renderRequest number request =
-      let
-        position = (fst house.position - 1, snd house.position - toFloat number)
-      in
-      case request of
-        Request.Return _ article _ ->
-          [ CategoryView.render position [] (Request.category request)
-          , CategoryView.render
-              position
-              [onClick address (Actions.ClickArticle article)]
-              Category.Return
-          ]
-        Request.Order house category _ ->
-          [ CategoryView.render
-              position
-              [onClick address (Actions.ClickCategory category)]
-              (Request.category request)
-          ]
+    renderRequest number =
+      RequestView.render
+        address
+        ( fst house.position - 1
+        , snd house.position - toFloat number
+        )
+
     renderBubble =
       case getBubbleSprite (List.length requestsFromHouse) of
         Just sprite ->
@@ -119,4 +108,5 @@ render address requests house =
       , attributes =
         [ onClick address (Actions.ClickHouse house) ]
       }
-    ] ++ List.concat (List.indexedMap renderRequest requestsFromHouse) ++ renderBubble
+    ]
+    ++ List.concat (List.indexedMap renderRequest requestsFromHouse) ++ renderBubble

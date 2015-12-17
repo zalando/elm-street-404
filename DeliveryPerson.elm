@@ -15,7 +15,7 @@ onTheWaySprite : Sprite
 onTheWaySprite =
   { size = (2, 3)
   , offset = (0, -1)
-  , frames = 24
+  , frames = 29
   , src = "img/delivery-person.png"
   }
 

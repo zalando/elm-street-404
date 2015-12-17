@@ -1,11 +1,13 @@
 module InventoryView (render) where
+
 import Article exposing (Article)
 import Sprite exposing (Sprite)
 import Actions exposing (Action)
 import Category
+import ArticleView
 import CategoryView
 import Layers exposing (layers)
-import Html.Events exposing (onClick)
+
 
 bubbleSprite : Sprite
 bubbleSprite =
@@ -24,10 +26,7 @@ render address articles =
     placeholders = List.repeat (4 - articlesNumber) Category.Placeholder
 
     renderArticle number article =
-      CategoryView.render
-        (toFloat number + 2, 1)
-        [onClick address (Actions.ClickArticle article)]
-        article.category
+      ArticleView.render address (toFloat number + 2, 1) article
 
     renderCategory number category =
       CategoryView.render (toFloat (number + articlesNumber) + 2, 1) [] category
@@ -38,5 +37,5 @@ render address articles =
     , frame = 0
     , attributes = []
     }
-    :: List.indexedMap renderArticle articlesInDelivery
-    ++ List.indexedMap renderCategory placeholders
+    :: List.concat (List.indexedMap renderArticle articlesInDelivery)
+    ++ List.concat (List.indexedMap renderCategory placeholders)

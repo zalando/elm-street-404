@@ -1,4 +1,4 @@
-module Request (Request(..), removeOrders, removeReturns, category, inHouse, hasOrder, animate) where
+module Request (Request(..), removeOrders, removeReturns, inHouse, hasOrder, animate) where
 
 import House exposing (House)
 import Article exposing (Article)
@@ -87,7 +87,8 @@ animateRequestData : Time -> RequestData -> RequestData
 animateRequestData time request =
   { request
   | elapsed = request.elapsed + time
-  , blinkHidden = Debug.log "hidden" (flash request.elapsed)
+  -- , blinkHidden = Debug.log "hidden" (flash request.elapsed)
+  , blinkHidden = flash request.elapsed
   }
 
 
