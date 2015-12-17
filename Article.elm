@@ -1,8 +1,9 @@
-module Article (Article, State(..), dispatch, updateState, removeDelivered, inWarehouse, isPicked) where
+module Article (Article, State(..), dispatch, updateState, removeDelivered, inWarehouse, isPicked, availableCategories) where
 import Random
 import House exposing (House)
 import Warehouse exposing (Warehouse)
 import Category exposing (Category)
+import IHopeItWorks
 
 type State
   = InStock Warehouse
@@ -18,18 +19,23 @@ type alias Article =
   }
 
 
+availableCategories : List Article -> List Category -> List Category
+availableCategories articles =
+  IHopeItWorks.exclude (List.map .category (List.filter isVacant articles))
+
+
 removeDelivered : House -> Category -> List Article -> List Article
-removeDelivered house category articles =
+removeDelivered house category =
   {- TODO: remove only the first occurence -}
   let
     notInHouse house article =
       not (article.state == Delivered house)
   in
-    List.filter (notInHouse house) articles
+    List.filter (notInHouse house)
 
 
 updateState : State -> Article -> List Article -> List Article
-updateState state article articles =
+updateState state article =
   let
     update article' =
       if article' == article then
@@ -37,7 +43,7 @@ updateState state article articles =
       else
         article'
   in
-    List.map update articles
+    List.map update
 
 
 inWarehouse : Warehouse -> Article -> Bool
@@ -47,6 +53,16 @@ inWarehouse warehouse article =
 
 isPicked : Article -> Bool
 isPicked {state} = state == Picked
+
+
+{- returns true if the article can be ordered -}
+isVacant : Article -> Bool
+isVacant {state} =
+  case state of
+    InStock _ -> True
+    AwaitingReturn _ -> True
+    Picked -> True
+    _ -> False
 
 
 dispatch : Int -> Warehouse -> Random.Seed -> (List Article, Random.Seed)
