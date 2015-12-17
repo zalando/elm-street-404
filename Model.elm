@@ -48,9 +48,9 @@ initial =
     , fst (Article.dispatch (Warehouse.warehouse (1, 10)) (Random.initialSeed 1))
     ]
   , requests =
-    [ Request.OrderRequest (House.house (8, 10)) (Category.Shirt 1) {elapsed = 0}
-    , Request.OrderRequest (House.house (8, 10)) (Category.Shirt 2) {elapsed = 0}
-    , Request.OrderRequest (House.house (8, 10)) (Category.Shirt 3) {elapsed = 0}
+    [ Request.Order (House.house (8, 10)) (Category.Shirt 1) {elapsed = 0}
+    , Request.Order (House.house (8, 10)) (Category.Shirt 2) {elapsed = 0}
+    , Request.Order (House.house (8, 10)) (Category.Shirt 3) {elapsed = 0}
     ]
   , obstacles =
     [ Obstacle.fountain (10, 5)
@@ -96,20 +96,20 @@ navigateToWarehouse warehouse model =
 navigateToHouse : House -> Model -> Model
 navigateToHouse house model =
   navigateTo
-    (DeliveryPerson.OnTheWayToWarehouse house)
+    (DeliveryPerson.OnTheWayToHouse house)
     (placeToLocation house)
     model
 
 
 navigateTo : DeliveryPerson.Location -> (Int, Int) -> Model -> Model
 navigateTo location destination model =
-  { model |
-      deliveryPerson = DeliveryPerson.navigateTo
-        location
-        model.gridSize
-        (modelObstacles model)
-        destination
-        model.deliveryPerson
+  { model
+  | deliveryPerson = DeliveryPerson.navigateTo
+      location
+      model.gridSize
+      (modelObstacles model)
+      destination
+      model.deliveryPerson
   }
 
 

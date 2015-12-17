@@ -8,7 +8,6 @@ import DeliveryPerson exposing (Location(..))
 import Article exposing (State(..), Article)
 import Obstacle exposing (Obstacle)
 import Request exposing (Request)
-import Debug
 
 
 update : Action -> Model -> (Model, Effects Action)
@@ -26,9 +25,9 @@ update action model =
       else
         ({model | animationState = Nothing}, Effects.none)
     ClickArticle article ->
-      (onArticleClick (Debug.log "ClickArticle" article) model, Effects.none)
+      (onArticleClick article model, Effects.none)
     ClickRequest request ->
-      (onRequestClick (Debug.log "ClickRequest" request) model, Effects.none)
+      (onRequestClick request model, Effects.none)
     ClickWarehouse warehouse ->
       (Model.navigateToWarehouse warehouse model, Effects.none)
     ClickHouse house ->
@@ -54,15 +53,18 @@ animateDeliveryPerson elapsed model =
 onRequestClick : Request -> Model -> Model
 onRequestClick request model =
   case request of
-    Request.OrderRequest house category _ ->
+    Request.Order house category _ ->
       let
         -- find articles from the inventory with the same category
-        articles = List.filter (\a -> a.category == category && Article.inDelivery a) model.articles
+        articles =
+          List.filter
+            (\a -> a.category == category && Article.inDelivery a)
+            model.articles
       in
         case articles of
           article :: _ -> onArticleClick article model
           _ -> model
-    Request.ReturnRequest house article _ ->
+    Request.Return house article _ ->
       onArticleClick article model
 
 
@@ -83,8 +85,9 @@ onArticleClick article model =
           if Request.hasOrder house article.category model.requests then
             { model
             | requests = Request.removeOrders house article.category model.requests
-            , articles = Article.removeDelivered house article.category model.articles
-                         |> Article.updateState (Delivered house) article
+            , articles = model.articles
+              |> Article.removeDelivered house article.category
+              |> Article.updateState (Delivered house) article
             }
           else
             model
