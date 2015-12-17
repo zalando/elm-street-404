@@ -44,8 +44,8 @@ pushThePedals time deliveryPerson =
       {deliveryPerson | frames = rotateFrames deliveryPerson.frames}
   in
     case deliveryPerson.location of
-      OnTheWayToHouse _ -> animateObject 250 time updateDeliveryPerson deliveryPerson
-      OnTheWayToWarehouse _ -> animateObject 250 time updateDeliveryPerson deliveryPerson
+      OnTheWayToHouse _ -> animateObject 125 time updateDeliveryPerson deliveryPerson
+      OnTheWayToWarehouse _ -> animateObject 125 time updateDeliveryPerson deliveryPerson
       _ -> deliveryPerson
 
 
@@ -73,7 +73,7 @@ scale a b = (a * (fst b), a * (snd b))
 
 
 speed : Float
-speed = 0.06
+speed = 0.036
 
 
 clipFirst : List a -> List a
@@ -114,7 +114,7 @@ moveToNext time dest deliveryPerson =
       }
   in
     if remainderTime > 0 then
-      moveOnPath (Debug.log "remainder time" remainderTime) updatedPerson
+      moveOnPath remainderTime updatedPerson
     else
       updatedPerson
 
