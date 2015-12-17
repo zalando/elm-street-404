@@ -37,13 +37,6 @@ inHouse house request =
     Return house'' _ _ -> house'' == house
 
 
-category : Request -> Category
-category request =
-  case request of
-    Order _ category _ -> category
-    Return _ {category} _ -> category
-
-
 removeReturns : House -> Article -> List Request -> List Request
 removeReturns house article requests =
   {- TODO: remove only the first occurence -}

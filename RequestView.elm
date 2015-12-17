@@ -20,7 +20,7 @@ render address position request =
       CategoryView.render
         position
         [onClick address (Actions.ClickArticle article)]
-        Category.Return
+        (if data.blinkHidden then Category.Empty else Category.Return)
 
     Request.Order _ category data ->
       CategoryView.render

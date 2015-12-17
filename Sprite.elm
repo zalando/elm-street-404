@@ -52,7 +52,7 @@ render tileSize {sprite, position, frame, layer, attributes} =
        , "top" => (toString top ++ "px")
        , "position" => "absolute"
        , "overflow" => "hidden"
-       , "background-image" => ("url(" ++ sprite.src ++ ")")
+       , "background-image" => if sprite.src == "" then "none" else ("url(" ++ sprite.src ++ ")")
        , "background-position" => (toString (-frame * width * tileSize) ++ "px 0")
        , "background-repeat" => "no-repeat"
        , "background-size" => (toString (width * sprite.frames * tileSize) ++ "px " ++ (toString (height * tileSize)) ++ "px")
