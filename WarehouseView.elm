@@ -36,6 +36,8 @@ warehouseBubbleSprite =
   , src = "img/warehouse-bubble.png"
   }
 
+emptySprite : Sprite
+emptySprite = Sprite.empty (4, 4) (0, -1)
 
 render : Signal.Address Action -> List Article -> Warehouse ->  List Sprite.Box
 render address articles warehouse =
@@ -63,8 +65,7 @@ render address articles warehouse =
       , position = warehouse.position
       , layer = layers.obstacle
       , frame = 0
-      , attributes =
-        [ onClick address (Actions.ClickWarehouse warehouse) ]
+      , attributes = []
       }
     , { sprite = warehouseShadowSprite
       , position = warehouse.position
@@ -77,5 +78,12 @@ render address articles warehouse =
       , layer = layers.bubble
       , frame = 0
       , attributes = []
+      }
+    , { sprite = emptySprite
+      , position = warehouse.position
+      , layer = layers.clickAbove
+      , frame = 0
+      , attributes =
+        [ onClick address (Actions.ClickWarehouse warehouse) ]
       }
     ] ++ List.indexedMap renderArticle (articlesInWarehouse) ++ List.indexedMap renderCategory placeholders
