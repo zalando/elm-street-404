@@ -63,8 +63,14 @@ start : Model -> Model
 start model =
   let
     (articles, seed) = dispatchInWarehouses model.warehouses model.seed
+    categories = Article.availableCategories articles (Request.orderedCategories model.requests)
+    (orders, seed') = Request.orders 4 model.houses categories seed
   in
-    { model | articles = articles, seed = seed }
+    { model
+    | articles = articles
+    , seed = seed'
+    , requests = orders
+    }
 
 
 dispatchInWarehouses : List Warehouse -> Random.Seed -> (List Article, Random.Seed)

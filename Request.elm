@@ -1,10 +1,11 @@
-module Request (Request(..), removeOrders, removeReturns, inHouse, hasOrder, animate, initData, inTime) where
+module Request (Request(..), removeOrders, removeReturns, inHouse, hasOrder, animate, initData, inTime, orders, orderedCategories) where
 
 import House exposing (House)
 import Article exposing (Article)
 import Category exposing (Category)
 import Time exposing (Time)
-
+import IHopeItWorks
+import Random
 
 initialMaxWaitingTime : Time
 initialMaxWaitingTime = 60000
@@ -28,6 +29,37 @@ initData =
  , elapsed = 0
  , blinkHidden = False
  }
+
+
+orderedCategories : List Request -> List Category
+orderedCategories requests =
+  case requests of
+    request :: rest ->
+      case request of
+        Order _ category _ ->
+          category :: orderedCategories rest
+        _ ->
+          orderedCategories rest
+    [] -> []
+
+
+orders : Int -> List House -> List Category -> Random.Seed -> (List Request, Random.Seed)
+orders number houses categories seed =
+  if number == 0 then
+    ([], seed)
+  else
+    case IHopeItWorks.pickRandom houses seed of
+      (Just house, seed') ->
+        case IHopeItWorks.pickRandom categories seed' of
+          (Just category, seed'') ->
+            let
+              restCategories = snd (IHopeItWorks.remove ((==) category) categories)
+              restHouses = snd (IHopeItWorks.remove ((==) house) houses)
+              (rest, seed''') = orders (number - 1) restHouses restCategories seed''
+            in
+              (Order house category initData :: rest, seed''')
+          (Nothing, seed') -> ([], seed')
+      (Nothing, seed') -> ([], seed')
 
 
 inHouse : House -> Request -> Bool
