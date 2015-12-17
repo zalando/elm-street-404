@@ -1,4 +1,4 @@
-module Request (Request(..), removeOrders, removeReturns, inHouse, hasOrder, animate, initData) where
+module Request (Request(..), removeOrders, removeReturns, inHouse, hasOrder, animate, initData, inTime) where
 
 import House exposing (House)
 import Article exposing (Article)
@@ -6,8 +6,8 @@ import Category exposing (Category)
 import Time exposing (Time)
 
 
-maxWaitingTime : Time
-maxWaitingTime = 60000
+initialMaxWaitingTime : Time
+initialMaxWaitingTime = 60000
 
 
 type alias RequestData =
@@ -24,7 +24,7 @@ type Request
 
 initData : RequestData
 initData =
- { timeout = maxWaitingTime
+ { timeout = initialMaxWaitingTime
  , elapsed = 0
  , blinkHidden = False
  }
@@ -119,3 +119,9 @@ animate time request =
   case request of
     Order house category data -> Order house category (animateRequestData time data)
     Return house article data -> Return house article (animateRequestData time data)
+
+inTime : Request -> Bool
+inTime request =
+  case request of
+    Order _ _ data -> data.elapsed < data.timeout
+    Return _ _ data -> data.elapsed < data.timeout
