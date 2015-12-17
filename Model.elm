@@ -1,4 +1,14 @@
-module Model (Model, initial, start, animate, navigateToWarehouse, navigateToHouse, State(..), timeoutRequests) where
+module Model
+  ( Model
+  , initial
+  , start
+  , animate
+  , navigateToWarehouse
+  , navigateToHouse
+  , State(..)
+  , timeoutRequests
+  , updateGameState
+  ) where
 
 import Random
 import Time exposing (Time)
@@ -12,6 +22,7 @@ import Customer exposing (Customer)
 import Warehouse exposing (Warehouse)
 import Pathfinder exposing (obstacleTiles)
 import IHopeItWorks
+
 
 type State = Paused | Playing | Stopped
 
@@ -34,32 +45,35 @@ type alias Model =
 
 initial : Model
 initial =
-  { animationState = Nothing
-  , state = Stopped
-  , seed = Random.initialSeed 0
-  , tileSize = 40
-  , gridSize = (24, 14)
-  , deliveryPerson = DeliveryPerson.initial (10, 10)
-  , articles = []
-  , requests = []
-  , obstacles =
-    [ Obstacle.fountain (10, 5)
-    , Obstacle.fountain (20, 1)
-    , Obstacle.tree (1, 5)
-    , Obstacle.tree (15, 3)
-    ]
-  , houses =
-    [ House.house (8, 10)
-    , House.house (12, 7)
-    , House.house (16, 10)
-    , House.house (5, 5)
-    ]
-  , customers = []
-  , warehouses =
-    [ Warehouse.warehouse (19, 4)
-    , Warehouse.warehouse (1, 10)
-    ]
-  }
+  let
+    houses = 
+      [ House.house (8, 10)
+      , House.house (12, 7)
+      , House.house (16, 10)
+      , House.house (5, 5)
+      ]
+  in
+    { animationState = Nothing
+    , state = Stopped
+    , seed = Random.initialSeed 0
+    , tileSize = 40
+    , gridSize = (24, 14)
+    , deliveryPerson = DeliveryPerson.initial (10, 10)
+    , articles = []
+    , requests = []
+    , obstacles =
+      [ Obstacle.fountain (10, 5)
+      , Obstacle.fountain (20, 1)
+      , Obstacle.tree (1, 5)
+      , Obstacle.tree (15, 3)
+      ]
+    , houses = houses
+    , customers = List.map Customer.initial houses
+    , warehouses =
+      [ Warehouse.warehouse (19, 4)
+      , Warehouse.warehouse (1, 10)
+      ]
+    }
 
 
 start : Model -> Model
@@ -192,3 +206,14 @@ timeoutRequests model =
     | requests = inTime
     , customers = List.map (decHappiness timeouted) model.customers
     }
+
+
+updateGameState : Model -> Model
+updateGameState model =
+  { model
+  | state =
+    if countLives model <= 0 then
+      Stopped
+    else
+      model.state
+  }

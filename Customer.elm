@@ -1,4 +1,4 @@
-module Customer where
+module Customer (Customer, initial, livesHere, decHappiness, isLost) where
 
 import House exposing (House)
 
@@ -14,8 +14,8 @@ type alias Customer =
   }
 
 
-initialCustomer : House -> Customer
-initialCustomer house =
+initial : House -> Customer
+initial house =
   { happiness = 1
   , location = AtHome house
   }

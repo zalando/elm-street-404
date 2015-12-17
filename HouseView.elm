@@ -5,8 +5,10 @@ import Html.Events exposing (onClick)
 import Layers exposing (layers)
 import Sprite exposing (Sprite)
 import House exposing (House)
+import Customer exposing (Customer)
 import Request exposing (Request)
 import RequestView
+import CustomerView
 
 
 sprite : Sprite
@@ -53,6 +55,7 @@ bubbleSprite3 =
   , src = "img/house-bubble-3.png"
   }
 
+
 emptySprite : Sprite
 emptySprite = Sprite.empty (2, 3) (0, -1)
 
@@ -66,8 +69,19 @@ getBubbleSprite number =
     _ -> Just bubbleSprite3
 
 
-render : Signal.Address Action -> List Request -> House -> List Sprite.Box
-render address requests house =
+firstAtHome : House -> List Customer -> Maybe Customer
+firstAtHome house customers =
+  case customers of
+    [] -> Nothing
+    customer :: otherCustomers ->
+      if Customer.livesHere house customer then
+        Just customer
+      else
+        firstAtHome house otherCustomers
+
+
+render : Signal.Address Action -> List Request -> List Customer -> House -> List Sprite.Box
+render address requests customers house =
   let
     requestsFromHouse = List.filter (Request.inHouse house) requests
     renderRequest number =
@@ -88,6 +102,11 @@ render address requests house =
             }
           ]
         _ -> []
+    houseCustomer = firstAtHome house customers
+    renderCustomer =
+      case houseCustomer of
+        Nothing -> []
+        Just customer -> CustomerView.render customer
   in
     [ { sprite = sprite
       , position = house.position
@@ -109,4 +128,6 @@ render address requests house =
         [ onClick address (Actions.ClickHouse house) ]
       }
     ]
-    ++ List.concat (List.indexedMap renderRequest requestsFromHouse) ++ renderBubble
+    ++ List.concat (List.indexedMap renderRequest requestsFromHouse)
+    ++ renderBubble
+    ++ renderCustomer
