@@ -76,7 +76,7 @@ render address requests house =
       in
       case request of
         Request.Return _ article _ ->
-          [ CategoryView.render position [] (Request.category request)
+          [ CategoryView.render position [] article.category
           , CategoryView.render
               position
               [onClick address (Actions.ClickArticle article)]
@@ -86,7 +86,7 @@ render address requests house =
           [ CategoryView.render
               position
               [onClick address (Actions.ClickCategory category)]
-              (Request.category request)
+              category
           ]
     renderBubble =
       case getBubbleSprite (List.length requestsFromHouse) of
