@@ -40,6 +40,7 @@ animate : Time -> Model -> Model
 animate elapsed model =
   model |> animateObstacles elapsed
         |> animateDeliveryPerson elapsed
+        |> animateRequests elapsed
 
 
 animateObstacles : Time -> Model -> Model
@@ -50,6 +51,11 @@ animateObstacles elapsed model =
 animateDeliveryPerson : Time -> Model -> Model
 animateDeliveryPerson elapsed model =
   { model | deliveryPerson = DeliveryPerson.animate elapsed model.deliveryPerson }
+
+
+animateRequests : Time -> Model -> Model
+animateRequests elapsed model =
+ {model | requests = List.map (Request.animate elapsed) model.requests }
 
 
 onCategoryClick : Category -> Model -> Model

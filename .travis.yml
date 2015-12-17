@@ -2,11 +2,8 @@ language: haskell
 install:
   - npm install -g elm
   - elm-package install -y
-<<<<<<< HEAD
-script: bash ./deploy.sh
-=======
+  - npm install -g html-minifier
 script: bash ./gh-pages.sh
->>>>>>> b54d9e744a96f0d0f2434e0d93099b5d9448d94f
 env:
   global:
   - secure: "iBcfnGhbAee/biXg8uDvHukLWkr0pDcHsJnQnG/wKsXeHZuMkniizXM1hkF/uWOWAOnTBQA3v6WdypYTC+Xq/+i9+q9mv182BIOu2jC1NZ2VhuhMId2bW8LWmjpgR145/9N5YKbWIP2ALGCc6bxQ4wrzlR98jcG7O3Zq5bPvXvrKPUOr9Lr4E0ijVD9JyS9WTAcEVHTsO8gi+LmiBjUuxnSBZRVep0D0xD3/1yW6pvaTH7xsLNwA9YNkJJ3j8kvysuTxE5ix2DNckPBjViLNF3xf4aKAP3csi1i/NB2zHULL6I5oKRaVkujZppfgkrLVvFXM8Iw4+cx8hlhXzx3jIxNToXqMrmsWHbPZqgCuvRD9poUBJYcI7/S"
