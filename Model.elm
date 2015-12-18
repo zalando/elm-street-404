@@ -13,6 +13,8 @@ module Model
   , returnArticle
   , pickupReturn
   , pickupArticle
+  , dispatchArticles
+  , dispatchOrders
   ) where
 
 import Random
@@ -28,6 +30,7 @@ import Warehouse exposing (Warehouse)
 import Pathfinder exposing (obstacleTiles)
 import IHopeItWorks
 import Article exposing (State(..), Article)
+import Generator exposing (Generator)
 
 
 type State = Paused | Playing | Stopped
@@ -46,6 +49,8 @@ type alias Model =
   , houses : List House
   , customers : List Customer
   , warehouses : List Warehouse
+  , orderGenerator : Generator
+  , articleGenerator : Generator
   }
 
 
@@ -76,14 +81,16 @@ initial =
     [ Warehouse.warehouse (19, 4)
     , Warehouse.warehouse (1, 10)
     ]
+  , orderGenerator = Generator.initial 11000
+  , articleGenerator = Generator.initial 13000
   }
 
 
 start : Model -> Model
 start model =
   model |> dispatchCustomers
-        |> dispatchArticles 8
-        |> dispatchOrders 4
+        |> dispatchArticles 6
+        |> dispatchOrders 3
 
 
 dispatchCustomers : Model -> Model

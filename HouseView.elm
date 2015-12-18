@@ -70,6 +70,7 @@ getBubbleSprite number =
     _ -> Just bubbleSprite3
 
 
+-- TODO: use IHopeItWorks.first
 firstAtHome : House -> List Customer -> Maybe Customer
 firstAtHome house customers =
   case customers of

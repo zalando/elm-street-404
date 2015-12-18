@@ -10,6 +10,8 @@ import Article exposing (State(..), Article)
 import Obstacle exposing (Obstacle)
 import Request exposing (Request)
 import Category exposing (Category)
+import Generator
+import Customer exposing (Customer)
 
 
 update : Action -> Model -> (Model, Effects Action)
@@ -47,6 +49,34 @@ animate elapsed model =
   model |> animateObstacles elapsed
         |> animateDeliveryPerson elapsed
         |> animateRequests elapsed
+        |> animateGenerators elapsed
+        |> animateCustomers elapsed
+
+
+animateGenerators : Time -> Model -> Model
+animateGenerators elapsed model =
+  { model
+  | orderGenerator = Generator.animate elapsed model.orderGenerator
+  , articleGenerator = Generator.animate elapsed model.articleGenerator
+  }
+  |> dispatchArticles
+  |> dispatchOrders
+
+
+dispatchArticles : Model -> Model
+dispatchArticles model =
+  if model.articleGenerator.active then
+    Model.dispatchArticles 1 model
+  else
+    model
+
+
+dispatchOrders : Model -> Model
+dispatchOrders model =
+  if model.orderGenerator.active then
+    Model.dispatchOrders 1 model
+  else
+    model
 
 
 animateObstacles : Time -> Model -> Model
@@ -62,6 +92,10 @@ animateDeliveryPerson elapsed model =
 animateRequests : Time -> Model -> Model
 animateRequests elapsed model =
  {model | requests = List.map (Request.animate elapsed) model.requests }
+
+animateCustomers : Time -> Model -> Model
+animateCustomers elapsed model =
+ {model | customers = List.map (Customer.animate elapsed) model.customers }
 
 
 onCategoryClick : Category -> Model -> Model
