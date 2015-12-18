@@ -15,7 +15,6 @@ type State
 type alias Article =
   { category : Category
   , state : State
-  , id : Random.Seed
   }
 
 
@@ -46,15 +45,14 @@ removeDelivered house category =
 
 
 updateState : State -> Article -> List Article -> List Article
-updateState state article =
-  let
-    update article' =
-      if article' == article then
-        {article' | state = state}
+updateState state article articles =
+  case articles of
+    a :: restArticles ->
+      if a == article then
+        {a | state = state } :: restArticles
       else
-        article'
-  in
-    List.map update
+        a :: updateState state article restArticles
+    [] -> []
 
 
 inWarehouse : Warehouse -> Article -> Bool
@@ -90,7 +88,6 @@ dispatch number warehouses seed =
         in
           ( { category = category
             , state = InStock warehouse
-            , id = seed'''
             }
             :: items
           , seed'''
