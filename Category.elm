@@ -1,8 +1,8 @@
-module Category (Category(..), getFrame, random, color) where
+module Category (Category(..), getFrame, random, color, getColor, isShirt, isShoes, isPants, isScarf) where
 
 import Random
 import Array exposing (Array)
-
+import IHopeItWorks
 
 type Category
   = Shirt Int
@@ -30,6 +30,34 @@ getFrame category =
     Empty -> 14
 
 
+isShirt : Category -> Bool
+isShirt category =
+  case category of
+    Shirt _ -> True
+    _ -> False
+
+
+isShoes : Category -> Bool
+isShoes category =
+  case category of
+    Shoes _ -> True
+    _ -> False
+
+
+isPants : Category -> Bool
+isPants category =
+  case category of
+    Pants _ -> True
+    _ -> False
+
+
+isScarf : Category -> Bool
+isScarf category =
+  case category of
+    Scarf _ -> True
+    _ -> False
+
+
 color : Category -> Int
 color category =
   case category of
@@ -38,6 +66,16 @@ color category =
    Pants color -> color
    Scarf color -> color
    _ -> 0
+
+
+getColor : (Category -> Bool) -> List Category -> Int
+getColor fn categories =
+  let
+    maybeCategory = IHopeItWorks.first fn categories
+  in
+    case maybeCategory of
+      Just shirt -> color shirt
+      _ -> 3
 
 
 random : Random.Seed -> (Category, Random.Seed)
