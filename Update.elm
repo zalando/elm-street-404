@@ -83,42 +83,18 @@ onArticleClick article model =
     AtHouse house ->
       case article.state of
         AwaitingReturn house' ->
-          if
-            house' == house &&
-            List.length (List.filter Article.isPicked model.articles) < model.deliveryPerson.capacity
-          then
-            { model
-            | requests = Request.removeReturns house article model.requests
-            , articles = Article.updateState Picked article model.articles
-            }
-          else
-            model
+          Model.pickupReturn house house' article model
         Picked ->
-          if Request.hasOrder house article.category model.requests then
-            { model
-            | requests = Request.removeOrders house article.category model.requests
-            , articles = model.articles
-              |> Article.removeDelivered house article.category
-              |> Article.updateState (Delivered house) article
-            }
-          else
-            model
+          Model.deliverArticle house article model
         _ ->
           model
 
     AtWarehouse warehouse' ->
       case article.state of
         InStock warehouse ->
-          if warehouse == warehouse' &&
-            List.length (List.filter Article.isPicked model.articles) < model.deliveryPerson.capacity then
-              {model | articles = Article.updateState Picked article model.articles}
-          else
-            model
+          Model.pickupArticle warehouse warehouse' article model
         Picked ->
-          if List.length (List.filter (Article.inWarehouse warehouse') model.articles) < warehouse'.capacity then
-            {model | articles = Article.updateState (InStock warehouse') article model.articles}
-          else
-            model
+          Model.returnArticle warehouse' article model
         _ -> model
 
     _ -> model

@@ -9,6 +9,10 @@ module Model
   , timeoutRequests
   , updateCustomers
   , updateGameState
+  , deliverArticle
+  , returnArticle
+  , pickupReturn
+  , pickupArticle
   ) where
 
 import Random
@@ -23,6 +27,7 @@ import Customer exposing (Customer)
 import Warehouse exposing (Warehouse)
 import Pathfinder exposing (obstacleTiles)
 import IHopeItWorks
+import Article exposing (State(..), Article)
 
 
 type State = Paused | Playing | Stopped
@@ -248,3 +253,63 @@ updateGameState model =
     else
       model.state
   }
+
+
+incHappinessInTheHouse : House -> Model -> Model
+incHappinessInTheHouse house model =
+  { model
+  | customers = List.map
+      (\ customer ->
+        if Customer.livesHere house customer then
+          Customer.incHappiness customer
+        else
+          customer
+      )
+      model.customers
+  }
+
+
+deliverArticle : House -> Article -> Model -> Model
+deliverArticle house article model =
+  if Request.hasOrder house article.category model.requests then
+    { model
+    | requests = Request.removeOrders house article.category model.requests
+    , articles = model.articles
+      |> Article.removeDelivered house article.category
+      |> Article.updateState (Delivered house) article
+    }
+    |> incHappinessInTheHouse house
+  else
+    model
+
+
+pickupReturn : House -> House -> Article -> Model -> Model
+pickupReturn house articleHouse article model =
+  if
+    articleHouse == house &&
+    List.length (List.filter Article.isPicked model.articles) < model.deliveryPerson.capacity
+  then
+    { model
+    | requests = Request.removeReturns house article model.requests
+    , articles = Article.updateState Picked article model.articles
+    }
+    |> incHappinessInTheHouse house
+  else
+    model
+
+
+pickupArticle : Warehouse -> Warehouse -> Article -> Model -> Model
+pickupArticle warehouse articleWarehouse article model =
+  if warehouse == articleWarehouse &&
+    List.length (List.filter Article.isPicked model.articles) < model.deliveryPerson.capacity then
+      {model | articles = Article.updateState Picked article model.articles}
+  else
+    model
+
+
+returnArticle : Warehouse -> Article -> Model -> Model
+returnArticle warehouse article model =
+  if List.length (List.filter (Article.inWarehouse warehouse) model.articles) < warehouse.capacity then
+    {model | articles = Article.updateState (InStock warehouse) article model.articles}
+  else
+    model

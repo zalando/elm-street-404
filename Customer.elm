@@ -1,4 +1,4 @@
-module Customer (Customer, initial, livesHere, decHappiness, isLost, rodnams) where
+module Customer (Customer, initial, livesHere, decHappiness, incHappiness, isLost, rodnams) where
 
 import House exposing (House)
 import Random
