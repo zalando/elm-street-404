@@ -26,6 +26,7 @@ update action model =
         ( model
           |> Model.animate time animate
           |> Model.timeoutRequests
+          |> Model.updateCustomers
           |> Model.updateGameState
         , Effects.tick Tick
         )

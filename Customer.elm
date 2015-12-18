@@ -60,9 +60,17 @@ isLost customer =
 
 modHappiness : Int -> Customer -> Customer
 modHappiness d customer =
-  { customer
-  | happiness = customer.happiness + d
-  }
+  let
+    happiness = customer.happiness + d
+  in
+    { customer
+    | happiness = happiness
+    , location =
+      if happiness < 0 then 
+        Lost
+      else
+        customer.location
+    }
 
 
 incHappiness : Customer -> Customer

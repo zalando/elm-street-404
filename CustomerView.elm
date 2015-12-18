@@ -36,7 +36,7 @@ frame customer =
 
 render : List Request -> House -> Customer -> List Sprite.Box
 render requests house customer =
-  if customer.happiness < 0 then
+  if Customer.isLost customer then
     []
   else
     [ { sprite = sprite

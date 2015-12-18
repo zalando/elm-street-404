@@ -7,6 +7,7 @@ module Model
   , navigateToHouse
   , State(..)
   , timeoutRequests
+  , updateCustomers
   , updateGameState
   ) where
 
@@ -46,7 +47,7 @@ type alias Model =
 initial : Model
 initial =
   let
-    seed = Random.initialSeed 72
+    seed = Random.initialSeed 42
     houses = 
       [ House.house (8, 10)
       , House.house (12, 7)
@@ -199,6 +200,29 @@ timeoutRequests model =
     { model
     | requests = inTime
     , customers = List.map (decHappiness timeouted) model.customers
+    }
+
+
+houseEmpty : List Customer -> House -> Bool
+houseEmpty customers house =
+  case customers of
+    [] -> True
+    customer :: otherCustomers ->
+      if Customer.livesHere house customer then
+        False
+      else
+        houseEmpty otherCustomers house
+
+
+updateCustomers : Model -> Model
+updateCustomers model =
+  let
+    emptyHouses = List.filter (houseEmpty model.customers) model.houses
+    (newCustomers, seed) = Customer.rodnams emptyHouses model.seed
+  in
+    { model
+    | customers = model.customers ++ newCustomers
+    , seed = seed
     }
 
 
