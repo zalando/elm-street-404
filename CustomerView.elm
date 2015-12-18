@@ -40,7 +40,7 @@ render requests house customer =
     []
   else
     [ { sprite = sprite
-      , position = house.position
+      , position = (fst house.position, snd house.position + 0.01)
       , layer = layers.customer
       , frame = frame customer
       , attributes = []
