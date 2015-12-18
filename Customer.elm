@@ -27,7 +27,7 @@ initial typ house =
 rodnam : House -> Random.Seed -> (Customer, Random.Seed)
 rodnam house seed =
   let
-    (typ, seed') = Random.generate (Random.int 0 6) seed
+    (typ, seed') = Random.generate (Random.int 0 5) seed
   in
     (initial typ house, seed')
 

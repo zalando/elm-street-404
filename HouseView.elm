@@ -84,6 +84,7 @@ render : Signal.Address Action -> List Request -> List Customer -> House -> List
 render address requests customers house =
   let
     requestsFromHouse = List.filter (Request.inHouse house) requests
+    hasRequests = (List.length requestsFromHouse) > 0
     renderRequest number =
       RequestView.render
         address
@@ -106,7 +107,11 @@ render address requests customers house =
     renderCustomer =
       case houseCustomer of
         Nothing -> []
-        Just customer -> CustomerView.render house customer
+        Just customer ->
+          if hasRequests then
+            CustomerView.render requests house customer
+          else
+            []
   in
     [ { sprite = sprite
       , position = house.position

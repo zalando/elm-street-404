@@ -46,14 +46,14 @@ type alias Model =
 initial : Model
 initial =
   let
-    seed = Random.initialSeed 0
+    seed = Random.initialSeed 72
     houses = 
       [ House.house (8, 10)
       , House.house (12, 7)
       , House.house (16, 10)
       , House.house (5, 5)
       ]
-    (customers, seed') = Customer.rodnams houses seed
+    (customers, seed') = Debug.log "customers" (Customer.rodnams houses seed)
   in
     { animationState = Nothing
     , state = Stopped
