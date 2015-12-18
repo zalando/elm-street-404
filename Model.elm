@@ -15,6 +15,8 @@ module Model
   , pickupArticle
   , dispatchArticles
   , dispatchOrders
+  , cleanupLostArticles
+  , cleanupLostRequests
   ) where
 
 import Random
@@ -219,7 +221,6 @@ countLives model =
 timeoutRequests : Model -> Model
 timeoutRequests model =
   let
-    livesBefore = countLives model
     (inTime, timeouted) = splitList Request.inTime model.requests
   in
     { model
@@ -249,6 +250,41 @@ updateCustomers model =
     | customers = model.customers ++ newCustomers
     , seed = seed
     }
+
+
+articleInEmptyHouse : List Customer -> Article -> Bool
+articleInEmptyHouse customers article =
+  case article.state of
+    Article.Delivered house ->
+      houseEmpty customers house
+    _ -> False
+
+
+requestInEmptyHouse : List Customer -> Request -> Bool
+requestInEmptyHouse customers request =
+  case request of
+    Request.Order house _ _ -> houseEmpty customers house
+    Request.Return house _ _ -> houseEmpty customers house
+
+
+cleanupLostArticles : Model -> Model
+cleanupLostArticles model =
+  { model
+  | articles =
+      List.filter
+        (\ article -> not (articleInEmptyHouse model.customers article))
+        model.articles
+  }
+
+
+cleanupLostRequests : Model -> Model
+cleanupLostRequests model =
+  { model
+  | requests =
+      List.filter
+        (\ request -> not (requestInEmptyHouse model.customers request))
+        model.requests
+  }
 
 
 updateGameState : Model -> Model

@@ -28,6 +28,8 @@ update action model =
         ( model
           |> Model.animate time animate
           |> Model.timeoutRequests
+          |> Model.cleanupLostArticles
+          |> Model.cleanupLostRequests
           |> Model.updateCustomers
           |> Model.updateGameState
         , Effects.tick Tick
