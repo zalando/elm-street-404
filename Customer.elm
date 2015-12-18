@@ -26,7 +26,7 @@ initial typ house =
   , happiness = 2
   , location = AtHome house
   , elapsed = 0
-  , frames = [0, 1, 2]
+  , frames = [0, 1]
   }
 
 

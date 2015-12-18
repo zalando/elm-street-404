@@ -81,6 +81,14 @@ dispatchOrders model =
     model
 
 
+dispatchReturns : Model -> Model
+dispatchReturns model =
+  if model.returnGenerator.active then
+    Model.dispatchReturns 1 model
+  else
+    model
+
+
 animateObstacles : Time -> Model -> Model
 animateObstacles elapsed model =
   { model | obstacles = List.map (Obstacle.animate elapsed) model.obstacles }

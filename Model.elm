@@ -15,6 +15,7 @@ module Model
   , pickupArticle
   , dispatchArticles
   , dispatchOrders
+  , dispatchReturns
   , cleanupLostArticles
   , cleanupLostRequests
   ) where
@@ -53,6 +54,7 @@ type alias Model =
   , warehouses : List Warehouse
   , orderGenerator : Generator
   , articleGenerator : Generator
+  , returnGenerator : Generator
   , score : Int
   }
 
@@ -86,6 +88,7 @@ initial =
     ]
   , orderGenerator = Generator.initial 11000
   , articleGenerator = Generator.initial 13000
+  , returnGenerator = Generator.initial 20000
   , score = 0
   }
 
@@ -123,9 +126,14 @@ dispatchOrders number model =
     houseSlots = IHopeItWorks.exclude
       (List.concat (List.map (\h -> List.repeat h.capacity h) model.houses))
       (List.map Request.house model.requests)
-    (orders, seed') = Request.orders number houseSlots categories model.seed
+    (orders, seed) = Request.orders number houseSlots categories model.seed
   in
-    { model | requests = model.requests ++ orders }
+    { model | requests = model.requests ++ orders, seed = seed }
+
+
+dispatchReturns : Int -> Model -> Model
+dispatchReturns number model =
+  model
 
 
 modelObstacles : Model -> List (Int, Int)
