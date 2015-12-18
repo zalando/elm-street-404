@@ -12,6 +12,7 @@ import DeliveryPerson
 import Pathfinder
 import InventoryView
 import Article
+import ScoreView
 
 (=>) : a -> b -> (a, b)
 (=>) = (,)
@@ -24,7 +25,8 @@ boxes address model =
     List.map (HouseView.render address model.requests model.articles model.customers) model.houses ++
     List.map (WarehouseView.render address model.articles) model.warehouses ++
     List.map Obstacle.render model.obstacles ++
-    [InventoryView.render address model.articles]
+    [InventoryView.render address model.articles] ++
+    [ScoreView.render model.score (Model.countLives model)]
   )
 
 

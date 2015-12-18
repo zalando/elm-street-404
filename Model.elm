@@ -18,6 +18,7 @@ module Model
   , dispatchReturns
   , cleanupLostArticles
   , cleanupLostRequests
+  , countLives
   ) where
 
 import Random
@@ -71,9 +72,8 @@ initial =
   , requests = []
   , obstacles =
     [ Obstacle.fountain (10, 5)
-    , Obstacle.fountain (20, 1)
     , Obstacle.tree (1, 5)
-    , Obstacle.tree (15, 3)
+    , Obstacle.tree (15, 5)
     ]
   , houses =
     [ House.house (8, 10)
@@ -83,7 +83,7 @@ initial =
     ]
   , customers = []
   , warehouses =
-    [ Warehouse.warehouse (19, 4)
+    [ Warehouse.warehouse (19, 6)
     , Warehouse.warehouse (1, 10)
     ]
   , orderGenerator = Generator.initial 11000
@@ -91,6 +91,10 @@ initial =
   , returnGenerator = Generator.initial 20000
   , score = 0
   }
+
+
+lifes : Model -> Int
+lifes model = 0
 
 
 start : Model -> Model

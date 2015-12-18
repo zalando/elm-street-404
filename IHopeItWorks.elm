@@ -1,4 +1,4 @@
-module IHopeItWorks (exclude, remove, pickRandom, first) where
+module IHopeItWorks (exclude, remove, pickRandom, first, digits) where
 import Random
 import Array
 
