@@ -53,6 +53,7 @@ type alias Model =
   , warehouses : List Warehouse
   , orderGenerator : Generator
   , articleGenerator : Generator
+  , score : Int
   }
 
 
@@ -85,6 +86,7 @@ initial =
     ]
   , orderGenerator = Generator.initial 11000
   , articleGenerator = Generator.initial 13000
+  , score = 0
   }
 
 
@@ -320,6 +322,7 @@ deliverArticle house article model =
     , articles = model.articles
       |> Article.removeDelivered house article.category
       |> Article.updateState (Delivered house) article
+    , score = model.score + 1
     }
     |> incHappinessInTheHouse house
   else
@@ -335,6 +338,7 @@ pickupReturn house articleHouse article model =
     { model
     | requests = Request.removeReturns house article model.requests
     , articles = Article.updateState Picked article model.articles
+    , score = model.score + 1
     }
     |> incHappinessInTheHouse house
   else
