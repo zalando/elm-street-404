@@ -7,6 +7,7 @@ import Sprite exposing (Sprite)
 import House exposing (House)
 import Customer exposing (Customer)
 import Request exposing (Request)
+import Article exposing (Article)
 import RequestView
 import CustomerView
 
@@ -80,11 +81,13 @@ firstAtHome house customers =
         firstAtHome house otherCustomers
 
 
-render : Signal.Address Action -> List Request -> List Customer -> House -> List Sprite.Box
-render address requests customers house =
+render : Signal.Address Action -> List Request -> List Article -> List Customer -> House -> List Sprite.Box
+render address requests articles customers house =
   let
     requestsFromHouse = List.filter (Request.inHouse house) requests
+    deliveredArticles = List.filter (Article.isDelivered house) articles
     hasRequests = (List.length requestsFromHouse) > 0
+    hasArticles = (List.length deliveredArticles) > 0
     renderRequest number =
       RequestView.render
         address
@@ -108,10 +111,10 @@ render address requests customers house =
       case houseCustomer of
         Nothing -> []
         Just customer ->
-          if hasRequests then
-            CustomerView.render requests house customer
-          else
+          if customer.happiness == 2 && not hasRequests && not hasArticles then
             []
+          else
+            CustomerView.render requestsFromHouse deliveredArticles house customer
   in
     [ { sprite = sprite
       , position = house.position

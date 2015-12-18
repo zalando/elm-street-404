@@ -53,8 +53,8 @@ orders number houses categories seed =
         case IHopeItWorks.pickRandom categories seed' of
           (Just category, seed'') ->
             let
-              restCategories = snd (IHopeItWorks.remove ((==) category) categories)
-              restHouses = snd (IHopeItWorks.remove ((==) house) houses)
+              restCategories = IHopeItWorks.remove ((==) category) categories
+              restHouses = IHopeItWorks.remove ((==) house) houses
               (rest, seed''') = orders (number - 1) restHouses restCategories seed''
             in
               (Order house category initData :: rest, seed''')

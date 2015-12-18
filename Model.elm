@@ -46,57 +46,70 @@ type alias Model =
 
 initial : Model
 initial =
-  let
-    seed = Random.initialSeed 42
-    houses = 
-      [ House.house (8, 10)
-      , House.house (12, 7)
-      , House.house (16, 10)
-      , House.house (5, 5)
-      ]
-    (customers, seed') = Debug.log "customers" (Customer.rodnams houses seed)
-  in
-    { animationState = Nothing
-    , state = Stopped
-    , seed = seed'
-    , tileSize = 40
-    , gridSize = (24, 14)
-    , deliveryPerson = DeliveryPerson.initial (10, 10)
-    , articles = []
-    , requests = []
-    , obstacles =
-      [ Obstacle.fountain (10, 5)
-      , Obstacle.fountain (20, 1)
-      , Obstacle.tree (1, 5)
-      , Obstacle.tree (15, 3)
-      ]
-    , houses = houses
-    , customers = customers
-    , warehouses =
-      [ Warehouse.warehouse (19, 4)
-      , Warehouse.warehouse (1, 10)
-      ]
-    }
+  { animationState = Nothing
+  , state = Stopped
+  , seed = Random.initialSeed 0
+  , tileSize = 40
+  , gridSize = (24, 14)
+  , deliveryPerson = DeliveryPerson.initial (10, 10)
+  , articles = []
+  , requests = []
+  , obstacles =
+    [ Obstacle.fountain (10, 5)
+    , Obstacle.fountain (20, 1)
+    , Obstacle.tree (1, 5)
+    , Obstacle.tree (15, 3)
+    ]
+  , houses =
+    [ House.house (8, 10)
+    , House.house (12, 7)
+    , House.house (16, 10)
+    , House.house (5, 5)
+    ]
+  , customers = []
+  , warehouses =
+    [ Warehouse.warehouse (19, 4)
+    , Warehouse.warehouse (1, 10)
+    ]
+  }
 
 
 start : Model -> Model
 start model =
+  model |> dispatchCustomers
+        |> dispatchArticles 8
+        |> dispatchOrders 4
+
+
+dispatchCustomers : Model -> Model
+dispatchCustomers model =
+  let
+    (customers, seed) = Customer.rodnams model.houses model.seed
+  in
+    { model | customers = customers, seed = seed }
+
+
+dispatchArticles : Int -> Model -> Model
+dispatchArticles number model =
   let
     warehouseSlots = IHopeItWorks.exclude
       (List.concat (List.map (\w -> List.repeat w.capacity w) model.warehouses))
       (Article.warehouses model.articles)
-    (articles, seed) = Article.dispatch 8 warehouseSlots model.seed
-    categories = Article.availableCategories articles (Request.orderedCategories model.requests)
+    (articles, seed) = Article.dispatch number warehouseSlots model.seed
+  in
+    { model | articles = model.articles ++ articles, seed = seed }
+
+
+dispatchOrders : Int -> Model -> Model
+dispatchOrders number model =
+  let
+    categories = Article.availableCategories model.articles (Request.orderedCategories model.requests)
     houseSlots = IHopeItWorks.exclude
       (List.concat (List.map (\h -> List.repeat h.capacity h) model.houses))
       (List.map Request.house model.requests)
-    (orders, seed') = Request.orders 4 houseSlots categories seed
+    (orders, seed') = Request.orders number houseSlots categories model.seed
   in
-    { model
-    | articles = articles
-    , seed = seed'
-    , requests = orders
-    }
+    { model | requests = model.requests ++ orders }
 
 
 modelObstacles : Model -> List (Int, Int)

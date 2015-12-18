@@ -21,7 +21,7 @@ boxes : Signal.Address Action -> Model -> List Sprite.Box
 boxes address model =
   List.concat (
     DeliveryPerson.render (List.length (List.filter Article.isPicked model.articles)) model.deliveryPerson ::
-    List.map (HouseView.render address model.requests model.customers) model.houses ++
+    List.map (HouseView.render address model.requests model.articles model.customers) model.houses ++
     List.map (WarehouseView.render address model.articles) model.warehouses ++
     List.map Obstacle.render model.obstacles ++
     [InventoryView.render address model.articles]

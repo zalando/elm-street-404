@@ -1,9 +1,20 @@
 language: haskell
+cache:
+  directories:
+    - node_modules
+    - elm-stuff
 install:
   - npm install -g elm
   - elm-package install -y
   - npm install -g html-minifier
-script: bash ./gh-pages.sh
+script:
+  - bash ./gh-pages.sh
+notifications:
+  email:
+    recipients:
+      - andrey.kuzmin@zalando.de
+      - vignesh.shamugam@zalando.de
+    on_failure: always
 env:
   global:
-  - secure: "mjgXAvwqFfspPEaoLdAZUAtZSnMW8ekwAZUZphZ69NLTd6FKr3C+S+BkWDqvSQ28vhX2R8JXhqCBqKh/HOrX91Lhx1IryEY5dZNogEzQWKoq1U4a8sZLBNZdSDu1f0uu0HeuqdrIbLLY/0BlGZMSlAYin3MATtnV0kHPZC1FLwQqyRxOdFjiOEfWGnEt22I16zBo4+/AQ+t7XRr/AooMS8szhNDJqNvwY3haUnYds9mcb2LhHoJ4a8se6ppI25ZiOBo3VXUcXvx6z65V468FEXHoHXn7c3Bh8D+yU9ZQ0qJ9wmpkmfwg3lvWoEz5EOSHTS9DXJH6rzk7PzHwdIH4o8JFhpM2PxN2hx/hu/0Xc4SG+2QgpBPizR39jgZAoH1NtJKf0I0j37AI1BDzOSvf2Em3z6yOAwe0tl6kBjCGe+tPN2glA3Xh8jONxlZ9kyaEBWxgPP7hj6L4Qt1YPgnu/f54xWbpS/jBhgGvq3K5iQVZbPMFBwPKIQXgFVFrlYZ0VSiuXiQxjF5nt609Xg/lLvKwxluyji7T1drAdp4vbMwpNgL4Cmv/EgmAvNjRZPKnp3c+ZKguzzzDQiGnBJFz2ytqeCbcUE6axtIy1Mw9OcdNqccgfI6XM0GWgppJEY6txJCd4PkMXe8fgzxecL0gZkrCOAj9KHm+fap/F6GekBw="
+  - secure: "jRwYN2EkXfd4wrWPw38xZodMgfNQkurR2Kqnr8BVjgiYg0Hy7Z/v0Lr+pZx+7uCH1462xHQy1Yl0IkvekW/GkgK9iyPREKgYIUGf/f1PsC+7DyNJHwzsv/PBE20lq1kAEvEqPDtwT9RxjFENox9G4LIV3TSGvHxQNNgbG3B7VoEjGcLPpn2/+Sd2ZJc6wpE1O03N8kPBBDL0lWPlMZXdb4JlXsh6e3dHJ8OOLTmljXNA5t1AI5XSn6SXnAbe3c4FQvPU2JYZdDyacn/KEWIf2JFe7cNY1jdkTxiDpJT2ZPzFt7ZHl7J3z9DMA/U9dICzE8LA4ZvAiILcLwOIWLPh4I0JTCFe9VPNBYqMb5x8xOZG9B5/lxIa8c9I/WWhw2KaDWVjc8jhI8tlhbq4GBUPGd0O/9PW2XQYnNOWo81G+FYDZWBtf5G9zshmKZ9sV523W0jAAbuX3eAVI5gbKQ82imgdvaKGXV8baIyw7ljA4/IcLXsxA9uMq6DU1STBSXPzE1OQBhEhIBafpmU6OIPQqBeNFPibx3lJjVOtrrkZdDQiCx7AFuoUSXfUWalA8/6gxSZSL4vMia0nsuqgN5CfZUdXNg5vuO9E+lqJNsfD8UhTDbM0hUW3sYalzD8ThDOcLid1J6+vzRDvVzLUbnNNaxOd9JzOZ9fqnu1HISbzVhk="
