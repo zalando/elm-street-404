@@ -24,6 +24,37 @@ sprite =
  , src = "img/customers.png"
  }
 
+shoeSprite: Sprite
+shoeSprite =
+  { size = size
+  , offset = (0, 0)
+  , frames = 4
+  , src = "img/shoes.png"
+  }
+
+shirtSprite: Sprite
+shirtSprite =
+  { size = size
+  , offset = (0, 0)
+  , frames = 12
+  , src = "img/shirts.png"
+  }
+
+scarveSprite: Sprite
+scarveSprite =
+  { size = size
+  , offset = (0, 0)
+  , frames = 3
+  , src = "img/scarves.png"
+  }
+
+trouserSprite: Sprite
+trouserSprite =
+  { size = size
+  , offset = (0, 0)
+  , frames = 3
+  , src = "img/trousers.png"
+  }
 
 moodFrameOffset : Int -> Int
 moodFrameOffset mood = 2 - mood
