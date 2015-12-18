@@ -9,8 +9,14 @@ module Model
   , timeoutRequests
   , updateCustomers
   , updateGameState
+  , deliverArticle
+  , returnArticle
+  , pickupReturn
+  , pickupArticle
   , dispatchArticles
   , dispatchOrders
+  , cleanupLostArticles
+  , cleanupLostRequests
   ) where
 
 import Random
@@ -25,6 +31,7 @@ import Customer exposing (Customer)
 import Warehouse exposing (Warehouse)
 import Pathfinder exposing (obstacleTiles)
 import IHopeItWorks
+import Article exposing (State(..), Article)
 import Generator exposing (Generator)
 
 
@@ -214,7 +221,6 @@ countLives model =
 timeoutRequests : Model -> Model
 timeoutRequests model =
   let
-    livesBefore = countLives model
     (inTime, timeouted) = splitList Request.inTime model.requests
   in
     { model
@@ -246,6 +252,41 @@ updateCustomers model =
     }
 
 
+articleInEmptyHouse : List Customer -> Article -> Bool
+articleInEmptyHouse customers article =
+  case article.state of
+    Article.Delivered house ->
+      houseEmpty customers house
+    _ -> False
+
+
+requestInEmptyHouse : List Customer -> Request -> Bool
+requestInEmptyHouse customers request =
+  case request of
+    Request.Order house _ _ -> houseEmpty customers house
+    Request.Return house _ _ -> houseEmpty customers house
+
+
+cleanupLostArticles : Model -> Model
+cleanupLostArticles model =
+  { model
+  | articles =
+      List.filter
+        (\ article -> not (articleInEmptyHouse model.customers article))
+        model.articles
+  }
+
+
+cleanupLostRequests : Model -> Model
+cleanupLostRequests model =
+  { model
+  | requests =
+      List.filter
+        (\ request -> not (requestInEmptyHouse model.customers request))
+        model.requests
+  }
+
+
 updateGameState : Model -> Model
 updateGameState model =
   { model
@@ -255,3 +296,63 @@ updateGameState model =
     else
       model.state
   }
+
+
+incHappinessInTheHouse : House -> Model -> Model
+incHappinessInTheHouse house model =
+  { model
+  | customers = List.map
+      (\ customer ->
+        if Customer.livesHere house customer then
+          Customer.incHappiness customer
+        else
+          customer
+      )
+      model.customers
+  }
+
+
+deliverArticle : House -> Article -> Model -> Model
+deliverArticle house article model =
+  if Request.hasOrder house article.category model.requests then
+    { model
+    | requests = Request.removeOrders house article.category model.requests
+    , articles = model.articles
+      |> Article.removeDelivered house article.category
+      |> Article.updateState (Delivered house) article
+    }
+    |> incHappinessInTheHouse house
+  else
+    model
+
+
+pickupReturn : House -> House -> Article -> Model -> Model
+pickupReturn house articleHouse article model =
+  if
+    articleHouse == house &&
+    List.length (List.filter Article.isPicked model.articles) < model.deliveryPerson.capacity
+  then
+    { model
+    | requests = Request.removeReturns house article model.requests
+    , articles = Article.updateState Picked article model.articles
+    }
+    |> incHappinessInTheHouse house
+  else
+    model
+
+
+pickupArticle : Warehouse -> Warehouse -> Article -> Model -> Model
+pickupArticle warehouse articleWarehouse article model =
+  if warehouse == articleWarehouse &&
+    List.length (List.filter Article.isPicked model.articles) < model.deliveryPerson.capacity then
+      {model | articles = Article.updateState Picked article model.articles}
+  else
+    model
+
+
+returnArticle : Warehouse -> Article -> Model -> Model
+returnArticle warehouse article model =
+  if List.length (List.filter (Article.inWarehouse warehouse) model.articles) < warehouse.capacity then
+    {model | articles = Article.updateState (InStock warehouse) article model.articles}
+  else
+    model

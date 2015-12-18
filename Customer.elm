@@ -1,9 +1,10 @@
-module Customer (Customer, initial, animate, livesHere, decHappiness, isLost, rodnams) where
+module Customer (Customer, initial, animate, livesHere, decHappiness, incHappiness, isLost, rodnams) where
 
 import House exposing (House)
 import Random
 import Time exposing (Time)
 import AnimationState exposing (animateObject, rotateFrames)
+
 
 type Location
   = AtHome House
