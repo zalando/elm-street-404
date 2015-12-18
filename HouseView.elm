@@ -108,10 +108,10 @@ render address requests customers house =
       case houseCustomer of
         Nothing -> []
         Just customer ->
-          if hasRequests then
-            CustomerView.render requests house customer
-          else
+          if customer.happiness == 2 && not hasRequests then
             []
+          else
+            CustomerView.render requests house customer
   in
     [ { sprite = sprite
       , position = house.position
