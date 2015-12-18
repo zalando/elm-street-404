@@ -46,16 +46,18 @@ type alias Model =
 initial : Model
 initial =
   let
+    seed = Random.initialSeed 0
     houses = 
       [ House.house (8, 10)
       , House.house (12, 7)
       , House.house (16, 10)
       , House.house (5, 5)
       ]
+    (customers, seed') = Customer.rodnams houses seed
   in
     { animationState = Nothing
     , state = Stopped
-    , seed = Random.initialSeed 0
+    , seed = seed'
     , tileSize = 40
     , gridSize = (24, 14)
     , deliveryPerson = DeliveryPerson.initial (10, 10)
@@ -68,7 +70,7 @@ initial =
       , Obstacle.tree (15, 3)
       ]
     , houses = houses
-    , customers = List.map Customer.initial houses
+    , customers = customers
     , warehouses =
       [ Warehouse.warehouse (19, 4)
       , Warehouse.warehouse (1, 10)

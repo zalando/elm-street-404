@@ -106,7 +106,7 @@ render address requests customers house =
     renderCustomer =
       case houseCustomer of
         Nothing -> []
-        Just customer -> CustomerView.render customer
+        Just customer -> CustomerView.render house customer
   in
     [ { sprite = sprite
       , position = house.position
