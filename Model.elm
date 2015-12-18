@@ -46,37 +46,32 @@ type alias Model =
 
 initial : Model
 initial =
-  let
-    seed = Random.initialSeed 42
-    houses = 
-      [ House.house (8, 10)
-      , House.house (12, 7)
-      , House.house (16, 10)
-      , House.house (5, 5)
-      ]
-    (customers, seed') = Debug.log "customers" (Customer.rodnams houses seed)
-  in
-    { animationState = Nothing
-    , state = Stopped
-    , seed = seed'
-    , tileSize = 40
-    , gridSize = (24, 14)
-    , deliveryPerson = DeliveryPerson.initial (10, 10)
-    , articles = []
-    , requests = []
-    , obstacles =
-      [ Obstacle.fountain (10, 5)
-      , Obstacle.fountain (20, 1)
-      , Obstacle.tree (1, 5)
-      , Obstacle.tree (15, 3)
-      ]
-    , houses = houses
-    , customers = customers
-    , warehouses =
-      [ Warehouse.warehouse (19, 4)
-      , Warehouse.warehouse (1, 10)
-      ]
-    }
+  { animationState = Nothing
+  , state = Stopped
+  , seed = Random.initialSeed 0
+  , tileSize = 40
+  , gridSize = (24, 14)
+  , deliveryPerson = DeliveryPerson.initial (10, 10)
+  , articles = []
+  , requests = []
+  , obstacles =
+    [ Obstacle.fountain (10, 5)
+    , Obstacle.fountain (20, 1)
+    , Obstacle.tree (1, 5)
+    , Obstacle.tree (15, 3)
+    ]
+  , houses =
+    [ House.house (8, 10)
+    , House.house (12, 7)
+    , House.house (16, 10)
+    , House.house (5, 5)
+    ]
+  , customers = []
+  , warehouses =
+    [ Warehouse.warehouse (19, 4)
+    , Warehouse.warehouse (1, 10)
+    ]
+  }
 
 
 start : Model -> Model
@@ -91,11 +86,13 @@ start model =
       (List.concat (List.map (\h -> List.repeat h.capacity h) model.houses))
       (List.map Request.house model.requests)
     (orders, seed') = Request.orders 4 houseSlots categories seed
+    (customers, seed'') = Customer.rodnams model.houses seed'
   in
     { model
     | articles = articles
-    , seed = seed'
+    , seed = seed''
     , requests = orders
+    , customers = customers
     }
 
 

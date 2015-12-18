@@ -19,7 +19,7 @@ type alias Customer =
 initial : Int -> House -> Customer
 initial typ house =
   { typ = typ
-  , happiness = 1
+  , happiness = 2
   , location = AtHome house
   }
 
@@ -66,7 +66,7 @@ modHappiness d customer =
     { customer
     | happiness = happiness
     , location =
-      if happiness < 0 then 
+      if happiness < 0 then
         Lost
       else
         customer.location
