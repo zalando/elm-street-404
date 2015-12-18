@@ -1,6 +1,17 @@
-module IHopeItWorks (exclude, remove, pickRandom) where
+module IHopeItWorks (exclude, remove, pickRandom, first) where
 import Random
 import Array
+
+
+first : (a -> Bool) -> List a -> Maybe a
+first fn list =
+  case list of
+    [] -> Nothing
+    el :: rest ->
+      if fn el then
+        Just el
+      else
+        first fn rest
 
 
 remove' : (a -> Bool) -> List a -> (Bool, List a)
