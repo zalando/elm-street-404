@@ -1,4 +1,4 @@
-module Category (Category(..), getFrame, random) where
+module Category (Category(..), getFrame, random, color) where
 
 import Random
 import Array exposing (Array)
@@ -28,6 +28,16 @@ getFrame category =
     Placeholder -> 12
     Return -> 13
     Empty -> 14
+
+
+color : Category -> Int
+color category =
+  case category of
+   Shirt color -> color
+   Shoes color -> color
+   Pants color -> color
+   Scarf color -> color
+   _ -> 0
 
 
 random : Random.Seed -> (Category, Random.Seed)
