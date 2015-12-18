@@ -36,12 +36,7 @@ availableCategories articles =
 
 removeDelivered : House -> Category -> List Article -> List Article
 removeDelivered house category =
-  {- TODO: remove only the first occurence -}
-  let
-    notInHouse house article =
-      not (article.state == Delivered house)
-  in
-    List.filter (notInHouse house)
+  IHopeItWorks.remove (\{state} -> state == Delivered house)
 
 
 updateState : State -> Article -> List Article -> List Article
