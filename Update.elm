@@ -26,6 +26,8 @@ update action model =
         ( model
           |> Model.animate time animate
           |> Model.timeoutRequests
+          |> Model.updateCustomers
+          |> Model.updateGameState
         , Effects.tick Tick
         )
       else
@@ -81,7 +83,10 @@ onArticleClick article model =
     AtHouse house ->
       case article.state of
         AwaitingReturn house' ->
-          if house' == house && List.length (List.filter Article.isPicked model.articles) < model.deliveryPerson.capacity then
+          if
+            house' == house &&
+            List.length (List.filter Article.isPicked model.articles) < model.deliveryPerson.capacity
+          then
             { model
             | requests = Request.removeReturns house article model.requests
             , articles = Article.updateState Picked article model.articles

@@ -3,8 +3,8 @@ import Random
 import Array
 
 
-remove : (a -> Bool) -> List a -> (Bool, List a)
-remove fn list =
+remove' : (a -> Bool) -> List a -> (Bool, List a)
+remove' fn list =
   case list of
     [] -> (False, [])
     first :: rest ->
@@ -12,9 +12,13 @@ remove fn list =
         (True, rest)
       else
         let
-          (found, remainder) = remove fn rest
+          (found, remainder) = remove' fn rest
         in
           (found, first :: remainder)
+
+
+remove : (a -> Bool) -> List a -> List a
+remove fn list = snd (remove' fn list)
 
 
 exclude : List a -> List a -> List a
@@ -23,7 +27,7 @@ exclude left right =
     [] -> []
     first :: rest ->
       let
-        (found, nextRight) = remove ((==) first) right
+        (found, nextRight) = remove' ((==) first) right
         nextLeft = exclude rest nextRight
       in
         if found then

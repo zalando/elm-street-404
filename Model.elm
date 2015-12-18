@@ -1,4 +1,15 @@
-module Model (Model, initial, start, animate, navigateToWarehouse, navigateToHouse, State(..), timeoutRequests) where
+module Model
+  ( Model
+  , initial
+  , start
+  , animate
+  , navigateToWarehouse
+  , navigateToHouse
+  , State(..)
+  , timeoutRequests
+  , updateCustomers
+  , updateGameState
+  ) where
 
 import Random
 import Time exposing (Time)
@@ -12,6 +23,7 @@ import Customer exposing (Customer)
 import Warehouse exposing (Warehouse)
 import Pathfinder exposing (obstacleTiles)
 import IHopeItWorks
+
 
 type State = Paused | Playing | Stopped
 
@@ -74,11 +86,13 @@ start model =
       (List.concat (List.map (\h -> List.repeat h.capacity h) model.houses))
       (List.map Request.house model.requests)
     (orders, seed') = Request.orders 4 houseSlots categories seed
+    (customers, seed'') = Customer.rodnams model.houses seed'
   in
     { model
     | articles = articles
-    , seed = seed'
+    , seed = seed''
     , requests = orders
+    , customers = customers
     }
 
 
@@ -184,3 +198,37 @@ timeoutRequests model =
     | requests = inTime
     , customers = List.map (decHappiness timeouted) model.customers
     }
+
+
+houseEmpty : List Customer -> House -> Bool
+houseEmpty customers house =
+  case customers of
+    [] -> True
+    customer :: otherCustomers ->
+      if Customer.livesHere house customer then
+        False
+      else
+        houseEmpty otherCustomers house
+
+
+updateCustomers : Model -> Model
+updateCustomers model =
+  let
+    emptyHouses = List.filter (houseEmpty model.customers) model.houses
+    (newCustomers, seed) = Customer.rodnams emptyHouses model.seed
+  in
+    { model
+    | customers = model.customers ++ newCustomers
+    , seed = seed
+    }
+
+
+updateGameState : Model -> Model
+updateGameState model =
+  { model
+  | state =
+    if countLives model <= 0 then
+      Stopped
+    else
+      model.state
+  }
