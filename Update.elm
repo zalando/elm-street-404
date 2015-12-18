@@ -11,6 +11,8 @@ import Obstacle exposing (Obstacle)
 import Request exposing (Request)
 import Category exposing (Category)
 import Generator
+import Customer exposing (Customer)
+
 
 update : Action -> Model -> (Model, Effects Action)
 update action model =
@@ -48,7 +50,7 @@ animate elapsed model =
         |> animateDeliveryPerson elapsed
         |> animateRequests elapsed
         |> animateGenerators elapsed
-
+        |> animateCustomers elapsed
 
 
 animateGenerators : Time -> Model -> Model
@@ -90,6 +92,10 @@ animateDeliveryPerson elapsed model =
 animateRequests : Time -> Model -> Model
 animateRequests elapsed model =
  {model | requests = List.map (Request.animate elapsed) model.requests }
+
+animateCustomers : Time -> Model -> Model
+animateCustomers elapsed model =
+ {model | customers = List.map (Customer.animate elapsed) model.customers }
 
 
 onCategoryClick : Category -> Model -> Model
