@@ -36,7 +36,7 @@ availableCategories articles =
 
 removeDelivered : House -> Category -> List Article -> List Article
 removeDelivered house category' =
-  IHopeItWorks.remove (\{state, category} -> state == Delivered house && category == category')
+  IHopeItWorks.remove (\{state, category} -> state == Delivered house && Category.isSame category category')
 
 
 updateState : State -> Article -> List Article -> List Article

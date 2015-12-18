@@ -1,4 +1,4 @@
-module Category (Category(..), getFrame, random, color, getColor, isShirt, isShoes, isPants, isScarf) where
+module Category (Category(..), getFrame, random, color, getColor, isShirt, isShoes, isPants, isScarf, isSame) where
 
 import Random
 import Array exposing (Array)
@@ -58,6 +58,23 @@ isScarf category =
     _ -> False
 
 
+baseCategory : Category -> Int
+baseCategory category =
+  case category of
+    Shirt _ -> 1
+    Shoes _ -> 2
+    Pants _ -> 3
+    Scarf _ -> 4
+    Placeholder -> 5
+    Return -> 6
+    Empty -> 7
+
+
+isSame : Category -> Category -> Bool
+isSame cat1 cat2 =
+  baseCategory cat1 == baseCategory cat2
+
+
 color : Category -> Int
 color category =
   case category of
@@ -66,6 +83,8 @@ color category =
    Pants color -> color
    Scarf color -> color
    _ -> 0
+
+
 
 
 getColor : (Category -> Bool) -> List Category -> Int
