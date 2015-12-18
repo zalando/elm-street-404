@@ -64,7 +64,7 @@ modHappiness d customer =
     happiness = customer.happiness + d
   in
     { customer
-    | happiness = happiness
+    | happiness = if happiness > 2 then 2 else happiness
     , location =
       if happiness < 0 then
         Lost
