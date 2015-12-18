@@ -5,6 +5,7 @@ import Sprite exposing (Sprite)
 import Layers exposing (layers)
 import House exposing (House)
 import Request exposing (Request)
+import Article exposing (Article)
 
 
 size : (Int, Int)
@@ -34,8 +35,8 @@ frame customer =
   (moodFrameOffset customer.happiness)
 
 
-render : List Request -> House -> Customer -> List Sprite.Box
-render requests house customer =
+render : List Request -> List Article -> House -> Customer -> List Sprite.Box
+render requests articles house customer =
   if Customer.isLost customer then
     []
   else

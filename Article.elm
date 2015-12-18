@@ -1,4 +1,4 @@
-module Article (Article, State(..), dispatch, warehouses, updateState, removeDelivered, inWarehouse, isPicked, availableCategories) where
+module Article (Article, State(..), dispatch, warehouses, updateState, removeDelivered, inWarehouse, isPicked, isDelivered, availableCategories) where
 import Random
 import House exposing (House)
 import Warehouse exposing (Warehouse)
@@ -62,6 +62,13 @@ inWarehouse warehouse article =
 
 isPicked : Article -> Bool
 isPicked {state} = state == Picked
+
+
+isDelivered : House -> Article -> Bool
+isDelivered house {state} =
+  case state of
+    Delivered house' -> house == house'
+    _ -> False
 
 
 {- returns true if the article can be ordered -}
