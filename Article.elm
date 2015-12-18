@@ -82,7 +82,7 @@ dispatch number warehouses seed =
     case IHopeItWorks.pickRandom warehouses seed of
       (Just warehouse, seed') ->
         let
-          restWarehouses = snd (IHopeItWorks.remove ((==) warehouse) warehouses)
+          restWarehouses = IHopeItWorks.remove ((==) warehouse) warehouses
           (category, seed'') = Category.random seed'
           (items, seed''') = dispatch (number - 1) restWarehouses seed''
         in
