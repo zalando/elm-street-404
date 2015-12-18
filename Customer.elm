@@ -1,8 +1,9 @@
-module Customer (Customer, initial, livesHere, decHappiness, isLost, rodnams) where
+module Customer (Customer, initial, animate, livesHere, decHappiness, isLost, rodnams) where
 
 import House exposing (House)
 import Random
-
+import Time exposing (Time)
+import AnimationState exposing (animateObject, rotateFrames)
 
 type Location
   = AtHome House
@@ -13,6 +14,8 @@ type alias Customer =
   { typ : Int
   , location : Location
   , happiness : Int
+  , elapsed: Time
+  , frames : List (Int)
   }
 
 
@@ -21,7 +24,19 @@ initial typ house =
   { typ = typ
   , happiness = 2
   , location = AtHome house
+  , elapsed = 0
+  , frames = [0, 1, 2]
   }
+
+
+animate : Time -> Customer -> Customer
+animate time customer =
+  let updateCustomer customer =
+    {customer | frames = rotateFrames customer.frames}
+  in
+    case customer.happiness of
+      0 -> animateObject 150 time updateCustomer customer
+      _ -> customer
 
 
 rodnam : House -> Random.Seed -> (Customer, Random.Seed)
