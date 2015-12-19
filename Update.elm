@@ -12,6 +12,7 @@ import Request exposing (Request)
 import Category exposing (Category)
 import Generator
 import Customer exposing (Customer)
+import IHopeItWorks
 
 
 update : Action -> Model -> (Model, Effects Action)
@@ -22,7 +23,7 @@ update action model =
       , Effects.tick (always Start)
       )
     Start ->
-      (Model.start { model | state = Playing} , Effects.tick Tick)
+      (Model.start model, Effects.tick Tick)
     Tick time ->
       if model.state == Playing then
         ( model
@@ -103,21 +104,22 @@ animateRequests : Time -> Model -> Model
 animateRequests elapsed model =
  {model | requests = List.map (Request.animate elapsed) model.requests }
 
+
 animateCustomers : Time -> Model -> Model
 animateCustomers elapsed model =
  {model | customers = List.map (Customer.animate elapsed) model.customers }
 
 
+-- click the 1st picked article that has the same category
 onCategoryClick : Category -> Model -> Model
 onCategoryClick category model =
   let
-    -- find articles from the inventory with the same category
-    articles = List.filter
+    maybeArticle = IHopeItWorks.first
       (\a -> a.category == category && Article.isPicked a)
       model.articles
   in
-    case articles of
-      article :: _ -> onArticleClick article model
+    case maybeArticle of
+      Just article -> onArticleClick article model
       _ -> model
 
 

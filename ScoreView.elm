@@ -13,14 +13,13 @@ scoreSprite =
   }
 
 
-render : Int -> Int -> List Sprite.Box
-render score lifes =
+render : Int -> Int -> Int -> List Sprite.Box
+render score maxLifes lifes =
   let
     digits' = List.reverse (IHopeItWorks.digits (score * 10))
     digits = if digits' == [] then [0] else digits'
     x = 22
     y = 1
-    maxLifes = 3
 
     renderLife number _ =
       { sprite = scoreSprite

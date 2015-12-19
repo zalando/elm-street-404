@@ -18,7 +18,7 @@ module Model
   , dispatchReturns
   , cleanupLostArticles
   , cleanupLostRequests
-  , countLives
+  , countLifes
   ) where
 
 import Random
@@ -57,6 +57,7 @@ type alias Model =
   , articleGenerator : Generator
   , returnGenerator : Generator
   , score : Int
+  , maxLifes : Int
   }
 
 
@@ -90,6 +91,7 @@ initial =
   , articleGenerator = Generator.initial 13000
   , returnGenerator = Generator.initial 20000
   , score = 0
+  , maxLifes = 3
   }
 
 
@@ -99,9 +101,10 @@ lifes model = 0
 
 start : Model -> Model
 start model =
-  model |> dispatchCustomers
-        |> dispatchArticles 6
-        |> dispatchOrders 3
+  {model | state = Playing}
+  |> dispatchCustomers
+  |> dispatchArticles 6
+  |> dispatchOrders 3
 
 
 dispatchCustomers : Model -> Model
@@ -220,13 +223,9 @@ decHappiness timeouted customer =
     customer
 
 
-maxLives : Int
-maxLives = 3
-
-
-countLives : Model -> Int
-countLives model =
-  maxLives -
+countLifes : Model -> Int
+countLifes model =
+  model.maxLifes -
   (model.customers
     |> List.filter Customer.isLost
     |> List.length)
@@ -303,13 +302,10 @@ cleanupLostRequests model =
 
 updateGameState : Model -> Model
 updateGameState model =
-  { model
-  | state =
-    if countLives model <= 0 then
-      Stopped
-    else
-      model.state
-  }
+  if countLifes model <= 0 then
+    { model | state = Stopped }
+  else
+    model
 
 
 incHappinessInTheHouse : House -> Model -> Model
