@@ -101,6 +101,6 @@ random seed =
     (color, seed') = Random.generate (Random.int 0 2) seed
     (categoryIndex, seed'') = Random.generate (Random.int 0 (Array.length categories - 1)) seed'
   in
-    ( (Maybe.withDefault Scarf (Array.get categoryIndex categories)) color
+    ( Scarf 1 -- (Maybe.withDefault Scarf (Array.get categoryIndex categories)) color
     , seed''
     )
