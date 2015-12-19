@@ -93,7 +93,7 @@ render address requests articles customers house =
       RequestView.render
         address
         ( fst house.position - 1
-        , snd house.position + 1 - toFloat (List.length requestsFromHouse - number)
+        , snd house.position - toFloat number
         )
 
     renderBubble =
