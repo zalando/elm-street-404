@@ -85,8 +85,6 @@ color category =
    _ -> 0
 
 
-
-
 getColor : (Category -> Bool) -> List Category -> Int
 getColor fn categories =
   let

@@ -18,12 +18,8 @@ initial timeout =
 
 animate : Time -> Generator -> Generator
 animate time generator =
-  let
-    updateGenerator generator =
-      { generator | active = True }
-  in
-    AnimationState.animateObject
-      generator.timeout
-      time
-      updateGenerator
-      { generator | active = False }
+  AnimationState.animateObject
+    generator.timeout
+    time
+    (\g -> { g | active = True })
+    {generator | active = False}

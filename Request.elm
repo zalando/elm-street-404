@@ -1,4 +1,4 @@
-module Request (Request(..), removeOrders, removeReturns, inHouse, hasOrder, animate, initData, inTime, house, orders, orderedCategories) where
+module Request (Request(..), isInReturn, inHouse, isOrdered, hasOrder, animate, inTime, house, orders, orderedCategories) where
 
 import House exposing (House)
 import Article exposing (Article)
@@ -65,14 +65,8 @@ orders number houses categories seed =
 inHouse : House -> Request -> Bool
 inHouse house request =
   case request of
-    Order house'' _ _ -> house'' == house
-    Return house'' _ _ -> house'' == house
-
-
-removeReturns : House -> Article -> List Request -> List Request
-removeReturns house article requests =
-  {- TODO: remove only the first occurence -}
-  List.filter (\r -> not (isInReturn house article r)) requests
+    Order house' _ _ -> house' == house
+    Return house' _ _ -> house' == house
 
 
 isInReturn : House -> Article -> Request -> Bool
@@ -90,12 +84,6 @@ isOrdered house category request =
     Order house' category' _ ->
       house' == house && category' == category
     _ -> False
-
-
-removeOrders : House -> Category -> List Request -> List Request
-removeOrders house category requests =
-  {- TODO: remove only the first occurence -}
-  List.filter (\r -> not (isOrdered house category r)) requests
 
 
 hasOrder : House -> Category -> List Request -> Bool

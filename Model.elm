@@ -330,7 +330,9 @@ deliverArticle : House -> Article -> Model -> Model
 deliverArticle house article model =
   if Request.hasOrder house article.category model.requests then
     { model
-    | requests = Request.removeOrders house article.category model.requests
+    | requests = IHopeItWorks.remove
+        (Request.isOrdered house article.category)
+        model.requests
     , articles = model.articles
       |> Article.removeDelivered house article.category
       |> Article.updateState (Delivered house) article
@@ -348,7 +350,7 @@ pickupReturn house articleHouse article model =
     List.length (List.filter Article.isPicked model.articles) < model.deliveryPerson.capacity
   then
     { model
-    | requests = Request.removeReturns house article model.requests
+    | requests = IHopeItWorks.remove (Request.isInReturn house article) model.requests
     , articles = Article.updateState Picked article model.articles
     , score = model.score + 1
     }
