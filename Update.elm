@@ -60,10 +60,12 @@ animateGenerators : Time -> Model -> Model
 animateGenerators elapsed model =
   { model
   | orderGenerator = Generator.animate elapsed model.orderGenerator
+  , returnGenerator = Generator.animate elapsed model.returnGenerator
   , articleGenerator = Generator.animate elapsed model.articleGenerator
   }
   |> dispatchArticles
   |> dispatchOrders
+  |> dispatchReturns
 
 
 dispatchArticles : Model -> Model

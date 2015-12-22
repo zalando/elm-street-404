@@ -1,4 +1,4 @@
-module Request (Request(..), isInReturn, inHouse, isOrdered, hasOrder, animate, inTime, house, orders, orderedCategories) where
+module Request (Request(..), isInReturn, inHouse, isOrdered, hasOrder, animate, inTime, house, orders, orderedCategories, returnArticles) where
 
 import House exposing (House)
 import Article exposing (Article)
@@ -41,6 +41,18 @@ orderedCategories requests =
         _ ->
           orderedCategories rest
     [] -> []
+
+
+returnArticles : List Article -> List Request
+returnArticles articles =
+  case articles of
+    [] -> []
+    article :: restArticles ->
+      case Article.house article of
+        Just house ->
+          Return house article initData :: returnArticles restArticles
+        Nothing ->
+          returnArticles restArticles
 
 
 orders : Int -> List House -> List Category -> Random.Seed -> (List Request, Random.Seed)

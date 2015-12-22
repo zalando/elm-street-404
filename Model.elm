@@ -89,7 +89,7 @@ initial =
     ]
   , orderGenerator = Generator.initial 11000
   , articleGenerator = Generator.initial 13000
-  , returnGenerator = Generator.initial 20000
+  , returnGenerator = Generator.initial 25000
   , score = 0
   , maxLifes = 3
   }
@@ -140,7 +140,22 @@ dispatchOrders number model =
 
 dispatchReturns : Int -> Model -> Model
 dispatchReturns number model =
-  model
+  let
+    housesWithArticles = List.filter (\h -> List.any (Article.isDelivered h) model.articles) model.houses
+    houseSlots = IHopeItWorks.exclude
+      (List.concat (List.map (\h -> List.repeat h.capacity h) housesWithArticles))
+      (List.map Request.house model.requests)
+    wearedArticles = List.filter Article.isWeared model.articles
+    (articlesToReturn, seed) = Article.chooseToReturn number houseSlots model.articles model.seed
+    articles = Article.markInReturn model.articles articlesToReturn
+    returnedArticles = Article.markInReturn articlesToReturn articlesToReturn
+    returns = Request.returnArticles returnedArticles
+  in
+    { model
+    | articles = articles
+    , requests = model.requests ++ returns
+    , seed = seed
+    }
 
 
 modelObstacles : Model -> List (Int, Int)
