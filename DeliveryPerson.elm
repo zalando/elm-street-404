@@ -198,7 +198,10 @@ navigationStart deliveryPerson =
 
 findPath : (Int, Int) -> List (Int, Int) -> (Int, Int) -> DeliveryPerson -> List (Int, Int)
 findPath gridSize obstacles destination deliveryPerson =
-  Pathfinder.find gridSize obstacles (navigationStart deliveryPerson) destination
+  let
+    start = navigationStart deliveryPerson
+  in
+    Pathfinder.find gridSize obstacles start destination
 
 
 appendPath : List (Int, Int) -> List (Int, Int) -> List (Int, Int)
