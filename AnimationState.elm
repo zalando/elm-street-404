@@ -2,19 +2,19 @@ module AnimationState (AnimationState, AnimatedObject, animateObject, animate, r
 import Time exposing (Time)
 
 type alias AnimationState =
-  Maybe { prevClockTime : Time, elapsedTime : Time }
+  Maybe { prevClockTime : Time, elapsed : Time }
 
 type alias AnimatedObject a =
   { a | elapsed: Time }
 
 
 animateObject : Time -> Time -> (AnimatedObject a -> AnimatedObject a) -> AnimatedObject a -> AnimatedObject a
-animateObject limit elapsed animationFunc state =
+animateObject timeout elapsed animationFunc state =
   let
     elapsed' = state.elapsed + elapsed
   in
-    if elapsed' > limit then
-      animationFunc {state | elapsed = elapsed' - limit}
+    if elapsed' > timeout then
+      animationFunc {state | elapsed = elapsed' - timeout}
     else
       {state | elapsed = elapsed'}
 
@@ -22,16 +22,16 @@ animateObject limit elapsed animationFunc state =
 animate : Time -> AnimationState -> (Time, AnimationState)
 animate time animationState =
   let
-    elapsedTime =
+    elapsed =
       case animationState of
         Nothing ->
           0
         Just {prevClockTime} ->
           min (time - prevClockTime) 25
   in
-    ( elapsedTime
+    ( elapsed
     , Just { prevClockTime = time
-           , elapsedTime = elapsedTime
+           , elapsed = elapsed
            }
     )
 
