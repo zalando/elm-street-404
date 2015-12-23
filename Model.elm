@@ -89,7 +89,7 @@ initial =
     ]
   , orderGenerator = Generator.initial 11000
   , articleGenerator = Generator.initial 13000
-  , returnGenerator = Generator.initial 25000
+  , returnGenerator = Generator.initial 31000
   , score = 0
   , maxLifes = 3
   }
@@ -119,7 +119,7 @@ dispatchArticles : Int -> Model -> Model
 dispatchArticles number model =
   let
     warehouseSlots = IHopeItWorks.exclude
-      (List.concat (List.map (\w -> List.repeat w.capacity w) model.warehouses))
+      (List.concat (List.map (\w -> List.repeat (w.capacity - 1) w) model.warehouses))
       (Article.warehouses model.articles)
     (articles, seed) = Article.dispatch number warehouseSlots model.seed
   in

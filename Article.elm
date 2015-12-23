@@ -114,21 +114,21 @@ dispatch number warehouses seed =
 
 
 chooseToReturn : Int -> List House -> List Article -> Random.Seed -> (List Article, Random.Seed)
-chooseToReturn number houseSlots articles seed =
+chooseToReturn number houses articles seed =
   if number == 0 then
     ([], seed)
   else
     let
       deliveredTo article house = isDelivered house article
       -- keep articles from available slots
-      availableArticles = List.filter (\a -> List.any (deliveredTo a) houseSlots) articles
+      availableArticles = List.filter (\a -> List.any (deliveredTo a) houses) articles
     in
       case IHopeItWorks.pickRandom availableArticles seed of
         (Just article, seed') ->
           let
             restArticles = IHopeItWorks.remove ((==) article) availableArticles
-            restHouseSlots = IHopeItWorks.remove (deliveredTo article) houseSlots
-            (returnArticles, seed'') = chooseToReturn (number - 1) restHouseSlots restArticles seed'
+            restHouses = IHopeItWorks.remove (deliveredTo article) houses
+            (returnArticles, seed'') = chooseToReturn (number - 1) restHouses restArticles seed'
           in
             (article :: returnArticles, seed'')
         (Nothing, seed') ->
