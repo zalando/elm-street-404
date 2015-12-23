@@ -14,6 +14,7 @@ To succeed, you'll have to plan your route carefully. You have to decide which p
 
 Unhappy customers: **you lose**.
 
+
 ## Instructions to run
 
 1. Install elm [elm-lang.org/install](http://elm-lang.org/install)
