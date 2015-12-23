@@ -3,6 +3,9 @@ cache:
   directories:
     - node_modules
     - elm-stuff
+branches:
+  only:
+    - master
 install:
   - npm install -g elm
   - elm-package install -y
