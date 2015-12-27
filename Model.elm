@@ -63,36 +63,46 @@ type alias Model =
 
 initial : Model
 initial =
-  { animationState = Nothing
-  , state = Stopped
-  , seed = Random.initialSeed 0
-  , tileSize = 40
-  , gridSize = (24, 14)
-  , deliveryPerson = DeliveryPerson.initial (10, 10)
-  , articles = []
-  , requests = []
-  , obstacles =
-    [ Obstacle.fountain (10, 5)
-    , Obstacle.tree (1, 5)
-    , Obstacle.tree (15, 5)
-    ]
-  , houses =
-    [ House.house (8, 10)
-    , House.house (12, 7)
-    , House.house (16, 10)
-    , House.house (5, 5)
-    ]
-  , customers = []
-  , warehouses =
-    [ Warehouse.warehouse (19, 6)
-    , Warehouse.warehouse (1, 10)
-    ]
-  , orderGenerator = Generator.initial 11000
-  , articleGenerator = Generator.initial 13000
-  , returnGenerator = Generator.initial 20000
-  , score = 0
-  , maxLifes = 3
-  }
+  let
+    gridSize = (24, 14)
+    obstacles = 
+      [ Obstacle.fountain (10, 5)
+      , Obstacle.tree (1, 5)
+      , Obstacle.tree (15, 5)
+      ]
+    houses =
+      [ House.house (8, 10)
+      , House.house (12, 7)
+      , House.house (16, 10)
+      , House.house (5, 5)
+      ]
+    warehouses =
+      [ Warehouse.warehouse (19, 6)
+      , Warehouse.warehouse (1, 10)
+      ]
+  in
+    { animationState = Nothing
+    , state = Stopped
+    , seed = Random.initialSeed 0
+    , tileSize = 40
+    , gridSize = gridSize
+    , deliveryPerson =
+        DeliveryPerson.initial
+          (allObstacles obstacles houses warehouses)
+          gridSize
+          (10, 10)
+    , articles = []
+    , requests = []
+    , obstacles = obstacles
+    , houses = houses
+    , customers = []
+    , warehouses = warehouses
+    , orderGenerator = Generator.initial 11000
+    , articleGenerator = Generator.initial 13000
+    , returnGenerator = Generator.initial 20000
+    , score = 0
+    , maxLifes = 3
+    }
 
 
 lifes : Model -> Int
@@ -143,11 +153,11 @@ dispatchReturns number model =
   model
 
 
-modelObstacles : Model -> List (Int, Int)
-modelObstacles model =
-  obstacleTiles model.obstacles ++
-  obstacleTiles model.houses ++
-  obstacleTiles model.warehouses
+allObstacles : List Obstacle -> List House -> List Warehouse -> List (Int, Int)
+allObstacles obstacles houses warehouses = 
+  obstacleTiles obstacles ++
+  obstacleTiles houses ++
+  obstacleTiles warehouses
 
 
 placeToLocation : {a | position : (Float, Float), size : (Float, Float )} -> (Int, Int)
@@ -176,8 +186,6 @@ navigateTo location destination model =
   { model
   | deliveryPerson = DeliveryPerson.navigateTo
       location
-      model.gridSize
-      (modelObstacles model)
       destination
       model.deliveryPerson
   }

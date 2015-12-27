@@ -1,9 +1,9 @@
-module Pathfinder (Obstacle, obstacleTiles, find, render) where
+module Pathfinder (Obstacle, Map, createMap, obstacleTiles, find, render) where
 
 import Svg exposing (svg, polyline, rect)
 import Svg.Attributes exposing (..)
 import Html exposing (Html)
-import Astar exposing (astar)
+import Astar
 import Html exposing (div, Html)
 import Html.Attributes exposing (style)
 import Mouse
@@ -14,6 +14,9 @@ type alias Obstacle a =
   { a | position : (Float, Float)
       , size : (Float, Float)
   }
+
+
+type alias Map = Astar.Grid
 
 
 obstacleRow : (Int, Int) -> Int -> Int -> List (Int, Int)
@@ -47,8 +50,12 @@ obstacleTiles obstacles =
   |> List.concat
 
 
-find : (Int, Int) -> List (Int, Int) -> (Int, Int) -> (Int, Int) -> List (Int, Int)
-find = astar
+createMap : List (Int, Int) -> (Int, Int) -> Map
+createMap = Astar.createGrid
+
+
+find : (Int, Int) -> (Int, Int) -> Map -> List (Int, Int)
+find = Astar.findPath
 
 
 pointToSring : Int -> (Int, Int) -> String
@@ -117,34 +124,3 @@ render (w, h) tileSize route =
 
 (=>) : a -> b -> (a, b)
 (=>) = (,)
-
-
-renderMain : (Int, Int) -> Html
-renderMain click =
-  let
-    tileSize = 40
-    dest = (fst click // tileSize, snd click // tileSize)
-    obstacles =
-      [ {position = (3, 5), size = (3, 3)}
-      , {position = (9, 6), size = (3, 3)}
-      , {position = (15, 6), size = (3, 3)}
-      , {position = (5, 2), size = (1, 3)}
-      , {position = (3, 1), size = (3, 1)}
-      ]
-    source = (1, 1)
-  in
-    div
-    [ Html.Attributes.style
-      [ "height" => "560px"
-      , "position" => "relative"
-      , "width" => "960px"
-      , "background-image" => "url(img/bg-grid.jpg)"
-      , "background-size" => "960px 560px"
-      ]
-    ]
-    [ render'
-        tileSize
-        obstacles
-        (find (36, 36) (obstacleTiles obstacles) source dest)
-        source
-    ]

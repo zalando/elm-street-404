@@ -35,6 +35,7 @@ type alias DeliveryPerson =
   , elapsed: Time
   , frames : List (Int)
   , capacity : Int
+  , map : Pathfinder.Map
   }
 
 
@@ -77,13 +78,6 @@ speed : Float
 speed = 0.036
 
 
-clipFirst : List a -> List a
-clipFirst list =
-  case list of
-    [] -> []
-    _ :: rest -> rest
-
-
 nextLocation : List (Int, Int) -> Location -> Location
 nextLocation route location =
   case route of
@@ -106,7 +100,11 @@ moveToNext time dest deliveryPerson =
     actualDelta = if absSpeed > absMax then maxDelta else speedDelta
     remainderTime = if absSpeed > absMax then time - time * absMax / absSpeed else 0
     nextPosition = add deliveryPerson.position actualDelta
-    nextRoute = if absSpeed >= absMax then clipFirst deliveryPerson.route else deliveryPerson.route
+    nextRoute =
+      if absSpeed >= absMax then
+        List.drop 1 deliveryPerson.route
+      else
+        deliveryPerson.route
     location = nextLocation nextRoute deliveryPerson.location
     updatedPerson =
       { deliveryPerson
@@ -140,14 +138,15 @@ animate: Time -> DeliveryPerson -> DeliveryPerson
 animate time deliveryPerson = pushThePedals time deliveryPerson |> moveOnPath time
 
 
-initial : (Int, Int) -> DeliveryPerson
-initial position =
+initial : List (Int, Int) -> (Int, Int) -> (Int, Int) -> DeliveryPerson
+initial obstacles mapSize position =
   { location = Initial
   , position = (toFloat (fst position), toFloat (snd position))
   , route = []
   , elapsed = 0
   , frames = [0, 1, 2]
   , capacity = 4
+  , map = (Pathfinder.createMap obstacles mapSize)
   }
 
 
@@ -196,12 +195,12 @@ navigationStart deliveryPerson =
     (List.head deliveryPerson.route)
 
 
-findPath : (Int, Int) -> List (Int, Int) -> (Int, Int) -> DeliveryPerson -> List (Int, Int)
-findPath gridSize obstacles destination deliveryPerson =
-  let
-    start = navigationStart deliveryPerson
-  in
-    Pathfinder.find gridSize obstacles start destination
+findPath : (Int, Int) -> DeliveryPerson -> List (Int, Int)
+findPath destination deliveryPerson =
+  Pathfinder.find
+    (navigationStart deliveryPerson)
+    destination
+    deliveryPerson.map
 
 
 appendPath : List (Int, Int) -> List (Int, Int) -> List (Int, Int)
@@ -211,11 +210,11 @@ appendPath current new =
     first :: rest -> first :: new
 
 
-navigateTo : Location -> (Int, Int) -> List (Int, Int) -> (Int, Int) -> DeliveryPerson -> DeliveryPerson
-navigateTo location gridSize obstacles destination deliveryPerson =
+navigateTo : Location -> (Int, Int) -> DeliveryPerson -> DeliveryPerson
+navigateTo location destination deliveryPerson =
   { deliveryPerson
   | location = location
   , route = appendPath
       deliveryPerson.route
-      (findPath gridSize obstacles destination deliveryPerson)
+      (findPath destination deliveryPerson)
   }
