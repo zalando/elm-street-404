@@ -18,7 +18,7 @@ module Model
   , dispatchReturns
   , cleanupLostArticles
   , cleanupLostRequests
-  , countLifes
+  , countLives
   ) where
 
 import Random
@@ -57,7 +57,7 @@ type alias Model =
   , articleGenerator : Generator
   , returnGenerator : Generator
   , score : Int
-  , maxLifes : Int
+  , maxLives : Int
   }
 
 
@@ -89,14 +89,14 @@ initial =
     ]
   , orderGenerator = Generator.initial 11000
   , articleGenerator = Generator.initial 13000
-  , returnGenerator = Generator.initial 20000
+  , returnGenerator = Generator.initial 31000
   , score = 0
-  , maxLifes = 3
+  , maxLives = 3
   }
 
 
-lifes : Model -> Int
-lifes model = 0
+lives : Model -> Int
+lives model = 0
 
 
 start : Model -> Model
@@ -119,7 +119,7 @@ dispatchArticles : Int -> Model -> Model
 dispatchArticles number model =
   let
     warehouseSlots = IHopeItWorks.exclude
-      (List.concat (List.map (\w -> List.repeat w.capacity w) model.warehouses))
+      (List.concat (List.map (\w -> List.repeat (w.capacity - 1) w) model.warehouses))
       (Article.warehouses model.articles)
     (articles, seed) = Article.dispatch number warehouseSlots model.seed
   in
@@ -140,7 +140,22 @@ dispatchOrders number model =
 
 dispatchReturns : Int -> Model -> Model
 dispatchReturns number model =
-  model
+  let
+    housesWithArticles = List.filter (\h -> List.any (Article.isDelivered h) model.articles) model.houses
+    houseSlots = IHopeItWorks.exclude
+      (List.concat (List.map (\h -> List.repeat h.capacity h) housesWithArticles))
+      (List.map Request.house model.requests)
+    wearedArticles = List.filter Article.isWorn model.articles
+    (articlesToReturn, seed) = Article.chooseToReturn number houseSlots model.articles model.seed
+    articles = Article.markInReturn model.articles articlesToReturn
+    returnedArticles = Article.markInReturn articlesToReturn articlesToReturn
+    returns = Request.returnArticles returnedArticles
+  in
+    { model
+    | articles = articles
+    , requests = model.requests ++ returns
+    , seed = seed
+    }
 
 
 modelObstacles : Model -> List (Int, Int)
@@ -223,9 +238,9 @@ decHappiness timeouted customer =
     customer
 
 
-countLifes : Model -> Int
-countLifes model =
-  model.maxLifes -
+countLives: Model -> Int
+countLives model =
+  model.maxLives -
   (model.customers
     |> List.filter Customer.isLost
     |> List.length)
@@ -302,7 +317,7 @@ cleanupLostRequests model =
 
 updateGameState : Model -> Model
 updateGameState model =
-  if countLifes model <= 0 then
+  if countLives model <= 0 then
     { model | state = Stopped }
   else
     model
