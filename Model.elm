@@ -31,13 +31,19 @@ import Obstacle exposing (Obstacle)
 import House exposing (House)
 import Customer exposing (Customer)
 import Warehouse exposing (Warehouse)
-import Pathfinder exposing (obstacleTiles)
 import IHopeItWorks
 import Article exposing (State(..), Article)
 import Generator exposing (Generator)
 
 
 type State = Paused | Playing | Stopped
+
+
+type alias MapObject a =
+  { a
+  | position : (Float, Float)
+  , size : (Float, Float)
+  }
 
 
 type alias Model =
@@ -63,36 +69,42 @@ type alias Model =
 
 initial : Model
 initial =
-  { animationState = Nothing
-  , state = Stopped
-  , seed = Random.initialSeed 0
-  , tileSize = 40
-  , gridSize = (24, 14)
-  , deliveryPerson = DeliveryPerson.initial (10, 10)
-  , articles = []
-  , requests = []
-  , obstacles =
-    [ Obstacle.fountain (10, 5)
-    , Obstacle.tree (1, 5)
-    , Obstacle.tree (15, 5)
-    ]
-  , houses =
-    [ House.house (8, 10)
-    , House.house (12, 7)
-    , House.house (16, 10)
-    , House.house (5, 5)
-    ]
-  , customers = []
-  , warehouses =
-    [ Warehouse.warehouse (19, 6)
-    , Warehouse.warehouse (1, 10)
-    ]
-  , orderGenerator = Generator.initial 11000
-  , articleGenerator = Generator.initial 13000
-  , returnGenerator = Generator.initial 31000
-  , score = 0
-  , maxLives = 3
-  }
+  let
+    gridSize = (24, 14)
+    obstacles =
+      [ Obstacle.fountain (10, 5)
+      , Obstacle.tree (1, 5)
+      , Obstacle.tree (15, 5)
+      ]
+    houses =
+      [ House.house (8, 10)
+      , House.house (12, 7)
+      , House.house (16, 10)
+      , House.house (5, 5)
+      ]
+    warehouses =
+      [ Warehouse.warehouse (19, 6)
+      , Warehouse.warehouse (1, 10)
+      ]
+  in
+    { animationState = Nothing
+    , state = Stopped
+    , seed = Random.initialSeed 0
+    , tileSize = 40
+    , gridSize = gridSize
+    , deliveryPerson = DeliveryPerson.initial (10, 10)
+    , articles = []
+    , requests = []
+    , obstacles = obstacles
+    , houses = houses
+    , customers = []
+    , warehouses = warehouses
+    , orderGenerator = Generator.initial 11000
+    , articleGenerator = Generator.initial 13000
+    , returnGenerator = Generator.initial 31000
+    , score = 0
+    , maxLives = 3
+    }
 
 
 lives : Model -> Int
@@ -158,14 +170,44 @@ dispatchReturns number model =
     }
 
 
-modelObstacles : Model -> List (Int, Int)
-modelObstacles model =
-  obstacleTiles model.obstacles ++
-  obstacleTiles model.houses ++
-  obstacleTiles model.warehouses
+allObstacles : List Obstacle -> List House -> List Warehouse -> List (Int, Int)
+allObstacles obstacles houses warehouses =
+  obstacleTiles obstacles ++
+  obstacleTiles houses ++
+  obstacleTiles warehouses
 
 
-placeToLocation : {a | position : (Float, Float), size : (Float, Float )} -> (Int, Int)
+obstacleRow : (Int, Int) -> Int -> Int -> List (Int, Int)
+obstacleRow position rowIndex columns =
+  case columns of
+    0 -> []
+    _ ->
+      (fst position + rowIndex, snd position + columns - 1) ::
+      obstacleRow position rowIndex (columns - 1)
+
+
+obstacleToTiles : (Int, Int) -> (Int, Int) -> List (Int, Int)
+obstacleToTiles position size =
+  case fst size of
+    0 -> []
+    _ ->
+      obstacleRow position (fst size - 1) (snd size) ++
+      obstacleToTiles position (fst size - 1, snd size)
+
+
+obstacleTiles : List (MapObject a) -> List (Int, Int)
+obstacleTiles obstacles =
+  let
+    toIntTuple (a, b) = (round a, round b)
+  in
+    obstacles
+    |> List.map
+      (\ {position, size} ->
+        obstacleToTiles (toIntTuple position) (toIntTuple size))
+    |> List.concat
+
+
+placeToLocation : MapObject a -> (Int, Int)
 placeToLocation {position, size} =
   ( round (fst position + snd size / 2 - 1)
   , round (snd position + snd size)
@@ -190,9 +232,9 @@ navigateTo : DeliveryPerson.Location -> (Int, Int) -> Model -> Model
 navigateTo location destination model =
   { model
   | deliveryPerson = DeliveryPerson.navigateTo
-      location
       model.gridSize
-      (modelObstacles model)
+      (allObstacles model.obstacles model.houses model.warehouses)
+      location
       destination
       model.deliveryPerson
   }

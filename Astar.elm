@@ -1,4 +1,6 @@
-module Astar (astar) where
+module Astar (findPath) where
+
+import Dict exposing (Dict)
 
 
 type alias Node =
@@ -12,8 +14,7 @@ type alias Node =
 
 
 type alias NodeList = List Node
-type alias Row = NodeList
-type alias Grid = List Row
+type alias Grid = Dict (Int, Int) Node
 
 
 toNode : (Int, Int) -> Node
@@ -35,8 +36,8 @@ nodey : Node -> Int
 nodey n = snd n.tile
 
 
-nodeEq : Node -> Node -> Bool
-nodeEq a b = a.tile == b.tile
+nodeq : Node -> Node -> Bool
+nodeq a b = a.tile == b.tile
 
 
 absDistance : Node -> Node -> Float
@@ -52,92 +53,55 @@ heuristics node dest =
   |> toFloat
 
 
-contains : NodeList -> Node -> Bool
-contains list node =
-  case list of
-    [] -> False
-    first :: rest ->
-      if nodeEq first node then
-        True
-      else
-        contains rest node
-
-
-setObstacle : NodeList -> Node -> Node
-setObstacle obstacles node =
-  { node | obstacle = contains obstacles node }
+contains : Node -> NodeList -> Bool
+contains node list = List.any (nodeq node) list
 
 
 removeNode : NodeList -> Node -> NodeList
-removeNode list node =
-  case list of
-    [] -> []
-    first :: rest ->
-      if nodeEq first node then
-        rest
-      else
-        first :: removeNode rest node
+removeNode list node = List.filter (\ n -> not (nodeq n node)) list
 
 
-createRow : Int -> Int -> NodeList -> Row
-createRow rowIndex columns obstacles =
-  case columns of
-    0 -> []
-    _ ->
-      let
-        node = setObstacle obstacles (toNode (rowIndex, columns - 1))
-        rest = createRow rowIndex (columns - 1) obstacles
-      in
-        node :: rest
+updateNodeList : NodeList -> Node -> NodeList
+updateNodeList list node = List.map (\ n -> if nodeq n node then node else n) list
 
 
-createGrid : (Int, Int) -> NodeList -> Grid
+getAreaTiles : (Int, Int) -> (Int, Int) -> List (Int, Int)
+getAreaTiles lower higher =
+  if fst lower == fst higher || snd lower == snd higher then
+    []
+  else if fst lower + 1 == fst higher then
+    lower :: getAreaTiles (fst lower, snd lower + 1) higher
+  else
+    (getAreaTiles lower (fst lower + 1, snd higher)) ++
+    (getAreaTiles (fst lower + 1, snd lower) higher)
+
+
+createGrid : (Int, Int) -> List (Int, Int) -> Grid
 createGrid gridSize obstacles =
-  case fst gridSize of
-    0 -> []
-    _ ->
-      let
-        row = createRow (fst gridSize - 1) (snd gridSize) obstacles
-        rest = createGrid (fst gridSize - 1, snd gridSize) obstacles
-      in
-        row :: rest
+  getAreaTiles (0, 0) gridSize
+  |> List.map toNode
+  |> List.map (\ node -> { node | obstacle = List.member node.tile obstacles })
+  |> List.foldl insertGridNode Dict.empty
 
 
-getRowNode : Row -> (Int, Int) -> Maybe Node
-getRowNode row tile =
-  case row of
-    [] -> Nothing
-    n :: rest ->
-      if (nodex n) == (fst tile) && (nodey n) == (snd tile) then
-        Just n
-      else
-        getRowNode rest tile
+insertGridNode : Node -> Grid -> Grid
+insertGridNode node = Dict.insert node.tile node
 
 
-getNode : Grid -> (Int, Int) -> Maybe Node
-getNode grid tile =
-  case grid of
-    [] -> Nothing
-    row :: rest ->
-      let
-        node = getRowNode row tile
-      in
-        case node of
-          Nothing -> getNode rest tile
-          Just n -> Just n
+updateGrid : Node -> Grid -> Grid
+updateGrid node = Dict.update node.tile (\_ -> Just node)
 
 
-pathToTileList : Grid -> Maybe (Int, Int) -> List (Int, Int)
-pathToTileList grid tile =
-  case tile of
-    Nothing -> []
-    Just t ->
-      let
-        mn = getNode grid t
-      in
-        case mn of
-          Nothing -> []
-          Just n -> n.tile :: pathToTileList grid n.parent
+getGridNode : Grid -> (Int, Int) -> Maybe Node
+getGridNode = flip Dict.get
+
+
+getNeighbors : Grid -> Node -> NodeList
+getNeighbors grid node =
+  getAreaTiles (nodex node - 1, nodey node - 1) (nodex node + 2, nodey node + 2)
+  |> List.filter (\ tile -> not ((fst tile == nodex node) && (snd tile == nodey node)))
+  |> List.filterMap (getGridNode grid)
+  |> List.filter (\ node -> not node.obstacle)
 
 
 smallestF : NodeList -> Maybe Node
@@ -148,60 +112,20 @@ smallestF nodes =
         Nothing -> (Just el)
         Just c -> Just (if el.f < c.f then el else c))
     Nothing
-    (nodes)
+    nodes
 
 
-getNeighborsIter : Grid -> Node -> (Int, Int) -> NodeList
-getNeighborsIter grid node tile =
-  if (nodex node + 1) < (fst tile) then
-    []
-  else if (nodey node + 1) < (snd tile) then
-    getNeighborsIter grid node (fst tile + 1, 0)
-  else
-    let
-      current = getNode grid tile
-    in
-      case current of
-        Nothing -> getNeighborsIter grid node (fst tile, snd tile + 1)
-        Just c ->
-          if nodeEq c node then
-            getNeighborsIter grid node (fst tile, snd tile + 1)
-          else
-            c :: getNeighborsIter grid node (fst tile, snd tile + 1)
-
-
-getNeighbors : Grid -> Node -> NodeList
-getNeighbors grid node =
-  (getNeighborsIter grid node (nodex node - 1, nodey node - 1))
-
-
-filter : (Node -> Bool) -> NodeList -> NodeList
-filter predicate list =
-  case list of
-    [] -> []
-    first :: rest ->
-      if predicate first then
-        first :: filter predicate rest
-      else
-        filter predicate rest
-
-
-updateNodeList : Row -> Node -> Row
-updateNodeList row node =
-  case row of
-    [] -> []
-    n :: rest ->
-      if nodeEq n node then
-        node :: rest
-      else
-        n :: updateNodeList rest node
-
-
-updateGrid : Grid -> Node -> Grid
-updateGrid grid node =
-  case grid of
-    [] -> []
-    row :: rest -> updateNodeList row node :: updateGrid rest node
+pathToTileList : Grid -> Maybe (Int, Int) -> List (Int, Int)
+pathToTileList grid tile =
+  case tile of
+    Nothing -> []
+    Just t ->
+      let
+        mn = getGridNode grid t
+      in
+        case mn of
+          Nothing -> []
+          Just n -> n.tile :: pathToTileList grid n.parent
 
 
 processNeighbors : Grid -> NodeList -> NodeList -> Node -> Node -> (Grid, NodeList)
@@ -211,18 +135,19 @@ processNeighbors grid open neighbors current dest =
     neighbor :: rest ->
       let
         g = current.g + absDistance current neighbor
-        neighborOpen = contains open neighbor
+        neighborOpen = contains neighbor open
         best = (not neighborOpen) || (g < neighbor.g)
         parent = if best then Just current.tile else neighbor.parent
         h = if (not neighborOpen) then heuristics neighbor dest else neighbor.h
         f = if best then g + h else neighbor.f
-        nupdate = { neighbor
+        nupdate =
+          { neighbor
           | parent = parent
           , f = f
           , g = g
           , h = h
           }
-        nextGrid = updateGrid grid nupdate
+        nextGrid = updateGrid nupdate grid
         nextOpen =
           if neighborOpen then
             updateNodeList open nupdate
@@ -232,49 +157,43 @@ processNeighbors grid open neighbors current dest =
         processNeighbors nextGrid nextOpen rest current dest
 
 
-estimateNext : Grid -> NodeList -> NodeList -> Node -> Node -> List (Int, Int)
-estimateNext grid open closed dest current =
+estimateNext : NodeList -> NodeList -> Node -> Node -> Grid -> List (Int, Int)
+estimateNext open closed dest current grid =
   let
     nextOpen = removeNode open current
     nextClosed = current :: closed
     neighbors = getNeighbors grid current
-    freeNeighbors = filter (\ n -> not n.obstacle) neighbors
-    openNeighbors = filter (\ n -> not (contains nextClosed n)) freeNeighbors
+    openNeighbors = List.filter (\ n -> not (contains n nextClosed)) neighbors
     gridAndOpen = processNeighbors grid nextOpen openNeighbors current dest
     continueGrid = fst gridAndOpen
     continueOpen = snd gridAndOpen
   in
-    astarIter continueGrid continueOpen nextClosed dest
+    astar continueOpen nextClosed dest continueGrid
 
 
-astarIter : Grid -> NodeList -> NodeList -> Node -> List (Int, Int)
-astarIter grid open closed dest =
+astar : NodeList -> NodeList -> Node -> Grid -> List (Int, Int)
+astar open closed dest grid =
   case (smallestF open) of
     Nothing -> []
     Just c ->
-      if nodeEq c dest then
+      if nodeq c dest then
         pathToTileList grid (Just c.tile)
       else
-        estimateNext grid open closed dest c
+        estimateNext open closed dest c grid
 
 
-clipFirst : List a -> List a
-clipFirst list =
-  case list of
-    [] -> []
-    _ :: rest -> rest
-
-
-astar : (Int, Int) -> List (Int, Int) -> (Int, Int) -> (Int, Int) -> List (Int, Int)
-astar gridSize obstacles start destination =
+findPath : (Int, Int) -> List (Int, Int) -> (Int, Int) -> (Int, Int) -> List (Int, Int)
+findPath gridSize obstacles start destination =
   let
-    obstacleNodes = List.map toNode obstacles
-    grid = createGrid gridSize obstacleNodes
-    insideObstacle = contains obstacleNodes (toNode destination)
+    grid = createGrid gridSize obstacles
+    nodes = Maybe.map2 (,) (getGridNode grid start) (getGridNode grid destination)
   in
-    if insideObstacle then
-      []
-    else
-      astarIter grid [toNode start] [] (toNode destination)
-      |> List.reverse 
-      |> clipFirst
+    case nodes of
+      Nothing -> []
+      Just (s, d) ->
+        if d.obstacle then
+          []
+        else
+          astar [s] [] d grid
+          |> List.reverse
+          |> List.drop 1

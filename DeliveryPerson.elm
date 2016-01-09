@@ -1,23 +1,10 @@
-module DeliveryPerson (DeliveryPerson, Location(..), initial, render, animate, navigateTo) where
+module DeliveryPerson (DeliveryPerson, Location(..), initial, animate, navigateTo) where
 
 import House exposing (House)
 import Warehouse exposing (Warehouse)
-import Sprite exposing (Sprite)
-import Basics exposing (atan2)
 import Time exposing (Time)
 import AnimationState exposing (animateObject, rotateFrames)
-import List exposing (head)
-import Pathfinder
-import Layers exposing (layers)
-
-
-sprite : Sprite
-sprite =
-  { size = (2, 3)
-  , offset = (0, -1)
-  , frames = 29
-  , src = "img/delivery-person.png"
-  }
+import Astar
 
 
 type Location
@@ -77,13 +64,6 @@ speed : Float
 speed = 0.036
 
 
-clipFirst : List a -> List a
-clipFirst list =
-  case list of
-    [] -> []
-    _ :: rest -> rest
-
-
 nextLocation : List (Int, Int) -> Location -> Location
 nextLocation route location =
   case route of
@@ -106,7 +86,11 @@ moveToNext time dest deliveryPerson =
     actualDelta = if absSpeed > absMax then maxDelta else speedDelta
     remainderTime = if absSpeed > absMax then time - time * absMax / absSpeed else 0
     nextPosition = add deliveryPerson.position actualDelta
-    nextRoute = if absSpeed >= absMax then clipFirst deliveryPerson.route else deliveryPerson.route
+    nextRoute =
+      if absSpeed >= absMax then
+        List.drop 1 deliveryPerson.route
+      else
+        deliveryPerson.route
     location = nextLocation nextRoute deliveryPerson.location
     updatedPerson =
       { deliveryPerson
@@ -151,42 +135,6 @@ initial position =
   }
 
 
-calculateDirection : (Float, Float) -> Int
-calculateDirection (x, y) =
-  (2 + round (atan2 y x * 4 / pi)) % 8
-
-
-direction : DeliveryPerson -> Int
-direction deliveryPerson =
-  case deliveryPerson.route of
-    first :: rest -> calculateDirection
-      ( toFloat (fst first) - fst deliveryPerson.position
-      , toFloat (snd first) - snd deliveryPerson.position
-      )
-    _ -> 0
-
-
-render : Int -> DeliveryPerson -> List Sprite.Box
-render numberOfBoxes deliveryPerson =
-  let
-    box frame =
-    [ { sprite = sprite
-      , position = deliveryPerson.position
-      , layer = layers.deliveryPerson
-      , frame = frame
-      , attributes = []
-      }
-    ]
-  in
-    case deliveryPerson.location of
-      OnTheWayToHouse _ ->
-        box (direction deliveryPerson * 3 + Maybe.withDefault 0 (head deliveryPerson.frames))
-      OnTheWayToWarehouse _ ->
-        box (direction deliveryPerson * 3 + Maybe.withDefault 0 (head deliveryPerson.frames))
-      _ ->
-        box (24 + numberOfBoxes)
-
-
 navigationStart : DeliveryPerson -> (Int, Int)
 navigationStart deliveryPerson =
   Maybe.withDefault
@@ -196,14 +144,6 @@ navigationStart deliveryPerson =
     (List.head deliveryPerson.route)
 
 
-findPath : (Int, Int) -> List (Int, Int) -> (Int, Int) -> DeliveryPerson -> List (Int, Int)
-findPath gridSize obstacles destination deliveryPerson =
-  let
-    start = navigationStart deliveryPerson
-  in
-    Pathfinder.find gridSize obstacles start destination
-
-
 appendPath : List (Int, Int) -> List (Int, Int) -> List (Int, Int)
 appendPath current new =
   case current of
@@ -211,11 +151,11 @@ appendPath current new =
     first :: rest -> first :: new
 
 
-navigateTo : Location -> (Int, Int) -> List (Int, Int) -> (Int, Int) -> DeliveryPerson -> DeliveryPerson
-navigateTo location gridSize obstacles destination deliveryPerson =
+navigateTo : (Int, Int) -> List (Int, Int) -> Location -> (Int, Int) -> DeliveryPerson -> DeliveryPerson
+navigateTo gridSize obstacles location destination deliveryPerson =
   { deliveryPerson
   | location = location
   , route = appendPath
       deliveryPerson.route
-      (findPath gridSize obstacles destination deliveryPerson)
+      (Astar.findPath gridSize obstacles (navigationStart deliveryPerson) destination)
   }
