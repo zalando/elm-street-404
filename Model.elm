@@ -31,13 +31,19 @@ import Obstacle exposing (Obstacle)
 import House exposing (House)
 import Customer exposing (Customer)
 import Warehouse exposing (Warehouse)
-import Pathfinder exposing (obstacleTiles)
 import IHopeItWorks
 import Article exposing (State(..), Article)
 import Generator exposing (Generator)
 
 
 type State = Paused | Playing | Stopped
+
+
+type alias MapObject a =
+  { a
+  | position : (Float, Float)
+  , size : (Float, Float)
+  }
 
 
 type alias Model =
@@ -86,11 +92,7 @@ initial =
     , seed = Random.initialSeed 0
     , tileSize = 40
     , gridSize = gridSize
-    , deliveryPerson =
-        DeliveryPerson.initial
-          (allObstacles obstacles houses warehouses)
-          gridSize
-          (10, 10)
+    , deliveryPerson = DeliveryPerson.initial (10, 10)
     , articles = []
     , requests = []
     , obstacles = obstacles
@@ -175,7 +177,37 @@ allObstacles obstacles houses warehouses =
   obstacleTiles warehouses
 
 
-placeToLocation : {a | position : (Float, Float), size : (Float, Float )} -> (Int, Int)
+obstacleRow : (Int, Int) -> Int -> Int -> List (Int, Int)
+obstacleRow position rowIndex columns =
+  case columns of
+    0 -> []
+    _ ->
+      (fst position + rowIndex, snd position + columns - 1) ::
+      obstacleRow position rowIndex (columns - 1)
+
+
+obstacleToTiles : (Int, Int) -> (Int, Int) -> List (Int, Int)
+obstacleToTiles position size =
+  case fst size of
+    0 -> []
+    _ ->
+      obstacleRow position (fst size - 1) (snd size) ++
+      obstacleToTiles position (fst size - 1, snd size)
+
+
+obstacleTiles : List (MapObject a) -> List (Int, Int)
+obstacleTiles obstacles =
+  let
+    toIntTuple (a, b) = (round a, round b)
+  in
+    obstacles
+    |> List.map
+      (\ {position, size} ->
+        obstacleToTiles (toIntTuple position) (toIntTuple size))
+    |> List.concat
+
+
+placeToLocation : MapObject a -> (Int, Int)
 placeToLocation {position, size} =
   ( round (fst position + snd size / 2 - 1)
   , round (snd position + snd size)
@@ -200,6 +232,8 @@ navigateTo : DeliveryPerson.Location -> (Int, Int) -> Model -> Model
 navigateTo location destination model =
   { model
   | deliveryPerson = DeliveryPerson.navigateTo
+      model.gridSize
+      (allObstacles model.obstacles model.houses model.warehouses)
       location
       destination
       model.deliveryPerson

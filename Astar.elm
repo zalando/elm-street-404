@@ -1,4 +1,4 @@
-module Astar (Grid, createGrid, findPath) where
+module Astar (findPath) where
 
 import Dict exposing (Dict)
 
@@ -76,8 +76,8 @@ getAreaTiles lower higher =
     (getAreaTiles (fst lower + 1, snd lower) higher)
 
 
-createGrid : List (Int, Int) -> (Int, Int) -> Grid
-createGrid obstacles gridSize =
+createGrid : (Int, Int) -> List (Int, Int) -> Grid
+createGrid gridSize obstacles =
   getAreaTiles (0, 0) gridSize
   |> List.map toNode
   |> List.map (\ node -> { node | obstacle = List.member node.tile obstacles })
@@ -85,15 +85,15 @@ createGrid obstacles gridSize =
 
 
 insertGridNode : Node -> Grid -> Grid
-insertGridNode node grid = Dict.insert node.tile node grid
+insertGridNode node = Dict.insert node.tile node
 
 
 updateGrid : Node -> Grid -> Grid
-updateGrid node grid = Dict.update node.tile (\ n -> Just node) grid
+updateGrid node = Dict.update node.tile (\_ -> Just node)
 
 
 getGridNode : Grid -> (Int, Int) -> Maybe Node
-getGridNode grid tile = Dict.get tile grid
+getGridNode = flip Dict.get
 
 
 getNeighbors : Grid -> Node -> NodeList
@@ -182,16 +182,15 @@ astar open closed dest grid =
         estimateNext open closed dest c grid
 
 
-findPath : (Int, Int) -> (Int, Int) -> Grid -> List (Int, Int)
-findPath start destination grid =
+findPath : (Int, Int) -> List (Int, Int) -> (Int, Int) -> (Int, Int) -> List (Int, Int)
+findPath gridSize obstacles start destination =
   let
-    startNode = getGridNode grid start
-    destNode = getGridNode grid destination
+    grid = createGrid gridSize obstacles
+    nodes = Maybe.map2 (,) (getGridNode grid start) (getGridNode grid destination)
   in
-    case (startNode, destNode) of
-      (Nothing, _) -> []
-      (_, Nothing) -> []
-      (Just s, Just d) ->
+    case nodes of
+      Nothing -> []
+      Just (s, d) ->
         if d.obstacle then
           []
         else

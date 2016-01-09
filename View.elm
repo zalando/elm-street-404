@@ -8,8 +8,8 @@ import Sprite
 import Obstacle
 import HouseView
 import WarehouseView
-import DeliveryPerson
-import Pathfinder
+import DeliveryPersonView
+import PathView
 import InventoryView
 import Article
 import ScoreView
@@ -21,7 +21,7 @@ import ScoreView
 boxes : Signal.Address Action -> Model -> List Sprite.Box
 boxes address model =
   List.concat (
-    DeliveryPerson.render (List.length (List.filter Article.isPicked model.articles)) model.deliveryPerson ::
+    DeliveryPersonView.render (List.length (List.filter Article.isPicked model.articles)) model.deliveryPerson ::
     List.map (HouseView.render address model.requests model.articles model.customers) model.houses ++
     List.map (WarehouseView.render address model.articles) model.warehouses ++
     List.map Obstacle.render model.obstacles ++
@@ -42,6 +42,6 @@ view address model =
     , "background-size" => "960px 560px"
     ]
   ]
-  ( Pathfinder.render model.gridSize model.tileSize model.deliveryPerson.route ::
+  ( PathView.render model.gridSize model.tileSize model.deliveryPerson.route ::
     List.map (Sprite.render model.tileSize) (Sprite.sort (boxes address model))
   )
