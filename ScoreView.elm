@@ -14,7 +14,7 @@ scoreSprite =
 
 
 render : Int -> Int -> Int -> List Sprite.Box
-render score maxLifes lifes =
+render score maxLives lives =
   let
     digits' = List.reverse (IHopeItWorks.digits (score * 10))
     digits = if digits' == [] then [0] else digits'
@@ -23,9 +23,9 @@ render score maxLifes lifes =
 
     renderLife number _ =
       { sprite = scoreSprite
-      , position = (9 + toFloat (maxLifes - number), y)
+      , position = (9 + toFloat (maxLives - number), y)
       , layer = layers.customer
-      , frame = if number >= (maxLifes - lifes) then 11 else 12
+      , frame = if number >= (maxLives - lives) then 11 else 12
       , attributes = []
       }
 
@@ -44,4 +44,4 @@ render score maxLifes lifes =
     , attributes = []
     }
     :: (List.indexedMap renderDigit digits)
-    ++ (List.indexedMap renderLife (List.repeat maxLifes True))
+    ++ (List.indexedMap renderLife (List.repeat maxLives True))

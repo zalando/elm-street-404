@@ -7,9 +7,9 @@ branches:
   only:
     - master
 install:
-  - npm install -g elm
+  - npm install -g elm@0.16.0
   - elm-package install -y
-  - npm install -g html-minifier
+  - npm install -g html-minifier@1.0.0
 script:
   - bash ./gh-pages.sh
 notifications:

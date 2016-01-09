@@ -26,7 +26,7 @@ boxes address model =
     List.map (WarehouseView.render address model.articles) model.warehouses ++
     List.map Obstacle.render model.obstacles ++
     [InventoryView.render address model.articles] ++
-    [ScoreView.render model.score model.maxLifes (Model.countLifes model)]
+    [ScoreView.render model.score model.maxLives (Model.countLives model)]
   )
 
 
