@@ -4,6 +4,7 @@ import Random
 import Array exposing (Array)
 import IHopeItWorks
 
+
 type Category
   = Shirt Int
   | Shoes Int

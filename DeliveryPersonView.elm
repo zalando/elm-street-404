@@ -21,13 +21,13 @@ calculateDirection (x, y) =
 
 
 direction : DeliveryPerson -> Int
-direction deliveryPerson =
-  case deliveryPerson.route of
-    first :: rest -> calculateDirection
-      ( toFloat (fst first) - fst deliveryPerson.position
-      , toFloat (snd first) - snd deliveryPerson.position
+direction {route, position} =
+  case route of
+    (x, y) :: rest -> calculateDirection
+      ( toFloat x - fst position
+      , toFloat y - snd position
       )
-    _ -> 0
+    [] -> 0
 
 
 render : Int -> DeliveryPerson -> List Sprite.Box

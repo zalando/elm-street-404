@@ -95,7 +95,3 @@ incHappiness = modHappiness 1
 
 decHappiness : Customer -> Customer
 decHappiness = modHappiness -1
-
-
-isTooUnhappy : Customer -> Bool
-isTooUnhappy customer = customer.happiness < 0

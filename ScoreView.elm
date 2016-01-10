@@ -2,7 +2,7 @@ module ScoreView (render) where
 
 import Sprite exposing (Sprite)
 import Layers exposing (layers)
-import IHopeItWorks
+
 
 scoreSprite : Sprite
 scoreSprite =
@@ -13,11 +13,22 @@ scoreSprite =
   }
 
 
+digitsList : Int -> List Int
+digitsList n =
+  let
+    nn = n // 10
+    r = n % 10
+  in
+    if nn == 0 && r == 0 then
+      []
+    else
+      r :: (digitsList nn)
+
+
 render : Int -> Int -> Int -> List Sprite.Box
 render score maxLives lives =
   let
-    digits' = List.reverse (IHopeItWorks.digits (score * 10))
-    digits = if digits' == [] then [0] else digits'
+    digits = if score == 0 then [0] else digitsList (score * 10)
     x = 22
     y = 1
 
@@ -31,7 +42,7 @@ render score maxLives lives =
 
     renderDigit number digit =
       { sprite = scoreSprite
-      , position = (x + toFloat (number - List.length digits), y)
+      , position = (x - toFloat number - 1, y)
       , layer = layers.customer
       , frame = digit
       , attributes = []

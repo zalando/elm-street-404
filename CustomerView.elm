@@ -1,4 +1,4 @@
-module CustomerView where
+module CustomerView (render) where
 
 import Customer exposing (Customer)
 import Sprite exposing (Sprite)
@@ -19,11 +19,12 @@ emptySprite = Sprite.empty size (0, -1)
 
 sprite : Sprite
 sprite =
- { size = size
- , offset = (0, 0)
- , frames = 18
- , src = "img/customers.png"
- }
+  { size = size
+  , offset = (0, 0)
+  , frames = 18
+  , src = "img/customers.png"
+  }
+
 
 shoesSprite: Sprite
 shoesSprite =
@@ -33,6 +34,7 @@ shoesSprite =
   , src = "img/shoes.png"
   }
 
+
 shirtSprite: Sprite
 shirtSprite =
   { size = size
@@ -40,6 +42,7 @@ shirtSprite =
   , frames = 12
   , src = "img/shirts.png"
   }
+
 
 scarfSprite: Sprite
 scarfSprite =
@@ -49,6 +52,7 @@ scarfSprite =
   , src = "img/scarves.png"
   }
 
+
 pantsSprite: Sprite
 pantsSprite =
   { size = size
@@ -57,8 +61,6 @@ pantsSprite =
   , src = "img/trousers.png"
   }
 
-moodFrameOffset : Int -> Int
-moodFrameOffset mood = 2 - mood
 
 shirtFrameOffset : Int -> Customer -> Int
 shirtFrameOffset color {happiness, frames} =
@@ -68,10 +70,9 @@ shirtFrameOffset color {happiness, frames} =
     color * 3 + 1 + Maybe.withDefault 0 (List.head frames)
 
 
-frame : Customer -> Int
-frame customer =
-  customer.typ * 3 +
-  (moodFrameOffset customer.happiness)
+customerFrameOffset : Customer -> Int
+customerFrameOffset {typ, happiness} =
+  typ * 3 + 2 - happiness
 
 
 render : List Request -> List Article -> House -> Customer -> List Sprite.Box
@@ -90,7 +91,7 @@ render requests articles house customer =
       [ { sprite = sprite
         , position = position 0.001
         , layer = layers.customer
-        , frame = frame customer
+        , frame = customerFrameOffset customer
         , attributes = []
         }
       , { sprite = shirtSprite

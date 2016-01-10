@@ -38,10 +38,6 @@ warehouseBubbleSprite =
   }
 
 
-emptySprite : Sprite
-emptySprite = Sprite.empty (4, 4) (0, -1)
-
-
 render : Signal.Address Action -> List Article -> Warehouse ->  List Sprite.Box
 render address articles warehouse =
   let
@@ -78,7 +74,7 @@ render address articles warehouse =
       , frame = 0
       , attributes = []
       }
-    , { sprite = emptySprite
+    , { sprite = Sprite.empty (4, 4) (0, -1)
       , position = warehouse.position
       , layer = layers.clickAbove
       , frame = 0

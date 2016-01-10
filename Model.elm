@@ -107,10 +107,6 @@ initial =
     }
 
 
-lives : Model -> Int
-lives model = 0
-
-
 start : Model -> Model
 start model =
   {model | state = Playing}

@@ -5,7 +5,7 @@ import Html exposing (div, br, Html, text, button)
 import Html.Attributes exposing (style)
 import Model exposing (Model)
 import Sprite
-import Obstacle
+import ObstacleView
 import HouseView
 import WarehouseView
 import DeliveryPersonView
@@ -13,6 +13,7 @@ import PathView
 import InventoryView
 import Article
 import ScoreView
+
 
 (=>) : a -> b -> (a, b)
 (=>) = (,)
@@ -24,7 +25,7 @@ boxes address model =
     DeliveryPersonView.render (List.length (List.filter Article.isPicked model.articles)) model.deliveryPerson ::
     List.map (HouseView.render address model.requests model.articles model.customers) model.houses ++
     List.map (WarehouseView.render address model.articles) model.warehouses ++
-    List.map Obstacle.render model.obstacles ++
+    List.map ObstacleView.render model.obstacles ++
     [InventoryView.render address model.articles] ++
     [ScoreView.render model.score model.maxLives (Model.countLives model)]
   )
