@@ -1,4 +1,4 @@
-module Astar (astar) where
+module Astar (findPath) where
 
 import Dict exposing (Dict)
 
@@ -181,9 +181,12 @@ getPath state =
   |> List.drop 1
 
 
-astar : (Int, Int) -> List (Int, Int) -> (Int, Int) -> (Int, Int) -> List (Int, Int)
+astar : Point -> List Point -> Point -> Point -> List Point
 astar gridSize obstacles start destination =
   initialState gridSize obstacles start destination
   |> (flip (List.foldl checkInitNodeState)) [start, destination]
   |> astarIter
   |> getPath
+
+
+findPath = astar
