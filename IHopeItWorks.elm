@@ -1,4 +1,4 @@
-module IHopeItWorks (exclude, remove, pickRandom, first, digits) where
+module IHopeItWorks (exclude, remove, pickRandom, first) where
 import Random
 import Array
 
@@ -56,15 +56,3 @@ pickRandom list seed =
       (index, seed'') = Random.generate (Random.int 0 (List.length list - 1)) seed
     in
       (Array.get index (Array.fromList list), seed'')
-
-
-digits : Int -> List Int
-digits n =
-  let
-    nn = n // 10
-    r = n % 10
-  in
-    if nn == 0 && r == 0 then
-      []
-    else
-      r :: (digits nn)

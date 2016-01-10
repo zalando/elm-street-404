@@ -8,10 +8,10 @@ import Layers exposing (layers)
 
 
 pointToSring : Int -> (Int, Int) -> String
-pointToSring tileSize point =
-  (fst point * tileSize + tileSize // 2 |> toString) ++
+pointToSring tileSize (x, y) =
+  toString (x * tileSize + tileSize // 2) ++
   "," ++
-  (snd point * tileSize + tileSize // 2 |> toString)
+  toString (y * tileSize + tileSize // 2)
 
 
 renderPoints : Int -> List (Int, Int) -> Html

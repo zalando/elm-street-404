@@ -45,19 +45,19 @@ currentDestination deliveryPerson =
 
 
 absValue : (Float, Float) -> Float
-absValue v = sqrt ((fst v) ^ 2 + (snd v) ^ 2)
+absValue (x, y) = sqrt (x ^ 2 + y ^ 2)
 
 
 diff : (Float, Float) -> (Float, Float) -> (Float, Float)
-diff a b = ((fst a) - (fst b), (snd a) - (snd b))
+diff (x1, y1) (x2, y2) = (x1 - x2, y1 - y2)
 
 
 add : (Float, Float) -> (Float, Float) -> (Float, Float)
-add a b = ((fst a) + (fst b), (snd a) + (snd b))
+add (x1, y1) (x2, y2) = (x1 + x2, y1 + y2)
 
 
 scale : Float -> (Float, Float) -> (Float, Float)
-scale a b = (a * (fst b), a * (snd b))
+scale a (x, y) = (a * x, a * y)
 
 
 speed : Float
@@ -121,7 +121,10 @@ moveOnPath time deliveryPerson =
 
 
 animate: Time -> DeliveryPerson -> DeliveryPerson
-animate time deliveryPerson = pushThePedals time deliveryPerson |> moveOnPath time
+animate time deliveryPerson =
+  deliveryPerson
+  |> pushThePedals time
+  |> moveOnPath time
 
 
 initial : (Int, Int) -> DeliveryPerson
@@ -136,12 +139,12 @@ initial position =
 
 
 navigationStart : DeliveryPerson -> (Int, Int)
-navigationStart deliveryPerson =
+navigationStart {position, route} =
   Maybe.withDefault
-    ( round (fst deliveryPerson.position)
-    , round (snd deliveryPerson.position)
+    ( round (fst position)
+    , round (snd position)
     )
-    (List.head deliveryPerson.route)
+    (List.head route)
 
 
 appendPath : List (Int, Int) -> List (Int, Int) -> List (Int, Int)

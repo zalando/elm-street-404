@@ -112,9 +112,11 @@ z = 30000
 a : Float
 a = 0.00000024
 
+
 -- initial blinking speed
 b : Float
 b = 0.003
+
 
 -- constant time shift (positive to make sure it starts with not blinking)
 c : Float
@@ -151,6 +153,7 @@ animate time request =
   case request of
     Order house category data -> Order house category (animateRequestData time data)
     Return house article data -> Return house article (animateRequestData time data)
+
 
 inTime : Request -> Bool
 inTime request =

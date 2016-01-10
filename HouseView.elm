@@ -10,6 +10,7 @@ import Request exposing (Request)
 import Article exposing (Article)
 import RequestView
 import CustomerView
+import IHopeItWorks
 
 
 sprite : Sprite
@@ -57,10 +58,6 @@ bubbleSprite3 =
   }
 
 
-emptySprite : Sprite
-emptySprite = Sprite.empty (2, 3) (0, -1)
-
-
 getBubbleSprite : Int -> Maybe Sprite
 getBubbleSprite number =
   case number of
@@ -68,18 +65,6 @@ getBubbleSprite number =
     1 -> Just bubbleSprite1
     2 -> Just bubbleSprite2
     _ -> Just bubbleSprite3
-
-
--- TODO: use IHopeItWorks.first
-firstAtHome : House -> List Customer -> Maybe Customer
-firstAtHome house customers =
-  case customers of
-    [] -> Nothing
-    customer :: otherCustomers ->
-      if Customer.livesHere house customer then
-        Just customer
-      else
-        firstAtHome house otherCustomers
 
 
 render : Signal.Address Action -> List Request -> List Article -> List Customer -> House -> List Sprite.Box
@@ -107,7 +92,7 @@ render address requests articles customers house =
             }
           ]
         _ -> []
-    houseCustomer = firstAtHome house customers
+    houseCustomer = IHopeItWorks.first (Customer.livesHere house) customers
     renderCustomer =
       case houseCustomer of
         Nothing -> []
@@ -129,7 +114,7 @@ render address requests articles customers house =
       , frame = 0
       , attributes = []
       }
-    , { sprite = emptySprite
+    , { sprite = Sprite.empty (2, 3) (0, -1)
       , position = house.position
       , layer = layers.clickAbove
       , frame = 0

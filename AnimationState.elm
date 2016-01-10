@@ -1,8 +1,11 @@
 module AnimationState (AnimationState, AnimatedObject, animateObject, animate, rotateFrames) where
+
 import Time exposing (Time)
+
 
 type alias AnimationState =
   Maybe { prevClockTime : Time, elapsed : Time }
+
 
 type alias AnimatedObject a =
   { a | elapsed: Time }
@@ -35,8 +38,9 @@ animate time animationState =
            }
     )
 
+
 rotateFrames : List Int -> List Int
 rotateFrames frames =
   case frames of
-    frame :: list -> list ++ [frame]
     [] -> []
+    frame :: list -> list ++ [frame]

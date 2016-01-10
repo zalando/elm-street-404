@@ -21,12 +21,12 @@ type alias Article =
 warehouses : List Article -> List Warehouse
 warehouses articles =
   case articles of
-    article :: rest ->
-      case article.state of
+    [] -> []
+    {state} :: rest ->
+      case state of
         InStock warehouse ->
           warehouse :: warehouses rest
         _ -> warehouses rest
-    _ -> []
 
 
 house : Article -> Maybe House
@@ -50,12 +50,12 @@ removeDelivered house category' =
 updateState : State -> Article -> List Article -> List Article
 updateState state article articles =
   case articles of
+    [] -> []
     a :: restArticles ->
       if a == article then
         {a | state = state } :: restArticles
       else
         a :: updateState state article restArticles
-    [] -> []
 
 
 inWarehouse : Warehouse -> Article -> Bool
