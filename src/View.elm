@@ -13,6 +13,7 @@ import PathView
 import InventoryView
 import Article
 import ScoreView
+import StartGameView
 
 
 (=>) : a -> b -> (a, b)
@@ -22,12 +23,13 @@ import ScoreView
 boxes : Signal.Address Action -> Model -> List Sprite.Box
 boxes address model =
   List.concat (
+    StartGameView.render address model.state ::
+    InventoryView.render address model.articles ::
+    ScoreView.render model.score model.maxLives (Model.countLives model) ::
     DeliveryPersonView.render (List.length (List.filter Article.isPicked model.articles)) model.deliveryPerson ::
     List.map (HouseView.render address model.requests model.articles model.customers) model.houses ++
     List.map (WarehouseView.render address model.articles) model.warehouses ++
-    List.map ObstacleView.render model.obstacles ++
-    [InventoryView.render address model.articles] ++
-    [ScoreView.render model.score model.maxLives (Model.countLives model)]
+    List.map ObstacleView.render model.obstacles
   )
 
 

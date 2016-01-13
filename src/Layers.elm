@@ -11,6 +11,7 @@ type alias Layers =
   , article : Int
   , articleReturn : Int
   , clickAbove : Int
+  , clickToStart : Int
   }
 
 layers : Layers
@@ -25,4 +26,5 @@ layers =
   , article = 7
   , articleReturn = 8
   , clickAbove = 6
+  , clickToStart = 9
   }

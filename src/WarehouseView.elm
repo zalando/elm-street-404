@@ -55,6 +55,19 @@ render address articles warehouse =
         , toFloat ((numberOfArticles + number) // 2) + y - 2
         )
         []
+
+    renderBubble =
+      if List.length articlesInWarehouse == 0 then
+        []
+      else
+        { sprite = warehouseBubbleSprite
+        , position = warehouse.position
+        , layer = layers.bubble
+        , frame = 0
+        , attributes = []
+        } ::
+        List.concat (List.indexedMap renderArticle articlesInWarehouse) ++
+        List.concat (List.indexedMap renderCategory placeholders)
   in
     [ { sprite = warehouseSprite
       , position = warehouse.position
@@ -68,12 +81,6 @@ render address articles warehouse =
       , frame = 0
       , attributes = []
       }
-    , { sprite = warehouseBubbleSprite
-      , position = warehouse.position
-      , layer = layers.bubble
-      , frame = 0
-      , attributes = []
-      }
     , { sprite = Sprite.empty (4, 4) (0, -1)
       , position = warehouse.position
       , layer = layers.clickAbove
@@ -82,5 +89,4 @@ render address articles warehouse =
         [ onClick address (Actions.ClickWarehouse warehouse) ]
       }
     ]
-    ++ List.concat(List.indexedMap renderArticle articlesInWarehouse)
-    ++ List.concat(List.indexedMap renderCategory placeholders)
+    ++ renderBubble

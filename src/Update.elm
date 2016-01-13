@@ -20,7 +20,7 @@ update action model =
   case action of
     Init time ->
       ( {model | seed = Random.initialSeed (floor time)}
-      , Effects.tick (always Start)
+      , Effects.none
       )
     Start ->
       (Model.start model, Effects.tick Tick)
@@ -38,13 +38,21 @@ update action model =
       else
         ({model | animationState = Nothing}, Effects.none)
     ClickArticle article ->
-      (onArticleClick article model, Effects.none)
+      ifPlaying (onArticleClick article) model
     ClickCategory category ->
-      (onCategoryClick category model, Effects.none)
+      ifPlaying (onCategoryClick category) model
     ClickWarehouse warehouse ->
-      (Model.navigateToWarehouse warehouse model, Effects.none)
+      ifPlaying (Model.navigateToWarehouse warehouse) model
     ClickHouse house ->
-      (Model.navigateToHouse house model, Effects.none)
+      ifPlaying (Model.navigateToHouse house) model
+
+
+ifPlaying : (Model -> Model) -> Model -> (Model, Effects Action)
+ifPlaying fun model =
+  if model.state == Playing then
+    (fun model, Effects.none)
+  else
+    (model, Effects.none)
 
 
 animate : Time -> Model -> Model
