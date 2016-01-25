@@ -22,7 +22,7 @@ sprite =
   { size = size
   , offset = (0, 0)
   , frames = 18
-  , src = "img/customers.png"
+  , src = "customers.png"
   }
 
 
@@ -31,7 +31,7 @@ shoesSprite =
   { size = size
   , offset = (0, 0)
   , frames = 4
-  , src = "img/shoes.png"
+  , src = "shoes.png"
   }
 
 
@@ -40,7 +40,7 @@ shirtSprite =
   { size = size
   , offset = (0, 0)
   , frames = 12
-  , src = "img/shirts.png"
+  , src = "shirts.png"
   }
 
 
@@ -49,7 +49,7 @@ scarfSprite =
   { size = size
   , offset = (0, 0)
   , frames = 3
-  , src = "img/scarves.png"
+  , src = "scarves.png"
   }
 
 
@@ -58,7 +58,7 @@ pantsSprite =
   { size = size
   , offset = (0, 0)
   , frames = 3
-  , src = "img/trousers.png"
+  , src = "trousers.png"
   }
 
 

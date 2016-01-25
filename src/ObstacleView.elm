@@ -10,7 +10,7 @@ fountainShadowSprite =
   { size = (4, 2)
   , offset = (0, 1)
   , frames = 1
-  , src = "img/fountain-shadow.png"
+  , src = "fountain-shadow.png"
   }
 
 
@@ -19,7 +19,7 @@ fountainSprite =
   { size = (3, 2)
   , offset = (0, 0)
   , frames = 1
-  , src = "img/fountain.png"
+  , src = "fountain.png"
   }
 
 
@@ -28,7 +28,7 @@ fountainSpringSprite =
   { size = (1, 2)
   , offset = (1, -1)
   , frames = 4
-  , src = "img/fountain-spring.png"
+  , src = "fountain-spring.png"
   }
 
 
@@ -37,7 +37,7 @@ treeSprite =
   { size = (3, 5)
   , offset = (0, -3)
   , frames = 1
-  , src = "img/tree.png"
+  , src = "tree.png"
   }
 
 

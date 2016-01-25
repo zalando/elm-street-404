@@ -14,7 +14,7 @@ bubbleSprite =
   { size = (7, 3)
   , offset = (0, 0)
   , frames = 1
-  , src = "img/inventory-bubble.png"
+  , src = "inventory-bubble.png"
   }
 
 

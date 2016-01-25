@@ -11,7 +11,7 @@ sprite =
   { size = (2, 3)
   , offset = (0, -1)
   , frames = 29
-  , src = "img/delivery-person.png"
+  , src = "delivery-person.png"
   }
 
 

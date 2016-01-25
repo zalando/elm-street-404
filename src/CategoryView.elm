@@ -11,7 +11,7 @@ categorySprite =
   { size = (1, 1)
   , offset = (0, 0)
   , frames = 14
-  , src = "img/categories.png"
+  , src = "categories.png"
   }
 
 

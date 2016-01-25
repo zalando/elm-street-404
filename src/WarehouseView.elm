@@ -16,7 +16,7 @@ warehouseSprite =
   { size = (4, 4)
   , offset = (0, -1)
   , frames = 1
-  , src = "img/warehouse.png"
+  , src = "warehouse.png"
   }
 
 
@@ -25,7 +25,7 @@ warehouseShadowSprite =
   { size = (5, 4)
   , offset = (0, 0)
   , frames = 1
-  , src = "img/warehouse-shadow.png"
+  , src = "warehouse-shadow.png"
   }
 
 
@@ -34,7 +34,7 @@ warehouseBubbleSprite =
   { size = (4, 5)
   , offset = (-2, -3)
   , frames = 1
-  , src = "img/warehouse-bubble.png"
+  , src = "warehouse-bubble.png"
   }
 
 

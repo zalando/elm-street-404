@@ -9,7 +9,7 @@ scoreSprite =
   { size = (1, 1)
   , offset = (0, 0)
   , frames = 13
-  , src = "img/score.png"
+  , src = "score.png"
   }
 
 

@@ -12,7 +12,7 @@ clickToStartSprite =
   { size = (10, 2)
   , offset = (0, 0)
   , frames = 1
-  , src = "img/click-to-start.png"
+  , src = "click-to-start.png"
   }
 
 

@@ -18,7 +18,7 @@ sprite =
   { size = (2, 3)
   , offset = (0, -1)
   , frames = 1
-  , src = "img/house.png"
+  , src = "house.png"
   }
 
 
@@ -27,7 +27,7 @@ shadowSprite =
   { size = (3, 2)
   , offset = (0, 1)
   , frames = 1
-  , src = "img/house-shadow.png"
+  , src = "house-shadow.png"
   }
 
 
@@ -36,7 +36,7 @@ bubbleSprite1 =
   { size = (3, 3)
   , offset = (-2, -1)
   , frames = 1
-  , src = "img/house-bubble-1.png"
+  , src = "house-bubble-1.png"
   }
 
 
@@ -45,7 +45,7 @@ bubbleSprite2 =
   { size = (3, 4)
   , offset = (-2, -2)
   , frames = 1
-  , src = "img/house-bubble-2.png"
+  , src = "house-bubble-2.png"
   }
 
 
@@ -54,7 +54,7 @@ bubbleSprite3 =
   { size = (3, 5)
   , offset = (-2, -3)
   , frames = 1
-  , src = "img/house-bubble-3.png"
+  , src = "house-bubble-3.png"
   }
 
 
