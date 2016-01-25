@@ -19,6 +19,7 @@ module Model
   , cleanupLostArticles
   , cleanupLostRequests
   , countLives
+  , images
   ) where
 
 import Random
@@ -36,7 +37,7 @@ import Article exposing (State(..), Article)
 import Generator exposing (Generator)
 
 
-type State = Paused | Playing | Stopped
+type State = Initialising | Loading | Paused | Playing | Stopped
 
 
 type alias MapObject a =
@@ -46,9 +47,20 @@ type alias MapObject a =
   }
 
 
+images : List String
+images =
+  [ "fountain-spring.png", "house-bubble-2.png", "house.png", "customers.png", "tree.png"
+  , "warehouse-shadow.png", "categories.png", "delivery-person.png", "fountain.png"
+  , "house-bubble-3.png", "inventory-bubble.png", "shirts.png", "trousers.png"
+  , "warehouse.png", "click-to-start.png", "fountain-shadow.png", "house-bubble-1.png"
+  , "house-shadow.png", "scarves.png", "shoes.png", "warehouse-bubble.png"
+  ]
+
+
 type alias Model =
   { animationState : AnimationState.AnimationState
   , state : State
+  , images : List String
   , seed : Random.Seed
   , tileSize : Int
   , gridSize : (Int, Int)
@@ -70,7 +82,8 @@ type alias Model =
 initial : Model
 initial =
   { animationState = Nothing
-  , state = Stopped
+  , state = Initialising
+  , images = images
   , seed = Random.initialSeed 0
   , tileSize = 40
   , gridSize = (24, 14)

@@ -4,9 +4,10 @@
     "repository": "https://github.com/user/project.git",
     "license": "MIT",
     "source-directories": [
-        "src"
+        "src", "vendor/elm-image-load"
     ],
     "exposed-modules": [],
+    "native-modules": true,
     "dependencies": {
         "elm-lang/core": "3.0.0 <= v < 4.0.0",
         "evancz/elm-effects": "2.0.1 <= v < 3.0.0",
