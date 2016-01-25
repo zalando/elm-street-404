@@ -11,17 +11,31 @@ import Obstacle exposing (Obstacle)
 import Request exposing (Request)
 import Category exposing (Category)
 import Generator
+import Config
 import Customer exposing (Customer)
 import IHopeItWorks
-
+import ImageLoad
+import Json.Decode as Decoder
+import Task exposing (Task)
 
 update : Action -> Model -> (Model, Effects Action)
 update action model =
   case action of
     Init time ->
       ( {model | seed = Random.initialSeed (floor time)}
-      , Effects.none
+      , loadImage "score.png"
       )
+    ImageLoaded image ->
+      if image == "score.png" then
+        ({model | state = Loading}, Effects.batch (List.map loadImage model.images))
+      else
+        let
+          newModel = {model | images = List.filter ((/=) image) model.images}
+        in
+          if List.length newModel.images == 0 then
+            ({newModel | state = Stopped}, Effects.none)
+          else
+            (newModel, Effects.none)
     Start ->
       (Model.start model, Effects.tick Tick)
     Tick time ->
@@ -53,6 +67,13 @@ ifPlaying fun model =
     (fun model, Effects.none)
   else
     (model, Effects.none)
+
+
+loadImage : String -> Effects Action
+loadImage image =
+  ImageLoad.load (Config.imageUrl image) (Decoder.succeed image) `Task.onError` always (Task.succeed image)
+  |> Task.map (always (ImageLoaded image))
+  |> Effects.task
 
 
 animate : Time -> Model -> Model

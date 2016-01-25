@@ -15,3 +15,4 @@ type Action
   | ClickCategory Category
   | ClickWarehouse Warehouse
   | ClickHouse House
+  | ImageLoaded String
