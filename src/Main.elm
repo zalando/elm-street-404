@@ -7,6 +7,7 @@ import StartApp
 import Task
 import Update
 import View
+import Window
 
 
 app : { html : Signal Html.Html
@@ -15,16 +16,19 @@ app : { html : Signal Html.Html
       }
 app =
   StartApp.start
-    { init = (Model.initial, Effects.tick Actions.Init)
+    { init = (Model.initial windowDimensions, Effects.tick Actions.Init)
     , update = Update.update
     , view = View.view
-    , inputs = []
+    , inputs = [Signal.map Actions.Dimensions Window.dimensions]
     }
 
 
 main : Signal Html.Html
 main =
   app.html
+
+
+port windowDimensions : (Int, Int)
 
 
 port tasks : Signal (Task.Task Effects.Never ())

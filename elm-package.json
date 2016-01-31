@@ -4,7 +4,9 @@
     "repository": "https://github.com/user/project.git",
     "license": "MIT",
     "source-directories": [
-        "src", "vendor/elm-image-load"
+        "src",
+        "vendor/elm-image-load",
+        "vendor/elm-astar"
     ],
     "exposed-modules": [],
     "native-modules": true,

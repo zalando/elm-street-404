@@ -47,6 +47,18 @@ type alias MapObject a =
   }
 
 
+limitSize : (Int, Int) -> (Int, Int)
+limitSize (width, height) =
+  ( width |> max 14 |> min 24
+  , height |> max 14 |> min 24
+  )
+
+
+gridSize : Int -> (Int, Int) -> (Int, Int)
+gridSize tileSize (width, height) =
+  limitSize (width // tileSize, height // tileSize)
+
+
 images : List String
 images =
   [ "fountain-spring.png", "house-bubble-2.png", "house.png", "customers.png", "tree.png"
@@ -63,6 +75,7 @@ type alias Model =
   , images : List String
   , seed : Random.Seed
   , tileSize : Int
+  , dimensions : (Int, Int)
   , gridSize : (Int, Int)
   , deliveryPerson : DeliveryPerson
   , articles : List Article
@@ -79,14 +92,15 @@ type alias Model =
   }
 
 
-initial : Model
-initial =
+initial : (Int, Int) -> Model
+initial dimensions =
   { animationState = Nothing
   , state = Initialising
   , images = images
   , seed = Random.initialSeed 0
   , tileSize = 40
-  , gridSize = (24, 14)
+  , dimensions = dimensions
+  , gridSize = gridSize 40 dimensions
   , deliveryPerson = DeliveryPerson.initial (10, 10)
   , articles = []
   , requests = []

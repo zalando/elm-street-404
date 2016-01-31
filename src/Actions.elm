@@ -16,3 +16,4 @@ type Action
   | ClickWarehouse Warehouse
   | ClickHouse House
   | ImageLoaded String
+  | Dimensions (Int, Int)

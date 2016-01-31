@@ -10,7 +10,7 @@ html-minifier --minify-css --minify-js gh-pages/main.html -o gh-pages/index.html
 rm gh-pages/main.html
 
 # Copy the images
-cp -R src/img gh-pages
+cp -R img gh-pages
 
 cd gh-pages
 

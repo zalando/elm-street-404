@@ -1,5 +1,7 @@
 module Config (imageUrl) where
 
+port imagesUrl : String
+
 imageUrl : String -> String
 imageUrl img =
-    "img/" ++ img
+    imagesUrl ++ img

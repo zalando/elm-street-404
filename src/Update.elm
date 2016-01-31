@@ -21,6 +21,8 @@ import Task exposing (Task)
 update : Action -> Model -> (Model, Effects Action)
 update action model =
   case action of
+    Dimensions dimensions ->
+      ({model | dimensions = Debug.log "dimensions" dimensions}, Effects.none)
     Init time ->
       ( {model | seed = Random.initialSeed (floor time)}
       , loadImage "score.png"
