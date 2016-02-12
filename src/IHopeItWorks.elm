@@ -1,6 +1,5 @@
 module IHopeItWorks (exclude, remove, pickRandom, first) where
 import Random
-import Array
 
 
 first : (a -> Bool) -> List a -> Maybe a
@@ -55,4 +54,4 @@ pickRandom list seed =
     let
       (index, seed'') = Random.generate (Random.int 0 (List.length list - 1)) seed
     in
-      (Array.get index (Array.fromList list), seed'')
+      (List.head (List.drop index list), seed'')

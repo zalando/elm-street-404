@@ -11,7 +11,6 @@ import Obstacle exposing (Obstacle)
 import Request exposing (Request)
 import Category exposing (Category)
 import Generator
-import Config
 import Customer exposing (Customer)
 import IHopeItWorks
 import ImageLoad
@@ -25,11 +24,11 @@ update action model =
       ({model | dimensions = Debug.log "dimensions" dimensions}, Effects.none)
     Init time ->
       ( {model | seed = Random.initialSeed (floor time)}
-      , loadImage "score.png"
+      , (loadImage model.imagesUrl) "score.png"
       )
     ImageLoaded image ->
       if image == "score.png" then
-        ({model | state = Loading}, Effects.batch (List.map loadImage model.images))
+        ({model | state = Loading}, Effects.batch (List.map (loadImage model.imagesUrl) model.images))
       else
         let
           newModel = {model | images = List.filter ((/=) image) model.images}
@@ -71,9 +70,9 @@ ifPlaying fun model =
     (model, Effects.none)
 
 
-loadImage : String -> Effects Action
-loadImage image =
-  ImageLoad.load (Config.imageUrl image) (Decoder.succeed image) `Task.onError` always (Task.succeed image)
+loadImage : String -> String -> Effects Action
+loadImage imagesUrl image =
+  ImageLoad.load (imagesUrl ++ "/" ++ image) (Decoder.succeed image) `Task.onError` always (Task.succeed image)
   |> Task.map (always (ImageLoaded image))
   |> Effects.task
 

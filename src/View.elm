@@ -15,7 +15,6 @@ import Article
 import ScoreView
 import StartGameView
 import DigitsView
-import Config
 
 
 (=>) : a -> b -> (a, b)
@@ -49,10 +48,10 @@ view address model =
     , "margin" => "auto"
     , "position" => "relative"
     , "width" => (toString (fst model.gridSize * model.tileSize) ++ "px")
-    , "background-image" => ("url(" ++ Config.imageUrl "bg-grid.jpg" ++ ")")
+    , "background-image" => ("url(" ++ model.imagesUrl ++ "/bg-grid.jpg" ++ ")")
     , "background-size" => "960px 560px"
     ]
   ]
   ( PathView.render model.gridSize model.tileSize model.deliveryPerson.route ::
-    List.map (Sprite.render Config.imageUrl model.tileSize) (Sprite.sort (boxes address model))
+    List.map (Sprite.render model.imagesUrl model.tileSize) (Sprite.sort (boxes address model))
   )

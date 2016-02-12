@@ -5,6 +5,7 @@ import Warehouse exposing (Warehouse)
 import Category exposing (Category)
 import IHopeItWorks
 
+
 type State
   = InStock Warehouse
   | AwaitingReturn House

@@ -75,6 +75,7 @@ type alias Model =
   , images : List String
   , seed : Random.Seed
   , tileSize : Int
+  , imagesUrl : String
   , dimensions : (Int, Int)
   , gridSize : (Int, Int)
   , deliveryPerson : DeliveryPerson
@@ -92,13 +93,14 @@ type alias Model =
   }
 
 
-initial : (Int, Int) -> Model
-initial dimensions =
+initial : (Int, Int) -> String -> Model
+initial dimensions imagesUrl =
   { animationState = Nothing
   , state = Initialising
   , images = images
   , seed = Random.initialSeed 0
   , tileSize = 40
+  , imagesUrl = imagesUrl
   , dimensions = dimensions
   , gridSize = gridSize 40 dimensions
   , deliveryPerson = DeliveryPerson.initial (10, 10)
