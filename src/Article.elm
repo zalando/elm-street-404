@@ -1,4 +1,4 @@
-module Article (Article, State(..), dispatch, warehouses, house, updateState, removeDelivered, inWarehouse, isPicked, isDelivered, isWorn, availableCategories, chooseToReturn, markInReturn) where
+module Article (Article, State(..), dispatch, warehouses, house, updateState, removeDelivered, inWarehouse, isPicked, isDelivered, isWorn, availableCategories, return, markInReturn) where
 import Random
 import House exposing (House)
 import Warehouse exposing (Warehouse)
@@ -92,48 +92,50 @@ isVacant {state} =
     _ -> False
 
 
-dispatch : Int -> List Warehouse -> Random.Seed -> (List Article, Random.Seed)
-dispatch number warehouses seed =
-  if number == 0 then
-    ([], seed)
+dispatch : Int -> List Warehouse -> Random.Generator (List Article)
+dispatch number warehouses =
+  if number <= 0 then
+    Random.map (always []) (Random.int 0 0)
   else
-    case IHopeItWorks.pickRandom warehouses seed of
-      (Just warehouse, seed') ->
-        let
-          restWarehouses = IHopeItWorks.remove ((==) warehouse) warehouses
-          (category, seed'') = Category.random seed'
-          (items, seed''') = dispatch (number - 1) restWarehouses seed''
-        in
-          ( { category = category
-            , state = InStock warehouse
-            }
-            :: items
-          , seed'''
-          )
-      (Nothing, seed') ->
-        ([], seed')
+    IHopeItWorks.pickRandom warehouses
+    `Random.andThen`
+    (\maybeWarehouse ->
+      case maybeWarehouse of
+        Just warehouse ->
+          Random.map2
+            (\category articles -> {category = category, state = InStock warehouse} :: articles)
+            Category.random
+            (dispatch (number - 1) (IHopeItWorks.remove ((==) warehouse) warehouses))
+        Nothing ->
+          Random.map (always []) (Random.int 0 0)
+    )
 
 
-chooseToReturn : Int -> List House -> List Article -> Random.Seed -> (List Article, Random.Seed)
-chooseToReturn number houses articles seed =
-  if number == 0 then
-    ([], seed)
+return : Int -> List House -> List Article -> Random.Generator (List Article)
+return number houses articles =
+  if number <= 0 then
+    Random.map (always []) (Random.int 0 0)
   else
     let
-      deliveredTo article house = isDelivered house article
+      deliveredTo = flip isDelivered
       -- keep articles from available slots
       availableArticles = List.filter (\a -> List.any (deliveredTo a) houses) articles
     in
-      case IHopeItWorks.pickRandom availableArticles seed of
-        (Just article, seed') ->
-          let
-            restArticles = IHopeItWorks.remove ((==) article) availableArticles
-            restHouses = IHopeItWorks.remove (deliveredTo article) houses
-            (returnArticles, seed'') = chooseToReturn (number - 1) restHouses restArticles seed'
-          in
-            (article :: returnArticles, seed'')
-        (Nothing, seed') ->
-          ([], seed')
+      IHopeItWorks.pickRandom availableArticles
+      `Random.andThen`
+      (\maybeArticle ->
+        case maybeArticle of
+          Just article ->
+            Random.map
+              ((::) article)
+              ( return
+                  (number - 1)
+                  (IHopeItWorks.remove (deliveredTo article) houses)
+                  (IHopeItWorks.remove ((==) article) availableArticles)
+              )
+          Nothing ->
+            Random.map (always []) (Random.int 0 0)
+      )
 
 
 markInReturn : List Article -> List Article -> List Article

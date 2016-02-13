@@ -95,10 +95,9 @@ getColor fn categories =
       _ -> 3
 
 
-random : Random.Seed -> (Category, Random.Seed)
-random seed =
-  let
-    (color, seed') = Random.generate (Random.int 0 2) seed
-    (maybeCategory, seed'') = IHopeItWorks.pickRandom categories seed'
-  in
-    ((Maybe.withDefault Scarf maybeCategory) color, seed'')
+random : Random.Generator Category
+random  =
+  Random.map2
+    (<|)
+    (Random.map (Maybe.withDefault Scarf) (IHopeItWorks.pickRandom categories))
+    (Random.int 0 2)

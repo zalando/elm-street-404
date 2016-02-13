@@ -25,10 +25,10 @@ type Request
 
 initData : RequestData
 initData =
- { timeout = initialMaxWaitingTime
- , elapsed = 0
- , blinkHidden = False
- }
+  { timeout = initialMaxWaitingTime
+  , elapsed = 0
+  , blinkHidden = False
+  }
 
 
 orderedCategories : List Request -> List Category
@@ -55,23 +55,26 @@ returnArticles articles =
           returnArticles restArticles
 
 
-orders : Int -> List House -> List Category -> Random.Seed -> (List Request, Random.Seed)
-orders number houses categories seed =
-  if number == 0 then
-    ([], seed)
+orders : Int -> List House -> List Category -> Random.Generator (List Request)
+orders number houses categories =
+  if number <= 0 then
+    Random.map (always []) (Random.int 0 0)
   else
-    case IHopeItWorks.pickRandom houses seed of
-      (Just house, seed') ->
-        case IHopeItWorks.pickRandom categories seed' of
-          (Just category, seed'') ->
-            let
-              restCategories = IHopeItWorks.remove ((==) category) categories
-              restHouses = IHopeItWorks.remove ((==) house) houses
-              (rest, seed''') = orders (number - 1) restHouses restCategories seed''
-            in
-              (Order house category initData :: rest, seed''')
-          (Nothing, seed') -> ([], seed')
-      (Nothing, seed') -> ([], seed')
+    Random.pair (IHopeItWorks.pickRandom houses) (IHopeItWorks.pickRandom categories)
+    `Random.andThen`
+    (\pair ->
+      case pair of
+        (Just house, Just category) ->
+          Random.map
+            ((::) (Order house category initData))
+            ( orders
+                (number - 1)
+                (IHopeItWorks.remove ((==) house) houses)
+                (IHopeItWorks.remove ((==) category) categories)
+            )
+        _ ->
+          Random.map (always []) (Random.int 0 0)
+    )
 
 
 inHouse : House -> Request -> Bool

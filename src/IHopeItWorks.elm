@@ -46,12 +46,8 @@ exclude left right =
           first :: nextLeft
 
 
-pickRandom : List a -> Random.Seed -> (Maybe a, Random.Seed)
-pickRandom list seed =
-  if List.length list == 0 then
-    (Nothing, seed)
-  else
-    let
-      (index, seed'') = Random.generate (Random.int 0 (List.length list - 1)) seed
-    in
-      (List.head (List.drop index list), seed'')
+pickRandom : List a -> Random.Generator (Maybe a)
+pickRandom list =
+  Random.map
+    (\index -> (List.head (List.drop index list)))
+    (Random.int 0 (List.length list - 1))

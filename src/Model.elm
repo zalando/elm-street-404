@@ -152,7 +152,7 @@ start model =
 dispatchCustomers : Model -> Model
 dispatchCustomers model =
   let
-    (customers, seed) = Customer.rodnams model.houses model.seed
+    (customers, seed) = Random.generate (Customer.rodnams model.houses) model.seed
   in
     { model | customers = customers, seed = seed }
 
@@ -163,7 +163,7 @@ dispatchArticles number model =
     warehouseSlots = IHopeItWorks.exclude
       (List.concat (List.map (\w -> List.repeat (w.capacity - 1) w) model.warehouses))
       (Article.warehouses model.articles)
-    (articles, seed) = Article.dispatch number warehouseSlots model.seed
+    (articles, seed) = Random.generate (Article.dispatch number warehouseSlots) model.seed
   in
     { model | articles = model.articles ++ articles, seed = seed }
 
@@ -175,7 +175,7 @@ dispatchOrders number model =
     houseSlots = IHopeItWorks.exclude
       (List.concat (List.map (\h -> List.repeat h.capacity h) model.houses))
       (List.map Request.house model.requests)
-    (orders, seed) = Request.orders number houseSlots categories model.seed
+    (orders, seed) = Random.generate (Request.orders number houseSlots categories) model.seed
   in
     { model | requests = model.requests ++ orders, seed = seed }
 
@@ -188,7 +188,7 @@ dispatchReturns number model =
       (List.concat (List.map (\h -> List.repeat h.capacity h) housesWithArticles))
       (List.map Request.house model.requests)
     wearedArticles = List.filter Article.isWorn model.articles
-    (articlesToReturn, seed) = Article.chooseToReturn number houseSlots model.articles model.seed
+    (articlesToReturn, seed) = Random.generate (Article.return number houseSlots model.articles) model.seed
     articles = Article.markInReturn model.articles articlesToReturn
     returnedArticles = Article.markInReturn articlesToReturn articlesToReturn
     returns = Request.returnArticles returnedArticles
@@ -344,7 +344,7 @@ updateCustomers : Model -> Model
 updateCustomers model =
   let
     emptyHouses = List.filter (houseEmpty model.customers) model.houses
-    (newCustomers, seed) = Customer.rodnams emptyHouses model.seed
+    (newCustomers, seed) = Random.generate (Customer.rodnams emptyHouses) model.seed
   in
     { model
     | customers = model.customers ++ newCustomers
