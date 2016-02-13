@@ -27,7 +27,9 @@ boxes address model =
     if model.state == Model.Initialising then
       []
     else if model.state == Model.Loading then
-      DigitsView.render (12, 6) (round (100 * (1 - toFloat (List.length model.images) / toFloat (List.length Model.images))))
+      DigitsView.render
+        (toFloat (fst model.gridSize) / 2 + 1, toFloat (snd model.gridSize) / 2) 
+        (round (100 * (1 - toFloat (List.length model.images) / toFloat (List.length Model.images))))
     else
       List.concat (
         StartGameView.render address model.gridSize model.state ::
