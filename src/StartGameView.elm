@@ -16,11 +16,11 @@ clickToStartSprite =
   }
 
 
-render : Signal.Address Action -> Model.State -> List Sprite.Box
-render address state =
+render : Signal.Address Action -> (Int, Int) -> Model.State -> List Sprite.Box
+render address (width, height) state =
   if state == Model.Stopped then
     [ { sprite = clickToStartSprite
-      , position = (6, 6)
+      , position = (toFloat width / 2 - 5, toFloat height / 2 - 1)
       , layer = layers.clickToStart
       , frame = 0
       , attributes = [onClick address Actions.Start]

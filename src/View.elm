@@ -23,16 +23,16 @@ import DigitsView
 
 boxes : Signal.Address Action -> Model -> List Sprite.Box
 boxes address model =
-  StartGameView.render address model.state ++
+  StartGameView.render address model.gridSize model.state ++
     if model.state == Model.Initialising then
       []
     else if model.state == Model.Loading then
       DigitsView.render (12, 6) (round (100 * (1 - toFloat (List.length model.images) / toFloat (List.length Model.images))))
     else
       List.concat (
-        StartGameView.render address model.state ::
-        InventoryView.render address model.articles ::
-        ScoreView.render model.score model.maxLives (Model.countLives model) ::
+        StartGameView.render address model.gridSize model.state ::
+        InventoryView.render address model.gridSize model.articles ::
+        ScoreView.render model.gridSize model.score model.maxLives (Model.countLives model) ::
         DeliveryPersonView.render (List.length (List.filter Article.isPicked model.articles)) model.deliveryPerson ::
         List.map (HouseView.render address model.requests model.articles model.customers) model.houses ++
         List.map (WarehouseView.render address model.articles) model.warehouses ++
