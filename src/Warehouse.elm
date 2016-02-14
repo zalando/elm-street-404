@@ -1,10 +1,9 @@
 module Warehouse (Warehouse, warehouse) where
 
-type alias Warehouse =
-  { position : (Float, Float)
-  , size : (Float, Float)
-  , capacity : Int
-  }
+import MapObject exposing (MapObject)
+
+
+type alias Warehouse = MapObject { capacity : Int }
 
 
 warehouse : (Float, Float) -> Warehouse

@@ -1,6 +1,9 @@
 module Obstacle (Obstacle, Category(..), animate, fountain, tree) where
+
 import Time exposing (Time)
 import AnimationState exposing (animateObject, rotateFrames)
+import MapObject exposing (MapObject)
+
 
 type Category = Fountain | Tree
 
@@ -16,13 +19,12 @@ animate time obstacle =
       _ -> obstacle
 
 
-type alias Obstacle =
-  { category : Category
-  , position : (Float, Float)
-  , size : (Float, Float)
-  , elapsed: Time
-  , frames : List (Int)
-  }
+type alias Obstacle
+  = MapObject
+      { category : Category
+      , elapsed: Time
+      , frames : List (Int)
+      }
 
 
 fountain : (Float, Float) -> Obstacle

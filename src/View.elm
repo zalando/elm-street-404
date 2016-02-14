@@ -28,7 +28,7 @@ boxes address model =
       []
     else if model.state == Model.Loading then
       DigitsView.render
-        (toFloat (fst model.gridSize) / 2 + 1, toFloat (snd model.gridSize) / 2) 
+        (toFloat (fst model.gridSize) / 2 + 1, toFloat (snd model.gridSize) / 2)
         (round (100 * (1 - toFloat (List.length model.images) / toFloat (List.length Model.images))))
     else
       List.concat (
@@ -52,6 +52,7 @@ view address model =
     , "width" => (toString (fst model.gridSize * model.tileSize) ++ "px")
     , "background-image" => ("url(" ++ model.imagesUrl ++ "/bg-grid.jpg" ++ ")")
     , "background-size" => "960px 560px"
+    , "background-position" => "50% 0"
     ]
   ]
   ( PathView.render model.gridSize model.tileSize model.deliveryPerson.route ::

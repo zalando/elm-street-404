@@ -127,10 +127,10 @@ animate time deliveryPerson =
   |> moveOnPath time
 
 
-initial : (Int, Int) -> DeliveryPerson
+initial : (Float, Float) -> DeliveryPerson
 initial position =
   { location = Initial
-  , position = (toFloat (fst position), toFloat (snd position))
+  , position = position
   , route = []
   , elapsed = 0
   , frames = [0, 1, 2]

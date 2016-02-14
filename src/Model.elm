@@ -35,16 +35,9 @@ import Warehouse exposing (Warehouse)
 import IHopeItWorks
 import Article exposing (State(..), Article)
 import Generator exposing (Generator)
-
+import MapObject exposing (MapObject)
 
 type State = Initialising | Loading | Paused | Playing | Stopped
-
-
-type alias MapObject a =
-  { a
-  | position : (Float, Float)
-  , size : (Float, Float)
-  }
 
 
 limitSize : (Int, Int) -> (Int, Int)
@@ -102,31 +95,52 @@ initial dimensions imagesUrl =
   , tileSize = 40
   , imagesUrl = imagesUrl
   , dimensions = dimensions
-  , gridSize = gridSize 40 dimensions
-  , deliveryPerson = DeliveryPerson.initial (10, 10)
+  , gridSize = (0, 0)
+  , deliveryPerson = DeliveryPerson.initial (0, 0)
   , articles = []
   , requests = []
-  , obstacles =
-    [ Obstacle.fountain (10, 5)
-    , Obstacle.tree (1, 5)
-    , Obstacle.tree (15, 5)
-    ]
-  , houses =
-    [ House.house (8, 10)
-    , House.house (12, 7)
-    , House.house (16, 10)
-    , House.house (5, 5)
-    ]
+  , obstacles = []
+  , houses = []
   , customers = []
-  , warehouses =
-    [ Warehouse.warehouse (19, 6)
-    , Warehouse.warehouse (1, 10)
-    ]
+  , warehouses = []
   , orderGenerator = Generator.initial 11000
   , articleGenerator = Generator.initial 13000
   , returnGenerator = Generator.initial 31000
   , score = 0
   , maxLives = 3
+  }
+  |> resize
+  |> positionDeliveryPerson
+
+
+resize : Model -> Model
+resize model =
+  { model
+  | gridSize = gridSize model.tileSize model.dimensions
+  }
+
+
+positionDeliveryPerson : Model -> Model
+positionDeliveryPerson ({gridSize} as model) =
+  { model
+  | deliveryPerson =
+      DeliveryPerson.initial
+        ( toFloat (fst gridSize // 2 - 1)
+        , toFloat (snd gridSize // 4 * 3 - 1)
+        )
+  }
+
+
+positionObstacles : Model -> Model
+positionObstacles ({gridSize} as model) =
+  { model
+  | warehouses =
+      [ Warehouse.warehouse (toFloat (fst gridSize) - 5, 5)
+      , Warehouse.warehouse (1, toFloat (snd gridSize) - 5)
+      ]
+  , obstacles =
+      [ Obstacle.fountain (toFloat (fst gridSize // 2) - 1, toFloat (snd gridSize // 2) - 1)
+      ]
   }
 
 
@@ -142,8 +156,10 @@ start model =
   , returnGenerator = Generator.initial 31000
   , score = 0
   , maxLives = 3
-  , deliveryPerson = DeliveryPerson.initial (10, 10)
   }
+  |> resize
+  |> positionDeliveryPerson
+  |> positionObstacles
   |> dispatchCustomers
   |> dispatchArticles 6
   |> dispatchOrders 3
