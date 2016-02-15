@@ -15,6 +15,7 @@ import Article
 import ScoreView
 import StartGameView
 import DigitsView
+import Layers exposing (layers)
 
 
 (=>) : a -> b -> (a, b)
@@ -40,6 +41,25 @@ boxes address model =
         List.map (WarehouseView.render address model.articles) model.warehouses ++
         List.map ObstacleView.render model.obstacles
       )
+
+
+debug : Model -> Html
+debug model =
+  div
+    [ style
+        [ "background" => "linear-gradient(0deg, #000000 0, rgba(0,0,0,0) 2px, rgba(0,0,0,0) 100%), linear-gradient(90deg, #000000 0, rgba(0,0,0,0) 2px, rgba(0,0,0,0) 100%)"
+        , "background-origin" => "padding-box"
+        , "background-clip" => "border-box"
+        , "background-size" => (toString model.tileSize ++ "px " ++ toString model.tileSize ++ "px")
+        , "position" => "absolute"
+        , "left" => "0"
+        , "top" => "0"
+        , "width" => "100%"
+        , "height" => "100%"
+        , "z-index" => toString layers.grid
+        ]
+    ]
+    []
 
 
 view : Signal.Address Action -> Model -> Html

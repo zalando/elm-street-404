@@ -4,6 +4,7 @@ import House exposing (House)
 import Warehouse exposing (Warehouse)
 import Time exposing (Time)
 import AnimationState exposing (animateObject, rotateFrames)
+import MapObject exposing (MapObject)
 import Astar
 
 
@@ -16,13 +17,13 @@ type Location
 
 
 type alias DeliveryPerson =
-  { location : Location
-  , position : (Float, Float)
-  , route : List (Int, Int)
-  , elapsed: Time
-  , frames : List (Int)
-  , capacity : Int
-  }
+  MapObject
+    { location : Location
+    , route : List (Int, Int)
+    , elapsed: Time
+    , frames : List (Int)
+    , capacity : Int
+    }
 
 
 pushThePedals : Time -> DeliveryPerson -> DeliveryPerson
@@ -131,6 +132,7 @@ initial : (Float, Float) -> DeliveryPerson
 initial position =
   { location = Initial
   , position = position
+  , size = (2, 1)
   , route = []
   , elapsed = 0
   , frames = [0, 1, 2]

@@ -20,6 +20,8 @@ module Model
   , cleanupLostRequests
   , countLives
   , images
+  , resize
+  , positionDeliveryPerson
   ) where
 
 import Random
@@ -36,6 +38,7 @@ import IHopeItWorks
 import Article exposing (State(..), Article)
 import Generator exposing (Generator)
 import MapObject exposing (MapObject)
+import MapObjectCategory
 
 type State = Initialising | Loading | Paused | Playing | Stopped
 
@@ -132,16 +135,27 @@ positionDeliveryPerson ({gridSize} as model) =
 
 
 positionObstacles : Model -> Model
-positionObstacles ({gridSize} as model) =
-  { model
-  | warehouses =
-      [ Warehouse.warehouse (toFloat (fst gridSize) - 5, 5)
-      , Warehouse.warehouse (1, toFloat (snd gridSize) - 5)
-      ]
-  , obstacles =
-      [ Obstacle.fountain (toFloat (fst gridSize // 2) - 1, toFloat (snd gridSize // 2) - 1)
-      ]
-  }
+positionObstacles ({gridSize, deliveryPerson} as model) =
+  let
+    (width, height) = gridSize
+    (categories, seed) =
+      Random.generate
+        ( MapObjectCategory.placeObjects
+            {size=(toFloat width - 2, toFloat height - 6), position=(1, 4)}
+            deliveryPerson
+            (List.map (always Warehouse.warehouse) [0..1])
+            (List.map (always House.house) [0..3])
+            (Obstacle.fountain :: List.map (always Obstacle.tree) [0..3])
+        )
+        model.seed
+  in
+    { model
+    | deliveryPerson = Maybe.withDefault deliveryPerson (MapObjectCategory.deliveryPerson categories)
+    , warehouses = MapObjectCategory.warehouses categories
+    , houses = MapObjectCategory.houses categories
+    , obstacles = MapObjectCategory.obstacles categories
+    , seed = seed
+    }
 
 
 start : Model -> Model
@@ -158,7 +172,6 @@ start model =
   , maxLives = 3
   }
   |> resize
-  |> positionDeliveryPerson
   |> positionObstacles
   |> dispatchCustomers
   |> dispatchArticles 6

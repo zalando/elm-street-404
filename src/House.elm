@@ -6,9 +6,9 @@ import MapObject exposing (MapObject)
 type alias House = MapObject { capacity : Int }
 
 
-house : (Float, Float) -> House
-house position =
-  { position = position
+house : House
+house =
+  { position = (0, 0)
   , size = (2, 2)
   , capacity = 3
   }

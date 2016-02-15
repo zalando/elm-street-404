@@ -27,20 +27,20 @@ type alias Obstacle
       }
 
 
-fountain : (Float, Float) -> Obstacle
-fountain position =
+fountain : Obstacle
+fountain =
   { category = Fountain
-  , position = position
+  , position = (0, 0)
   , size = (3, 2)
   , elapsed = 0
   , frames = [0, 1, 2, 3]
   }
 
 
-tree : (Float, Float) -> Obstacle
-tree position =
+tree : Obstacle
+tree =
   { category = Tree
-  , position = position
+  , position = (0, 0)
   , size = (3, 2)
   , elapsed = 0
   , frames = [0]

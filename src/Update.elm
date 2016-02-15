@@ -21,7 +21,14 @@ update : Action -> Model -> (Model, Effects Action)
 update action model =
   case action of
     Dimensions dimensions ->
-      ({model | dimensions = Debug.log "dimensions" dimensions}, Effects.none)
+      if model.state == Playing then
+        ({model | dimensions = dimensions}, Effects.none)
+      else
+        ( {model | dimensions = dimensions}
+          |> Model.resize
+          |> Model.positionDeliveryPerson
+        , Effects.none
+        )
     Init time ->
       ( {model | seed = Random.initialSeed (floor time)}
       , (loadImage model.imagesUrl) "score.png"
