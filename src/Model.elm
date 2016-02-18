@@ -61,7 +61,7 @@ images =
   , "warehouse-shadow.png", "categories.png", "delivery-person.png", "fountain.png"
   , "house-bubble-3.png", "inventory-bubble.png", "shirts.png", "trousers.png"
   , "warehouse.png", "click-to-start.png", "fountain-shadow.png", "house-bubble-1.png"
-  , "house-shadow.png", "scarves.png", "shoes.png", "warehouse-bubble.png"
+  , "house-shadow.png", "scarves.png", "shoes.png", "warehouse-bubble.png", "404-elm-street.png"
   ]
 
 
