@@ -20,8 +20,8 @@ type alias Customer =
   }
 
 
-initial : Int -> House -> Customer
-initial typ house =
+initial : House -> Int -> Customer
+initial house typ =
   { typ = typ
   , happiness = 2
   , location = AtHome house
@@ -40,24 +40,18 @@ animate time customer =
       _ -> customer
 
 
-rodnam : House -> Random.Seed -> (Customer, Random.Seed)
-rodnam house seed =
-  let
-    (typ, seed') = Random.generate (Random.int 0 5) seed
-  in
-    (initial typ house, seed')
+rodnam : House -> Random.Generator Customer
+rodnam house =
+  Random.map (initial house) (Random.int 0 5)
 
 
-rodnams : List House -> Random.Seed -> (List Customer, Random.Seed)
-rodnams houses seed =
+rodnams : List House -> Random.Generator (List Customer)
+rodnams houses =
   case houses of
-    [] -> ([], seed)
-    house :: otherHouses ->
-      let
-        (customer, seed') = rodnam house seed
-        (otherCustomers, seed'') = rodnams otherHouses seed'
-      in
-        (customer :: otherCustomers, seed'')
+    [] ->
+      Random.map (always []) (Random.int 0 0) -- could be Random.succeed []
+    house :: rest ->
+      Random.map2 (::) (rodnam house) (rodnams rest)
 
 
 livesHere : House -> Customer -> Bool

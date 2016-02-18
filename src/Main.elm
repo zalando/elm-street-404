@@ -1,32 +1,33 @@
 import Actions exposing (..)
-import Effects
-import Html
-import Model
-import Signal
-import StartApp
-import Task
+import Effects exposing (Never)
+import Html exposing (Html)
+import Model exposing (Model)
+import StartApp exposing (App)
+import Task exposing (Task)
 import Update
 import View
+import Window
 
 
-app : { html : Signal Html.Html
-      , model : Signal Model.Model
-      , tasks : Signal (Task.Task Effects.Never ())
-      }
+app : App Model
 app =
   StartApp.start
-    { init = (Model.initial, Effects.tick Actions.Init)
+    { init = (Model.initial windowDimensions imagesUrl, Effects.tick Actions.Init)
     , update = Update.update
     , view = View.view
-    , inputs = []
+    , inputs = [Signal.map Actions.Dimensions Window.dimensions]
     }
 
 
-main : Signal Html.Html
-main =
-  app.html
+main : Signal Html
+main = app.html
 
 
-port tasks : Signal (Task.Task Effects.Never ())
-port tasks =
-  app.tasks
+port imagesUrl : String
+
+
+port windowDimensions : (Int, Int)
+
+
+port tasks : Signal (Task Never ())
+port tasks = app.tasks

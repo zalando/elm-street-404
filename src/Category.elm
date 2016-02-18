@@ -1,7 +1,6 @@
 module Category (Category(..), getFrame, random, color, getColor, isShirt, isShoes, isPants, isScarf, isSame) where
 
 import Random
-import Array exposing (Array)
 import IHopeItWorks
 
 
@@ -15,8 +14,8 @@ type Category
   | Empty
 
 
-categories : Array (Int -> Category)
-categories = Array.fromList [Pants, Shirt, Shoes, Scarf]
+categories : List (Int -> Category)
+categories = [Pants, Shirt, Shoes, Scarf]
 
 
 getFrame : Category -> Int
@@ -96,12 +95,9 @@ getColor fn categories =
       _ -> 3
 
 
-random : Random.Seed -> (Category, Random.Seed)
-random seed =
-  let
-    (color, seed') = Random.generate (Random.int 0 2) seed
-    (categoryIndex, seed'') = Random.generate (Random.int 0 (Array.length categories - 1)) seed'
-  in
-    ( (Maybe.withDefault Scarf (Array.get categoryIndex categories)) color
-    , seed''
-    )
+random : Random.Generator Category
+random  =
+  Random.map2
+    (<|)
+    (Random.map (Maybe.withDefault Scarf) (IHopeItWorks.pickRandom categories))
+    (Random.int 0 2)

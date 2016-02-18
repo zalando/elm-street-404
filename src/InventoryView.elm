@@ -18,21 +18,24 @@ bubbleSprite =
   }
 
 
-render : Signal.Address Action -> List Article -> List Sprite.Box
-render address articles =
+render : Signal.Address Action -> (Int, Int) -> List Article -> List Sprite.Box
+render address (width, height) articles =
   let
+    x = toFloat (width - 7) / 2
+    y = toFloat height - 3
+
     articlesInDelivery = List.filter Article.isPicked articles
     articlesNumber = List.length articlesInDelivery
     placeholders = List.repeat (4 - articlesNumber) Category.Placeholder
 
     renderArticle number article =
-      ArticleView.render address (toFloat number + 2, 1) article
+      ArticleView.render address (toFloat number + x + 2, y + 1) article
 
     renderCategory number category =
-      CategoryView.render (toFloat (number + articlesNumber) + 2, 1) [] category
+      CategoryView.render (toFloat (number + articlesNumber) + x + 2, y + 1) [] category
   in
     { sprite = bubbleSprite
-    , position = (0, 0)
+    , position = (x, y)
     , layer = layers.bubble
     , frame = 0
     , attributes = []

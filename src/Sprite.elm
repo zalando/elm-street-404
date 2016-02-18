@@ -39,8 +39,8 @@ sort boxes =
   List.sortBy (\box -> snd box.position) boxes
 
 
-render : (String -> String) -> Int -> Box -> Html.Html
-render imageUrl tileSize {sprite, position, frame, layer, attributes} =
+render : String -> Int -> Box -> Html.Html
+render imagesUrl tileSize {sprite, position, frame, layer, attributes} =
   let
     (width, height) = sprite.size
     left = round ((fst position + fst sprite.offset) * toFloat tileSize)
@@ -52,7 +52,7 @@ render imageUrl tileSize {sprite, position, frame, layer, attributes} =
        , "top" => (toString top ++ "px")
        , "position" => "absolute"
        , "overflow" => "hidden"
-       , "background-image" => if sprite.src == "" then "none" else ("url(" ++ imageUrl sprite.src ++ ")")
+       , "background-image" => if sprite.src == "" then "none" else ("url(" ++ imagesUrl ++ "/" ++ sprite.src ++ ")")
        , "background-position" => (toString (-frame * width * tileSize) ++ "px 0")
        , "background-repeat" => "no-repeat"
        , "background-size" => (toString (width * sprite.frames * tileSize) ++ "px " ++ (toString (height * tileSize)) ++ "px")

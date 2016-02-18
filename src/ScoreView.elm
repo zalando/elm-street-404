@@ -14,15 +14,15 @@ scoreSprite =
   }
 
 
-render : Int -> Int -> Int -> List Sprite.Box
-render score maxLives lives =
+render : (Int, Int) -> Int -> Int -> Int -> List Sprite.Box
+render (width, height) score maxLives lives =
   let
-    x = 22
+    x = toFloat width - 2
     y = 1
 
     renderLife number _ =
       { sprite = scoreSprite
-      , position = (9 + toFloat (maxLives - number), y)
+      , position = (toFloat (maxLives - number), y)
       , layer = layers.customer
       , frame = if number >= (maxLives - lives) then 11 else 12
       , attributes = []

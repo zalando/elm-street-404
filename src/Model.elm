@@ -20,6 +20,8 @@ module Model
   , cleanupLostRequests
   , countLives
   , images
+  , resize
+  , cleanupModel
   ) where
 
 import Random
@@ -35,16 +37,22 @@ import Warehouse exposing (Warehouse)
 import IHopeItWorks
 import Article exposing (State(..), Article)
 import Generator exposing (Generator)
-
+import MapObject exposing (MapObject)
+import MapObjectCategory
 
 type State = Initialising | Loading | Paused | Playing | Stopped
 
 
-type alias MapObject a =
-  { a
-  | position : (Float, Float)
-  , size : (Float, Float)
-  }
+limitSize : (Int, Int) -> (Int, Int)
+limitSize (width, height) =
+  ( width |> max 14 |> min 24
+  , height |> max 14 |> min 24
+  )
+
+
+gridSize : Int -> (Int, Int) -> (Int, Int)
+gridSize tileSize (width, height) =
+  limitSize (width // tileSize, height // tileSize)
 
 
 images : List String
@@ -63,6 +71,8 @@ type alias Model =
   , images : List String
   , seed : Random.Seed
   , tileSize : Int
+  , imagesUrl : String
+  , dimensions : (Int, Int)
   , gridSize : (Int, Int)
   , deliveryPerson : DeliveryPerson
   , articles : List Article
@@ -79,39 +89,79 @@ type alias Model =
   }
 
 
-initial : Model
-initial =
+initial : (Int, Int) -> String -> Model
+initial dimensions imagesUrl =
   { animationState = Nothing
   , state = Initialising
   , images = images
   , seed = Random.initialSeed 0
   , tileSize = 40
-  , gridSize = (24, 14)
-  , deliveryPerson = DeliveryPerson.initial (10, 10)
+  , imagesUrl = imagesUrl
+  , dimensions = dimensions
+  , gridSize = (0, 0)
+  , deliveryPerson = DeliveryPerson.initial (0, 0)
   , articles = []
   , requests = []
-  , obstacles =
-    [ Obstacle.fountain (10, 5)
-    , Obstacle.tree (1, 5)
-    , Obstacle.tree (15, 5)
-    ]
-  , houses =
-    [ House.house (8, 10)
-    , House.house (12, 7)
-    , House.house (16, 10)
-    , House.house (5, 5)
-    ]
+  , obstacles = []
+  , houses = []
   , customers = []
-  , warehouses =
-    [ Warehouse.warehouse (19, 6)
-    , Warehouse.warehouse (1, 10)
-    ]
+  , warehouses = []
   , orderGenerator = Generator.initial 11000
   , articleGenerator = Generator.initial 13000
   , returnGenerator = Generator.initial 31000
   , score = 0
   , maxLives = 3
   }
+  |> resize
+  |> cleanupModel
+
+
+resize : Model -> Model
+resize model =
+  { model
+  | gridSize = gridSize model.tileSize model.dimensions
+  }
+
+
+cleanupModel : Model -> Model
+cleanupModel ({gridSize} as model) =
+  { model
+  | deliveryPerson =
+      DeliveryPerson.initial
+        ( toFloat (fst gridSize // 2 - 1)
+        , toFloat (snd gridSize // 4 * 3 - 1)
+        )
+  , articles = []
+  , requests = []
+  , obstacles = []
+  , houses = []
+  , customers = []
+  , warehouses = []
+  }
+
+
+positionObstacles : Model -> Model
+positionObstacles ({gridSize, deliveryPerson} as model) =
+  let
+    (width, height) = gridSize
+    (categories, seed) =
+      Random.generate
+        ( MapObjectCategory.placeObjects
+            {size=(toFloat width - 2, toFloat height - 6), position=(1, 4)}
+            deliveryPerson
+            (List.map (always Warehouse.warehouse) [0..1])
+            (List.map (always House.house) [0..3])
+            (Obstacle.fountain :: List.map (always Obstacle.tree) [0..3])
+        )
+        model.seed
+  in
+    { model
+    | deliveryPerson = Maybe.withDefault deliveryPerson (MapObjectCategory.deliveryPerson categories)
+    , warehouses = MapObjectCategory.warehouses categories
+    , houses = MapObjectCategory.houses categories
+    , obstacles = MapObjectCategory.obstacles categories
+    , seed = seed
+    }
 
 
 start : Model -> Model
@@ -126,8 +176,9 @@ start model =
   , returnGenerator = Generator.initial 31000
   , score = 0
   , maxLives = 3
-  , deliveryPerson = DeliveryPerson.initial (10, 10)
   }
+  |> resize
+  |> positionObstacles
   |> dispatchCustomers
   |> dispatchArticles 6
   |> dispatchOrders 3
@@ -136,7 +187,7 @@ start model =
 dispatchCustomers : Model -> Model
 dispatchCustomers model =
   let
-    (customers, seed) = Customer.rodnams model.houses model.seed
+    (customers, seed) = Random.generate (Customer.rodnams model.houses) model.seed
   in
     { model | customers = customers, seed = seed }
 
@@ -147,7 +198,7 @@ dispatchArticles number model =
     warehouseSlots = IHopeItWorks.exclude
       (List.concat (List.map (\w -> List.repeat (w.capacity - 1) w) model.warehouses))
       (Article.warehouses model.articles)
-    (articles, seed) = Article.dispatch number warehouseSlots model.seed
+    (articles, seed) = Random.generate (Article.dispatch number warehouseSlots) model.seed
   in
     { model | articles = model.articles ++ articles, seed = seed }
 
@@ -159,7 +210,7 @@ dispatchOrders number model =
     houseSlots = IHopeItWorks.exclude
       (List.concat (List.map (\h -> List.repeat h.capacity h) model.houses))
       (List.map Request.house model.requests)
-    (orders, seed) = Request.orders number houseSlots categories model.seed
+    (orders, seed) = Random.generate (Request.orders number houseSlots categories) model.seed
   in
     { model | requests = model.requests ++ orders, seed = seed }
 
@@ -172,7 +223,7 @@ dispatchReturns number model =
       (List.concat (List.map (\h -> List.repeat h.capacity h) housesWithArticles))
       (List.map Request.house model.requests)
     wearedArticles = List.filter Article.isWorn model.articles
-    (articlesToReturn, seed) = Article.chooseToReturn number houseSlots model.articles model.seed
+    (articlesToReturn, seed) = Random.generate (Article.return number houseSlots model.articles) model.seed
     articles = Article.markInReturn model.articles articlesToReturn
     returnedArticles = Article.markInReturn articlesToReturn articlesToReturn
     returns = Request.returnArticles returnedArticles
@@ -328,7 +379,7 @@ updateCustomers : Model -> Model
 updateCustomers model =
   let
     emptyHouses = List.filter (houseEmpty model.customers) model.houses
-    (newCustomers, seed) = Customer.rodnams emptyHouses model.seed
+    (newCustomers, seed) = Random.generate (Customer.rodnams emptyHouses) model.seed
   in
     { model
     | customers = model.customers ++ newCustomers

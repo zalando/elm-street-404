@@ -2,18 +2,22 @@
 set -e
 
 rm -rf gh-pages || exit 0;
-mkdir gh-pages;
 
-# compile the files using Elm
-elm make src/Main.elm --output gh-pages/main.html
-html-minifier --minify-css --minify-js gh-pages/main.html -o gh-pages/index.html
-rm gh-pages/main.html
+mkdir gh-pages
 
-# Copy the images
-cp -R src/img gh-pages
+# compile JS using Elm
+elm make src/Main.elm --output gh-pages/elm.js
+
+# copy the images and html
+cp index.html gh-pages/index.html
+cp -R img gh-pages
 
 cd gh-pages
 
+# minify js
+uglifyjs --compress warnings=false --mangle --source-map elm.js.map --output elm.js -- elm.js
+
+# init branch and commit
 git init
 git config user.name "travis"
 git add .

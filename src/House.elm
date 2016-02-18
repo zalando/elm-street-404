@@ -1,16 +1,14 @@
 module House (House, house) where
 
-
-type alias House =
-  { position : (Float, Float)
-  , size : (Float, Float)
-  , capacity : Int
-  }
+import MapObject exposing (MapObject)
 
 
-house : (Float, Float) -> House
-house position =
-  { position = position
-  , size = (3, 2)
+type alias House = MapObject { capacity : Int }
+
+
+house : House
+house =
+  { position = (0, 0)
+  , size = (2, 2)
   , capacity = 3
   }
