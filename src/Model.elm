@@ -21,7 +21,7 @@ module Model
   , countLives
   , images
   , resize
-  , positionDeliveryPerson
+  , cleanupModel
   ) where
 
 import Random
@@ -113,7 +113,7 @@ initial dimensions imagesUrl =
   , maxLives = 3
   }
   |> resize
-  |> positionDeliveryPerson
+  |> cleanupModel
 
 
 resize : Model -> Model
@@ -123,14 +123,20 @@ resize model =
   }
 
 
-positionDeliveryPerson : Model -> Model
-positionDeliveryPerson ({gridSize} as model) =
+cleanupModel : Model -> Model
+cleanupModel ({gridSize} as model) =
   { model
   | deliveryPerson =
       DeliveryPerson.initial
         ( toFloat (fst gridSize // 2 - 1)
         , toFloat (snd gridSize // 4 * 3 - 1)
         )
+  , articles = []
+  , requests = []
+  , obstacles = []
+  , houses = []
+  , customers = []
+  , warehouses = []
   }
 
 

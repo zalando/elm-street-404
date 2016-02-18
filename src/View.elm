@@ -70,9 +70,8 @@ view address model =
     , "margin" => "auto"
     , "position" => "relative"
     , "width" => (toString (fst model.gridSize * model.tileSize) ++ "px")
-    , "background-image" => ("url(" ++ model.imagesUrl ++ "/bg-grid.jpg" ++ ")")
-    , "background-size" => "960px 560px"
-    , "background-position" => "50% 0"
+    , "background-image" => ("url(" ++ model.imagesUrl ++ "/bg-tile.jpg" ++ ")")
+    , "background-size" => "560px 560px"
     ]
   ]
   ( PathView.render model.gridSize model.tileSize model.deliveryPerson.route ::

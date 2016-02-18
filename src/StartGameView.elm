@@ -16,6 +16,16 @@ clickToStartSprite =
   }
 
 
+elmStreet404Sprite : Sprite
+elmStreet404Sprite =
+  { size = (13, 2)
+  , offset = (0, 0)
+  , frames = 1
+  , src = "404-elm-street.png"
+  }
+
+
+
 render : Signal.Address Action -> (Int, Int) -> Model.State -> List Sprite.Box
 render address (width, height) state =
   if state == Model.Stopped then
@@ -24,6 +34,12 @@ render address (width, height) state =
       , layer = layers.clickToStart
       , frame = 0
       , attributes = [onClick address Actions.Start]
+      }
+    , { sprite = elmStreet404Sprite
+      , position = (toFloat width / 2 - 6.5, toFloat height / 4 - 1)
+      , layer = layers.clickToStart
+      , frame = 0
+      , attributes = []
       }
     ]
   else

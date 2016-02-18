@@ -26,7 +26,7 @@ update action model =
       else
         ( {model | dimensions = dimensions}
           |> Model.resize
-          |> Model.positionDeliveryPerson
+          |> Model.cleanupModel
         , Effects.none
         )
     Init time ->
