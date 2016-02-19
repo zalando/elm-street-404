@@ -181,12 +181,9 @@ getPath state =
   |> List.drop 1
 
 
-astar : Point -> List Point -> Point -> Point -> List Point
-astar gridSize obstacles start destination =
+findPath : Point -> List Point -> Point -> Point -> List Point
+findPath gridSize obstacles start destination =
   initialState gridSize obstacles start destination
   |> (flip (List.foldl checkInitNodeState)) [start, destination]
   |> astarIter
   |> getPath
-
-
-findPath = astar
