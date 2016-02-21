@@ -1,6 +1,6 @@
 module Request (Request, RequestCategory(..), isInReturn, isOrdered, hasOrder, animate, inTime, orders, orderedCategories, returnArticles) where
 
-import House exposing (House)
+import MapObject exposing (MapObject)
 import Article exposing (Article)
 import Category exposing (Category)
 import Time exposing (Time)
@@ -20,13 +20,13 @@ type RequestCategory
 
 type alias Request =
   AnimatedObject
-    { house : House
+    { house : MapObject
     , category : RequestCategory
     , blinkHidden : Bool
     }
 
 
-request : RequestCategory -> House -> Request
+request : RequestCategory -> MapObject -> Request
 request category house =
   { timeout = initialMaxWaitingTime
   , elapsed = 0
@@ -60,7 +60,7 @@ returnArticles articles =
           returnArticles restArticles
 
 
-orders : Int -> List House -> List Category -> Random.Generator (List Request)
+orders : Int -> List MapObject -> List Category -> Random.Generator (List Request)
 orders number houses categories =
   if number <= 0 then
     Random.map (always []) (Random.int 0 0)
@@ -82,7 +82,7 @@ orders number houses categories =
     )
 
 
-isInReturn : House -> Article -> Request -> Bool
+isInReturn : MapObject -> Article -> Request -> Bool
 isInReturn house article request =
   case request.category of
     Return article' ->
@@ -91,7 +91,7 @@ isInReturn house article request =
       False
 
 
-isOrdered : House -> Category -> Request -> Bool
+isOrdered : MapObject -> Category -> Request -> Bool
 isOrdered house category request =
   case request.category of
     Order category' ->
@@ -99,7 +99,7 @@ isOrdered house category request =
     _ -> False
 
 
-hasOrder : House -> Category -> List Request -> Bool
+hasOrder : MapObject -> Category -> List Request -> Bool
 hasOrder house category =
   List.any (isOrdered house category)
 

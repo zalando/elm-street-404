@@ -1,13 +1,13 @@
 module Customer (Customer, animate, livesHere, decHappiness, incHappiness, isLost, rodnams) where
 
-import House exposing (House)
+import MapObject exposing (MapObject)
 import Random
 import Time exposing (Time)
 import AnimationState exposing (AnimatedObject, animateObject, rotateFrames)
 
 
 type Location
-  = AtHome House
+  = AtHome MapObject
   | Lost
 
 
@@ -20,7 +20,7 @@ type alias Customer =
     }
 
 
-initial : House -> Int -> Customer
+initial : MapObject -> Int -> Customer
 initial house typ =
   { typ = typ
   , happiness = 2
@@ -39,12 +39,12 @@ animate time customer =
     customer
 
 
-rodnam : House -> Random.Generator Customer
+rodnam : MapObject -> Random.Generator Customer
 rodnam house =
   Random.map (initial house) (Random.int 0 5)
 
 
-rodnams : List House -> Random.Generator (List Customer)
+rodnams : List MapObject -> Random.Generator (List Customer)
 rodnams houses =
   case houses of
     [] ->
@@ -53,7 +53,7 @@ rodnams houses =
       Random.map2 (::) (rodnam house) (rodnams rest)
 
 
-livesHere : House -> Customer -> Bool
+livesHere : MapObject -> Customer -> Bool
 livesHere house {location} =
   case location of
     AtHome home -> home == house

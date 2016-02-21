@@ -1,7 +1,5 @@
 module DeliveryPerson (DeliveryPerson, Location(..), initial, animate, navigateTo) where
 
-import House exposing (House)
-import Warehouse exposing (Warehouse)
 import Time exposing (Time)
 import AnimationState exposing (AnimatedObject, animateObject, rotateFrames)
 import MapObject exposing (MapObject)
@@ -9,29 +7,26 @@ import Astar
 
 
 type Location
-  = AtHouse House
-  | AtWarehouse Warehouse
-  | OnTheWayToHouse House
-  | OnTheWayToWarehouse Warehouse
+  = At MapObject
+  | OnTheWayTo MapObject
   | Initial
 
 
 type alias DeliveryPerson =
   AnimatedObject
-    ( MapObject
-        { location : Location
-        , route : List (Int, Int)
-        , frames : List (Int)
-        , capacity : Int
-        }
-    )
+    { location : Location
+    , route : List (Int, Int)
+    , frames : List (Int)
+    , position : (Float, Float)
+    , capacity : Int
+    , size : (Float, Float)
+    }
 
 
 pushThePedals : Time -> DeliveryPerson -> DeliveryPerson
 pushThePedals time deliveryPerson =
   case deliveryPerson.location of
-    OnTheWayToHouse _ -> animateObject time rotateFrames deliveryPerson
-    OnTheWayToWarehouse _ -> animateObject time rotateFrames deliveryPerson
+    OnTheWayTo _ -> animateObject time rotateFrames deliveryPerson
     _ -> deliveryPerson
 
 
@@ -67,8 +62,7 @@ nextLocation route location =
   case route of
     [] ->
       case location of
-        OnTheWayToHouse house -> AtHouse house
-        OnTheWayToWarehouse warehouse -> AtWarehouse warehouse
+        OnTheWayTo mapObject -> At mapObject
         _ -> location
     _ -> location
 

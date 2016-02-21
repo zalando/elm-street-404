@@ -5,7 +5,8 @@ import Html exposing (div, br, Html, text, button)
 import Html.Attributes exposing (style)
 import Model exposing (Model)
 import Sprite
-import ObstacleView
+import TreeView
+import FountainView
 import HouseView
 import WarehouseView
 import DeliveryPersonView
@@ -15,11 +16,25 @@ import Article
 import ScoreView
 import StartGameView
 import DigitsView
+import MapObject exposing (MapObject, MapObjectCategory(..))
 import Layers exposing (layers)
 
 
 (=>) : a -> b -> (a, b)
 (=>) = (,)
+
+
+renderMapObject : Signal.Address Action -> Model -> MapObject -> List Sprite.Box
+renderMapObject address model mapObject =
+  case mapObject.category of
+    TreeCategory ->
+      TreeView.render mapObject
+    FountainCategory fountain ->
+      FountainView.render fountain mapObject
+    HouseCategory _ ->
+      HouseView.render address model.requests model.articles model.customers mapObject
+    WarehouseCategory capacity ->
+      WarehouseView.render address model.articles capacity mapObject
 
 
 boxes : Signal.Address Action -> Model -> List Sprite.Box
@@ -32,15 +47,11 @@ boxes address model =
         (toFloat (fst model.gridSize) / 2 + 1, toFloat (snd model.gridSize) / 2)
         (round (100 * (1 - toFloat (List.length model.images) / toFloat (List.length Model.images))))
     else
-      List.concat (
-        StartGameView.render address model.gridSize model.state ::
-        InventoryView.render address model.gridSize model.articles ::
-        ScoreView.render model.gridSize model.score model.maxLives (Model.countLives model) ::
-        DeliveryPersonView.render (List.length (List.filter Article.isPicked model.articles)) model.deliveryPerson ::
-        List.map (HouseView.render address model.requests model.articles model.customers) model.houses ++
-        List.map (WarehouseView.render address model.articles) model.warehouses ++
-        List.map ObstacleView.render model.obstacles
-      )
+      StartGameView.render address model.gridSize model.state ++
+      InventoryView.render address model.gridSize model.articles ++
+      ScoreView.render model.gridSize model.score model.maxLives (Model.countLives model) ++
+      DeliveryPersonView.render (List.length (List.filter Article.isPicked model.articles)) model.deliveryPerson ++
+      List.concat (List.map (renderMapObject address model) model.mapObjects)
 
 
 debug : Model -> Html

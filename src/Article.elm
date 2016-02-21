@@ -1,15 +1,14 @@
 module Article (Article, State(..), dispatch, warehouses, house, updateState, removeDelivered, inWarehouse, isPicked, isDelivered, isWorn, availableCategories, return, markInReturn) where
 import Random
-import House exposing (House)
-import Warehouse exposing (Warehouse)
+import MapObject exposing (MapObject, MapObjectCategory(..))
 import Category exposing (Category)
 import IHopeItWorks
 
 
 type State
-  = InStock Warehouse
-  | AwaitingReturn House
-  | Delivered House
+  = InStock MapObject
+  | AwaitingReturn MapObject
+  | Delivered MapObject
   | Picked
 
 
@@ -19,7 +18,7 @@ type alias Article =
   }
 
 
-warehouses : List Article -> List Warehouse
+warehouses : List Article -> List MapObject
 warehouses articles =
   case articles of
     [] -> []
@@ -30,7 +29,7 @@ warehouses articles =
         _ -> warehouses rest
 
 
-house : Article -> Maybe House
+house : Article -> Maybe MapObject
 house {state} =
   case state of
     AwaitingReturn house -> Just house
@@ -43,7 +42,7 @@ availableCategories articles =
   IHopeItWorks.exclude (List.map .category (List.filter isVacant articles))
 
 
-removeDelivered : House -> Category -> List Article -> List Article
+removeDelivered : MapObject -> Category -> List Article -> List Article
 removeDelivered house category' =
   IHopeItWorks.remove (\{state, category} -> state == Delivered house && Category.isSame category category')
 
@@ -59,20 +58,18 @@ updateState state article articles =
         a :: updateState state article restArticles
 
 
-inWarehouse : Warehouse -> Article -> Bool
-inWarehouse warehouse article =
-  article.state == InStock warehouse
+inWarehouse : MapObject -> Article -> Bool
+inWarehouse warehouse {state} =
+  state == InStock warehouse
 
 
 isPicked : Article -> Bool
 isPicked {state} = state == Picked
 
 
-isDelivered : House -> Article -> Bool
+isDelivered : MapObject -> Article -> Bool
 isDelivered house {state} =
-  case state of
-    Delivered house' -> house == house'
-    _ -> False
+  state == Delivered house
 
 
 isWorn : Article -> Bool
@@ -92,7 +89,7 @@ isVacant {state} =
     _ -> False
 
 
-dispatch : Int -> List Warehouse -> Random.Generator (List Article)
+dispatch : Int -> List MapObject -> Random.Generator (List Article)
 dispatch number warehouses =
   if number <= 0 then
     Random.map (always []) (Random.int 0 0)
@@ -111,7 +108,7 @@ dispatch number warehouses =
     )
 
 
-return : Int -> List House -> List Article -> Random.Generator (List Article)
+return : Int -> List MapObject -> List Article -> Random.Generator (List Article)
 return number houses articles =
   if number <= 0 then
     Random.map (always []) (Random.int 0 0)
