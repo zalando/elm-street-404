@@ -133,14 +133,21 @@ positionObstacles : Model -> Model
 positionObstacles ({gridSize, deliveryPerson} as model) =
   let
     (width, height) = gridSize
+    boxes = MapObject.splitBy
+      { size = model.deliveryPerson.size
+      , position = model.deliveryPerson.position
+      }
+      { size = (toFloat width - 2, toFloat height - 6)
+      , position = (1, 4)
+      }
     (mapObjects, seed) =
       Random.generate
-        ( MapObject.placeObjects
-            {size=(toFloat width - 2, toFloat height - 5), position=(1, 4)}
+        ( MapObject.placeRandom
             ( List.map (always MapObject.warehouse) [0..1] ++
               List.map (always MapObject.house) [0..3] ++
               (MapObject.fountain :: List.map (always MapObject.tree) [0..3])
             )
+            boxes
         )
         model.seed
   in

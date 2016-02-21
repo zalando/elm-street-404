@@ -1,4 +1,4 @@
-module MapObject (Box, MapObject, MapObjectCategory(..), placeObjects, tree, fountain, house, warehouse, isHouse, isWarehouse, animate) where
+module MapObject (Box, MapObject, MapObjectCategory(..), placeRandom, tree, fountain, house, warehouse, isHouse, animate, splitBy) where
 
 import Random
 import Fountain exposing (Fountain)
@@ -66,24 +66,12 @@ isHouse {category} =
     _ -> False
 
 
-isWarehouse : MapObject -> Bool
-isWarehouse {category} =
-  case category of
-    WarehouseCategory _ -> True
-    _ -> False
-
-
-placeObjects : Box -> List MapObject -> Random.Generator (List MapObject)
-placeObjects box mapObjects =
-    placeRandom mapObjects [box]
-
-
 size : MapObject -> (Float, Float)
 size {size} =
   let
     (w, h) = size
   in
-    (w, h + 1)
+    (w + 1, h + 1)
 
 
 placeRandom : List MapObject -> List Box -> Random.Generator (List MapObject)
