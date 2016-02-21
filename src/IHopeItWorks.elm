@@ -1,16 +1,17 @@
-module IHopeItWorks (exclude, remove, pickRandom, first) where
+module IHopeItWorks (exclude, remove, pickRandom, find) where
 import Random
 
 
-first : (a -> Bool) -> List a -> Maybe a
-first fn list =
+{-| find the first element in the list that matches the given predicate -}
+find : (a -> Bool) -> List a -> Maybe a
+find fn list =
   case list of
     [] -> Nothing
     el :: rest ->
       if fn el then
         Just el
       else
-        first fn rest
+        find fn rest
 
 
 remove' : (a -> Bool) -> List a -> (Bool, List a)
@@ -27,10 +28,12 @@ remove' fn list =
           (found, first :: remainder)
 
 
+{-| remove only the first match from the list -}
 remove : (a -> Bool) -> List a -> List a
-remove fn list = snd (remove' fn list)
+remove fn = remove' fn >> snd
 
 
+{-| exlude right list items from the given left list -}
 exclude : List a -> List a -> List a
 exclude left right =
   case left of
@@ -46,6 +49,7 @@ exclude left right =
           first :: nextLeft
 
 
+{-| generate random element from the list -}
 pickRandom : List a -> Random.Generator (Maybe a)
 pickRandom list =
   Random.map

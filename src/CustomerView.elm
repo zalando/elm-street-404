@@ -3,7 +3,7 @@ module CustomerView (render) where
 import Customer exposing (Customer)
 import Sprite exposing (Sprite)
 import Layers exposing (layers)
-import House exposing (House)
+import MapObject exposing (MapObject)
 import Request exposing (Request)
 import Article exposing (Article)
 import Category exposing (Category)
@@ -11,10 +11,6 @@ import Category exposing (Category)
 
 size : (Int, Int)
 size = (2, 3)
-
-
-emptySprite : Sprite
-emptySprite = Sprite.empty size (0, -1)
 
 
 sprite : Sprite
@@ -75,7 +71,7 @@ customerFrameOffset {typ, happiness} =
   typ * 3 + 2 - happiness
 
 
-render : List Request -> List Article -> House -> Customer -> List Sprite.Box
+render : List Request -> List Article -> MapObject -> Customer -> List Sprite.Box
 render requests articles house customer =
   let
     categories = (List.map .category articles)

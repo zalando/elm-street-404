@@ -43,9 +43,7 @@ render numberOfBoxes deliveryPerson =
     ]
   in
     case deliveryPerson.location of
-      DeliveryPerson.OnTheWayToHouse _ ->
-        box (direction deliveryPerson * 3 + Maybe.withDefault 0 (List.head deliveryPerson.frames))
-      DeliveryPerson.OnTheWayToWarehouse _ ->
+      DeliveryPerson.OnTheWayTo _ ->
         box (direction deliveryPerson * 3 + Maybe.withDefault 0 (List.head deliveryPerson.frames))
       _ ->
         box (24 + numberOfBoxes)

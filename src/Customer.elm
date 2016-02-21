@@ -1,51 +1,50 @@
-module Customer (Customer, initial, animate, livesHere, decHappiness, incHappiness, isLost, rodnams) where
+module Customer (Customer, animate, livesHere, decHappiness, incHappiness, isLost, rodnams) where
 
-import House exposing (House)
+import MapObject exposing (MapObject)
 import Random
 import Time exposing (Time)
-import AnimationState exposing (animateObject, rotateFrames)
+import AnimationState exposing (AnimatedObject, animateObject, rotateFrames)
 
 
 type Location
-  = AtHome House
+  = AtHome MapObject
   | Lost
 
 
 type alias Customer =
-  { typ : Int
-  , location : Location
-  , happiness : Int
-  , elapsed: Time
-  , frames : List (Int)
-  }
+  AnimatedObject
+    { typ : Int
+    , location : Location
+    , happiness : Int
+    , frames : List (Int)
+    }
 
 
-initial : House -> Int -> Customer
+initial : MapObject -> Int -> Customer
 initial house typ =
   { typ = typ
   , happiness = 2
   , location = AtHome house
   , elapsed = 0
+  , timeout = 150
   , frames = [0, 1]
   }
 
 
 animate : Time -> Customer -> Customer
 animate time customer =
-  let updateCustomer customer =
-    {customer | frames = rotateFrames customer.frames}
-  in
-    case customer.happiness of
-      0 -> animateObject 150 time updateCustomer customer
-      _ -> customer
+  if customer.happiness == 0 then
+    animateObject time rotateFrames customer
+  else
+    customer
 
 
-rodnam : House -> Random.Generator Customer
+rodnam : MapObject -> Random.Generator Customer
 rodnam house =
   Random.map (initial house) (Random.int 0 5)
 
 
-rodnams : List House -> Random.Generator (List Customer)
+rodnams : List MapObject -> Random.Generator (List Customer)
 rodnams houses =
   case houses of
     [] ->
@@ -54,32 +53,26 @@ rodnams houses =
       Random.map2 (::) (rodnam house) (rodnams rest)
 
 
-livesHere : House -> Customer -> Bool
-livesHere house customer =
-  case customer.location of
+livesHere : MapObject -> Customer -> Bool
+livesHere house {location} =
+  case location of
     AtHome home -> home == house
     Lost -> False
 
 
 isLost : Customer -> Bool
-isLost customer =
-  case customer.location of
-    AtHome _ -> False
-    Lost -> True
+isLost {location} = location == Lost
 
 
 modHappiness : Int -> Customer -> Customer
-modHappiness d customer =
+modHappiness d ({happiness, location} as customer) =
   let
-    happiness = customer.happiness + d
+    newHappiness = happiness + d |> min 2
+    newLocation = if newHappiness < 0 then Lost else location
   in
     { customer
-    | happiness = if happiness > 2 then 2 else happiness
-    , location =
-      if happiness < 0 then
-        Lost
-      else
-        customer.location
+    | happiness = newHappiness
+    , location = newLocation
     }
 
 

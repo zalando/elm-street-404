@@ -7,15 +7,16 @@ import Time exposing (Time)
 import Random
 import DeliveryPerson exposing (Location(..))
 import Article exposing (State(..), Article)
-import Obstacle exposing (Obstacle)
+import MapObject exposing (MapObject, MapObjectCategory(..))
 import Request exposing (Request)
 import Category exposing (Category)
-import Generator
 import Customer exposing (Customer)
 import IHopeItWorks
 import ImageLoad
 import Json.Decode as Decoder
 import Task exposing (Task)
+import AnimationState exposing (animateGenerator)
+
 
 update : Action -> Model -> (Model, Effects Action)
 update action model =
@@ -63,10 +64,8 @@ update action model =
       ifPlaying (onArticleClick article) model
     ClickCategory category ->
       ifPlaying (onCategoryClick category) model
-    ClickWarehouse warehouse ->
-      ifPlaying (Model.navigateToWarehouse warehouse) model
-    ClickHouse house ->
-      ifPlaying (Model.navigateToHouse house) model
+    ClickMapObject mapObject ->
+      ifPlaying (Model.navigateToMapObject mapObject) model
 
 
 ifPlaying : (Model -> Model) -> Model -> (Model, Effects Action)
@@ -86,7 +85,7 @@ loadImage imagesUrl image =
 
 animate : Time -> Model -> Model
 animate elapsed model =
-  model |> animateObstacles elapsed
+  model |> animateMapObjects elapsed
         |> animateDeliveryPerson elapsed
         |> animateRequests elapsed
         |> animateGenerators elapsed
@@ -96,9 +95,9 @@ animate elapsed model =
 animateGenerators : Time -> Model -> Model
 animateGenerators elapsed model =
   { model
-  | orderGenerator = Generator.animate elapsed model.orderGenerator
-  , returnGenerator = Generator.animate elapsed model.returnGenerator
-  , articleGenerator = Generator.animate elapsed model.articleGenerator
+  | orderGenerator = animateGenerator elapsed model.orderGenerator
+  , returnGenerator = animateGenerator elapsed model.returnGenerator
+  , articleGenerator = animateGenerator elapsed model.articleGenerator
   }
   |> dispatchArticles
   |> dispatchOrders
@@ -129,9 +128,9 @@ dispatchReturns model =
     model
 
 
-animateObstacles : Time -> Model -> Model
-animateObstacles elapsed model =
-  { model | obstacles = List.map (Obstacle.animate elapsed) model.obstacles }
+animateMapObjects : Time -> Model -> Model
+animateMapObjects elapsed model =
+  { model | mapObjects = List.map (MapObject.animate elapsed) model.mapObjects }
 
 
 animateDeliveryPerson : Time -> Model -> Model
@@ -153,11 +152,10 @@ animateCustomers elapsed model =
 onCategoryClick : Category -> Model -> Model
 onCategoryClick category model =
   let
-    maybeArticle = IHopeItWorks.first
-      (\a -> a.category == category && Article.isPicked a)
-      model.articles
+    isPickedCategory a =
+      a.category == category && Article.isPicked a
   in
-    case maybeArticle of
+    case IHopeItWorks.find isPickedCategory model.articles of
       Just article -> onArticleClick article model
       _ -> model
 
@@ -165,21 +163,22 @@ onCategoryClick category model =
 onArticleClick : Article -> Model -> Model
 onArticleClick article model =
   case model.deliveryPerson.location of
-    AtHouse house ->
-      case article.state of
-        AwaitingReturn house' ->
-          Model.pickupReturn house house' article model
-        Picked ->
-          Model.deliverArticle house article model
-        _ ->
-          model
-
-    AtWarehouse warehouse' ->
-      case article.state of
-        InStock warehouse ->
-          Model.pickupArticle warehouse warehouse' article model
-        Picked ->
-          Model.returnArticle warehouse' article model
+    At mapObject ->
+      case mapObject.category of
+        HouseCategory _ ->
+          case article.state of
+            AwaitingReturn house ->
+              Model.pickupReturn mapObject house article model
+            Picked ->
+              Model.deliverArticle mapObject article model
+            _ ->
+              model
+        WarehouseCategory _ ->
+          case article.state of
+            InStock warehouse ->
+              Model.pickupArticle warehouse mapObject article model
+            Picked ->
+              Model.returnArticle mapObject article model
+            _ -> model
         _ -> model
-
     _ -> model

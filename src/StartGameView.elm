@@ -25,7 +25,6 @@ elmStreet404Sprite =
   }
 
 
-
 render : Signal.Address Action -> (Int, Int) -> Model.State -> List Sprite.Box
 render address (width, height) state =
   if state == Model.Stopped then

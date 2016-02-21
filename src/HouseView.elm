@@ -4,7 +4,7 @@ import Actions exposing (Action)
 import Html.Events exposing (onClick)
 import Layers exposing (layers)
 import Sprite exposing (Sprite)
-import House exposing (House)
+import MapObject exposing (MapObject)
 import Customer exposing (Customer)
 import Request exposing (Request)
 import Article exposing (Article)
@@ -67,10 +67,10 @@ getBubbleSprite number =
     _ -> Just bubbleSprite3
 
 
-render : Signal.Address Action -> List Request -> List Article -> List Customer -> House -> List Sprite.Box
+render : Signal.Address Action -> List Request -> List Article -> List Customer -> MapObject -> List Sprite.Box
 render address requests articles customers house =
   let
-    requestsFromHouse = List.filter (Request.inHouse house) requests
+    requestsFromHouse = List.filter (\r -> r.house == house) requests
     deliveredArticles = List.filter (Article.isDelivered house) articles
     hasRequests = (List.length requestsFromHouse) > 0
     hasArticles = (List.length deliveredArticles) > 0
@@ -92,9 +92,8 @@ render address requests articles customers house =
             }
           ]
         _ -> []
-    houseCustomer = IHopeItWorks.first (Customer.livesHere house) customers
     renderCustomer =
-      case houseCustomer of
+      case IHopeItWorks.find (Customer.livesHere house) customers of
         Nothing -> []
         Just customer ->
           if customer.happiness == 2 && not hasRequests && not hasArticles then
@@ -119,7 +118,7 @@ render address requests articles customers house =
       , layer = layers.clickAbove
       , frame = 0
       , attributes =
-        [ onClick address (Actions.ClickHouse house) ]
+        [ onClick address (Actions.ClickMapObject house) ]
       }
     ]
     ++ List.concat (List.indexedMap renderRequest requestsFromHouse)

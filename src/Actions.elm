@@ -1,8 +1,7 @@
 module Actions (Action(..)) where
 
 import Article exposing (Article)
-import House exposing (House)
-import Warehouse exposing (Warehouse)
+import MapObject exposing (MapObject)
 import Time exposing (Time)
 import Category exposing (Category)
 
@@ -13,7 +12,6 @@ type Action
   | Start
   | ClickArticle Article
   | ClickCategory Category
-  | ClickWarehouse Warehouse
-  | ClickHouse House
+  | ClickMapObject MapObject
   | ImageLoaded String
   | Dimensions (Int, Int)
