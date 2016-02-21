@@ -136,7 +136,7 @@ positionObstacles ({gridSize, deliveryPerson} as model) =
     (mapObjects, seed) =
       Random.generate
         ( MapObject.placeObjects
-            {size=(toFloat width - 2, toFloat height - 6), position=(1, 4)}
+            {size=(toFloat width - 2, toFloat height - 5), position=(1, 4)}
             ( List.map (always MapObject.warehouse) [0..1] ++
               List.map (always MapObject.house) [0..3] ++
               (MapObject.fountain :: List.map (always MapObject.tree) [0..3])
@@ -179,23 +179,39 @@ dispatchCustomers model =
     { model | customers = customers, seed = seed }
 
 
+warehouseSlots : List MapObject -> List MapObject
+warehouseSlots mapObjects =
+  case mapObjects of
+    obj :: rest ->
+      case obj.category of
+        WarehouseCategory capacity ->
+          (List.repeat (capacity - 1) obj) ++ warehouseSlots rest
+        _ ->
+          warehouseSlots rest
+    [] ->
+      []
+
+
+houseSlots : List MapObject -> List MapObject
+houseSlots mapObjects =
+  case mapObjects of
+    obj :: rest ->
+      case obj.category of
+        HouseCategory capacity ->
+          (List.repeat capacity obj) ++ houseSlots rest
+        _ ->
+          houseSlots rest
+    [] ->
+      []
+
+
 dispatchArticles : Int -> Model -> Model
 dispatchArticles number model =
   let
-    initialSlots mapObjects =
-      case mapObjects of
-        obj :: rest ->
-          case obj.category of
-            WarehouseCategory capacity ->
-              (List.repeat (capacity - 1) obj) :: initialSlots rest
-            _ ->
-              initialSlots rest
-        [] ->
-          []
-    warehouseSlots = IHopeItWorks.exclude
-      (List.concat (initialSlots model.mapObjects))
+    initialSlots = IHopeItWorks.exclude
+      (warehouseSlots model.mapObjects)
       (Article.warehouses model.articles)
-    (articles, seed) = Random.generate (Article.dispatch number warehouseSlots) model.seed
+    (articles, seed) = Random.generate (Article.dispatch number initialSlots) model.seed
   in
     { model | articles = model.articles ++ articles, seed = seed }
 
@@ -203,21 +219,13 @@ dispatchArticles number model =
 dispatchOrders : Int -> Model -> Model
 dispatchOrders number model =
   let
-    initialSlots mapObjects =
-      case mapObjects of
-        obj :: rest ->
-          case obj.category of
-            HouseCategory capacity ->
-              (List.repeat capacity obj) :: initialSlots rest
-            _ ->
-              initialSlots rest
-        [] ->
-          []
-    categories = Article.availableCategories model.articles (Request.orderedCategories model.requests)
-    houseSlots = IHopeItWorks.exclude
-      (List.concat (initialSlots model.mapObjects))
+    categories = Article.availableCategories
+      model.articles
+      (Request.orderedCategories model.requests)
+    slots = IHopeItWorks.exclude
+      (houseSlots model.mapObjects)
       (List.map .house model.requests)
-    (orders, seed) = Random.generate (Request.orders number houseSlots categories) model.seed
+    (orders, seed) = Random.generate (Request.orders number slots categories) model.seed
   in
     { model | requests = model.requests ++ orders, seed = seed }
 
@@ -225,23 +233,13 @@ dispatchOrders number model =
 dispatchReturns : Int -> Model -> Model
 dispatchReturns number model =
   let
-    houses = List.filter MapObject.isHouse model.mapObjects
-    housesWithArticles = List.filter (\h -> List.any (Article.isDelivered h) model.articles) houses
-    initialSlots mapObjects =
-      case mapObjects of
-        obj :: rest ->
-          case obj.category of
-            HouseCategory capacity ->
-              (List.repeat capacity obj) :: initialSlots rest
-            _ ->
-              initialSlots rest
-        [] ->
-          []
-    houseSlots = IHopeItWorks.exclude
-      (List.concat (initialSlots housesWithArticles))
+    housesWithArticles = List.filter
+      (\h -> List.any (Article.isDelivered h) model.articles)
+      model.mapObjects
+    slots = IHopeItWorks.exclude
+      (houseSlots housesWithArticles)
       (List.map .house model.requests)
-    wearedArticles = List.filter Article.isWorn model.articles
-    (articlesToReturn, seed) = Random.generate (Article.return number houseSlots model.articles) model.seed
+    (articlesToReturn, seed) = Random.generate (Article.return number slots model.articles) model.seed
     articles = Article.markInReturn model.articles articlesToReturn
     returnedArticles = Article.markInReturn articlesToReturn articlesToReturn
     returns = Request.returnArticles returnedArticles
@@ -317,20 +315,6 @@ animate time animationFunc model =
     animationFunc elapsed {model | animationState = animationState}
 
 
-splitList : (a -> Bool) -> List a -> (List a, List a)
-splitList predicate list =
-  case list of
-    [] -> ([], [])
-    first :: rest ->
-      let
-        restSplit = splitList predicate rest
-      in
-        if predicate first then
-          (first :: fst restSplit, snd restSplit)
-        else
-          (fst restSplit, first :: snd restSplit)
-
-
 decHappinessIfHome : List MapObject -> Customer -> Customer
 decHappinessIfHome houses customer =
   case houses of
@@ -360,7 +344,7 @@ countLives model =
 timeoutRequests : Model -> Model
 timeoutRequests model =
   let
-    (inTime, timeouted) = splitList Request.inTime model.requests
+    (inTime, timeouted) = List.partition Request.inTime model.requests
   in
     { model
     | requests = inTime
@@ -382,8 +366,7 @@ houseEmpty customers house =
 updateCustomers : Model -> Model
 updateCustomers model =
   let
-    houses = List.filter MapObject.isHouse model.mapObjects
-    emptyHouses = List.filter (houseEmpty model.customers) houses
+    emptyHouses = List.filter (houseEmpty model.customers) model.mapObjects
     (newCustomers, seed) = Random.generate (Customer.rodnams emptyHouses) model.seed
   in
     { model

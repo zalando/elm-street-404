@@ -1,4 +1,4 @@
-module Article (Article, State(..), dispatch, warehouses, house, updateState, removeDelivered, inWarehouse, isPicked, isDelivered, isWorn, availableCategories, return, markInReturn) where
+module Article (Article, State(..), dispatch, warehouses, house, updateState, removeDelivered, inWarehouse, isPicked, isDelivered, availableCategories, return, markInReturn) where
 import Random
 import MapObject exposing (MapObject, MapObjectCategory(..))
 import Category exposing (Category)
@@ -70,13 +70,6 @@ isPicked {state} = state == Picked
 isDelivered : MapObject -> Article -> Bool
 isDelivered house {state} =
   state == Delivered house
-
-
-isWorn : Article -> Bool
-isWorn {state} =
-  case state of
-    Delivered _ -> True
-    _ -> False
 
 
 {- returns true if the article can be ordered -}
