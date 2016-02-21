@@ -26,7 +26,7 @@ module Model
 
 import Random
 import Time exposing (Time)
-import AnimationState
+import AnimationState exposing (Generator, animateObject)
 import DeliveryPerson exposing (DeliveryPerson)
 import Article exposing (Article)
 import Request exposing (Request)
@@ -36,7 +36,6 @@ import Customer exposing (Customer)
 import Warehouse exposing (Warehouse)
 import IHopeItWorks
 import Article exposing (State(..), Article)
-import Generator exposing (Generator)
 import MapObject exposing (MapObject)
 import MapObjectCategory
 
@@ -106,9 +105,9 @@ initial dimensions imagesUrl =
   , houses = []
   , customers = []
   , warehouses = []
-  , orderGenerator = Generator.initial 11000
-  , articleGenerator = Generator.initial 13000
-  , returnGenerator = Generator.initial 31000
+  , orderGenerator = AnimationState.generator 11000
+  , articleGenerator = AnimationState.generator 13000
+  , returnGenerator = AnimationState.generator 31000
   , score = 0
   , maxLives = 3
   }
@@ -171,9 +170,9 @@ start model =
   , articles = []
   , requests = []
   , customers = []
-  , orderGenerator = Generator.initial 11000
-  , articleGenerator = Generator.initial 13000
-  , returnGenerator = Generator.initial 31000
+  , orderGenerator = AnimationState.generator 11000
+  , articleGenerator = AnimationState.generator 13000
+  , returnGenerator = AnimationState.generator 31000
   , score = 0
   , maxLives = 3
   }
@@ -209,7 +208,7 @@ dispatchOrders number model =
     categories = Article.availableCategories model.articles (Request.orderedCategories model.requests)
     houseSlots = IHopeItWorks.exclude
       (List.concat (List.map (\h -> List.repeat h.capacity h) model.houses))
-      (List.map Request.house model.requests)
+      (List.map .house model.requests)
     (orders, seed) = Random.generate (Request.orders number houseSlots categories) model.seed
   in
     { model | requests = model.requests ++ orders, seed = seed }
@@ -221,7 +220,7 @@ dispatchReturns number model =
     housesWithArticles = List.filter (\h -> List.any (Article.isDelivered h) model.articles) model.houses
     houseSlots = IHopeItWorks.exclude
       (List.concat (List.map (\h -> List.repeat h.capacity h) housesWithArticles))
-      (List.map Request.house model.requests)
+      (List.map .house model.requests)
     wearedArticles = List.filter Article.isWorn model.articles
     (articlesToReturn, seed) = Random.generate (Article.return number houseSlots model.articles) model.seed
     articles = Article.markInReturn model.articles articlesToReturn
@@ -341,7 +340,7 @@ decHappinessIfHome houses customer =
 decHappiness : List Request -> Customer -> Customer
 decHappiness timeouted customer =
   decHappinessIfHome
-    (List.map Request.house timeouted)
+    (List.map .house timeouted)
     customer
 
 
@@ -395,13 +394,6 @@ articleInEmptyHouse customers article =
     _ -> False
 
 
-requestInEmptyHouse : List Customer -> Request -> Bool
-requestInEmptyHouse customers request =
-  case request of
-    Request.Order house _ _ -> houseEmpty customers house
-    Request.Return house _ _ -> houseEmpty customers house
-
-
 cleanupLostArticles : Model -> Model
 cleanupLostArticles model =
   { model
@@ -417,7 +409,7 @@ cleanupLostRequests model =
   { model
   | requests =
       List.filter
-        (\ request -> not (requestInEmptyHouse model.customers request))
+        (\ request -> not (houseEmpty model.customers request.house))
         model.requests
   }
 

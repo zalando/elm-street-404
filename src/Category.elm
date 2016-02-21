@@ -87,12 +87,9 @@ color category =
 
 getColor : (Category -> Bool) -> List Category -> Int
 getColor fn categories =
-  let
-    maybeCategory = IHopeItWorks.first fn categories
-  in
-    case maybeCategory of
-      Just shirt -> color shirt
-      _ -> 3
+  case IHopeItWorks.find fn categories of
+    Just shirt -> color shirt
+    _ -> 3
 
 
 random : Random.Generator Category

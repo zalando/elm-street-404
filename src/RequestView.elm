@@ -10,20 +10,20 @@ import Category
 
 render : Signal.Address Action -> (Float, Float) -> Request -> List Sprite.Box
 render address position request =
-  case request of
-    Request.Return _ article data ->
+  case request.category of
+    Request.Return article ->
       CategoryView.render
         position
         []
-        (if data.blinkHidden then Category.Empty else article.category)
+        (if request.blinkHidden then Category.Empty else article.category)
       ++
       CategoryView.render
         position
         [onClick address (Actions.ClickArticle article)]
-        (if data.blinkHidden then Category.Empty else Category.Return)
+        (if request.blinkHidden then Category.Empty else Category.Return)
 
-    Request.Order _ category data ->
+    Request.Order category ->
       CategoryView.render
         position
         [onClick address (Actions.ClickCategory category)]
-        (if data.blinkHidden then Category.Empty else category)
+        (if request.blinkHidden then Category.Empty else category)

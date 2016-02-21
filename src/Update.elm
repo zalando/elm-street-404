@@ -10,12 +10,13 @@ import Article exposing (State(..), Article)
 import Obstacle exposing (Obstacle)
 import Request exposing (Request)
 import Category exposing (Category)
-import Generator
 import Customer exposing (Customer)
 import IHopeItWorks
 import ImageLoad
 import Json.Decode as Decoder
 import Task exposing (Task)
+import AnimationState exposing (animateGenerator)
+
 
 update : Action -> Model -> (Model, Effects Action)
 update action model =
@@ -96,9 +97,9 @@ animate elapsed model =
 animateGenerators : Time -> Model -> Model
 animateGenerators elapsed model =
   { model
-  | orderGenerator = Generator.animate elapsed model.orderGenerator
-  , returnGenerator = Generator.animate elapsed model.returnGenerator
-  , articleGenerator = Generator.animate elapsed model.articleGenerator
+  | orderGenerator = animateGenerator elapsed model.orderGenerator
+  , returnGenerator = animateGenerator elapsed model.returnGenerator
+  , articleGenerator = animateGenerator elapsed model.articleGenerator
   }
   |> dispatchArticles
   |> dispatchOrders
@@ -153,11 +154,10 @@ animateCustomers elapsed model =
 onCategoryClick : Category -> Model -> Model
 onCategoryClick category model =
   let
-    maybeArticle = IHopeItWorks.first
-      (\a -> a.category == category && Article.isPicked a)
-      model.articles
+    isPickedCategory a =
+      a.category == category && Article.isPicked a
   in
-    case maybeArticle of
+    case IHopeItWorks.find isPickedCategory model.articles of
       Just article -> onArticleClick article model
       _ -> model
 

@@ -13,10 +13,6 @@ size : (Int, Int)
 size = (2, 3)
 
 
-emptySprite : Sprite
-emptySprite = Sprite.empty size (0, -1)
-
-
 sprite : Sprite
 sprite =
   { size = size

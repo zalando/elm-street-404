@@ -1,4 +1,4 @@
-module Request (Request(..), isInReturn, inHouse, isOrdered, hasOrder, animate, inTime, house, orders, orderedCategories, returnArticles) where
+module Request (Request, RequestCategory(..), isInReturn, isOrdered, hasOrder, animate, inTime, orders, orderedCategories, returnArticles) where
 
 import House exposing (House)
 import Article exposing (Article)
@@ -6,41 +6,46 @@ import Category exposing (Category)
 import Time exposing (Time)
 import IHopeItWorks
 import Random
+import AnimationState exposing (AnimatedObject)
+
 
 initialMaxWaitingTime : Time
 initialMaxWaitingTime = 60000
 
 
-type alias RequestData =
-  { timeout : Time
-  , elapsed : Time
-  , blinkHidden : Bool
-  }
+type RequestCategory
+  = Order Category
+  | Return Article
 
 
-type Request
-  = Order House Category RequestData
-  | Return House Article RequestData
+type alias Request =
+  AnimatedObject
+    { house : House
+    , category : RequestCategory
+    , blinkHidden : Bool
+    }
 
 
-initData : RequestData
-initData =
+request : RequestCategory -> House -> Request
+request category house =
   { timeout = initialMaxWaitingTime
   , elapsed = 0
   , blinkHidden = False
+  , house = house
+  , category = category
   }
 
 
 orderedCategories : List Request -> List Category
 orderedCategories requests =
   case requests of
+    [] -> []
     request :: rest ->
-      case request of
-        Order _ category _ ->
+      case request.category of
+        Order category ->
           category :: orderedCategories rest
         _ ->
           orderedCategories rest
-    [] -> []
 
 
 returnArticles : List Article -> List Request
@@ -50,7 +55,7 @@ returnArticles articles =
     article :: restArticles ->
       case Article.house article of
         Just house ->
-          Return house article initData :: returnArticles restArticles
+          request (Return article) house :: returnArticles restArticles
         Nothing ->
           returnArticles restArticles
 
@@ -66,7 +71,7 @@ orders number houses categories =
       case pair of
         (Just house, Just category) ->
           Random.map
-            ((::) (Order house category initData))
+            ((::) (request (Order category) house))
             ( orders
                 (number - 1)
                 (IHopeItWorks.remove ((==) house) houses)
@@ -77,33 +82,26 @@ orders number houses categories =
     )
 
 
-inHouse : House -> Request -> Bool
-inHouse house request =
-  case request of
-    Order house' _ _ -> house' == house
-    Return house' _ _ -> house' == house
-
-
 isInReturn : House -> Article -> Request -> Bool
 isInReturn house article request =
-  case request of
-    Return house' article' _ ->
-      house' == house && article' == article
+  case request.category of
+    Return article' ->
+      house == request.house && article' == article
     _ ->
       False
 
 
 isOrdered : House -> Category -> Request -> Bool
 isOrdered house category request =
-  case request of
-    Order house' category' _ ->
-      house' == house && category' == category
+  case request.category of
+    Order category' ->
+      house == request.house && category' == category
     _ -> False
 
 
 hasOrder : House -> Category -> List Request -> Bool
-hasOrder house category requests =
-  List.any (isOrdered house category) requests
+hasOrder house category =
+  List.any (isOrdered house category)
 
 
 -- time while it doesn't blink
@@ -140,47 +138,17 @@ flash elapsed =
       x = elapsed - z
       s = if a * x + b > m then m else a * x + b
     in
-     0 < sin (s * x + c) -- ((a * x * x) + (b * x) + c)
+      0 < sin (s * x + c)
 
 
-animateRequestData : Time -> RequestData -> RequestData
-animateRequestData time request =
+animate : Time -> Request -> Request
+animate time request =
   { request
   | elapsed = request.elapsed + time
   , blinkHidden = flash request.elapsed
   }
 
 
-animate : Time -> Request -> Request
-animate time request =
-  case request of
-    Order house category data -> Order house category (animateRequestData time data)
-    Return house article data -> Return house article (animateRequestData time data)
-
-
 inTime : Request -> Bool
-inTime request =
-  case request of
-    Order _ _ data -> data.elapsed < data.timeout
-    Return _ _ data -> data.elapsed < data.timeout
-
-
-house : Request -> House
-house request =
-  case request of
-    Order house _ _ -> house
-    Return house _ _ -> house
-
-
-data : Request -> RequestData
-data request =
-  case request of
-    Order _ _ data -> data
-    Return _ _ data -> data
-
-
-updateData : RequestData -> Request -> Request
-updateData data request =
-  case request of
-    Order house category _ -> Order house category data
-    Return house article _ -> Return house article data
+inTime {elapsed, timeout} =
+  elapsed < timeout

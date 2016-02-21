@@ -70,7 +70,7 @@ getBubbleSprite number =
 render : Signal.Address Action -> List Request -> List Article -> List Customer -> House -> List Sprite.Box
 render address requests articles customers house =
   let
-    requestsFromHouse = List.filter (Request.inHouse house) requests
+    requestsFromHouse = List.filter (\r -> r.house == house) requests
     deliveredArticles = List.filter (Article.isDelivered house) articles
     hasRequests = (List.length requestsFromHouse) > 0
     hasArticles = (List.length deliveredArticles) > 0
@@ -92,9 +92,8 @@ render address requests articles customers house =
             }
           ]
         _ -> []
-    houseCustomer = IHopeItWorks.first (Customer.livesHere house) customers
     renderCustomer =
-      case houseCustomer of
+      case IHopeItWorks.find (Customer.livesHere house) customers of
         Nothing -> []
         Just customer ->
           if customer.happiness == 2 && not hasRequests && not hasArticles then

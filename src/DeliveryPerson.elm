@@ -3,7 +3,7 @@ module DeliveryPerson (DeliveryPerson, Location(..), initial, animate, navigateT
 import House exposing (House)
 import Warehouse exposing (Warehouse)
 import Time exposing (Time)
-import AnimationState exposing (animateObject, rotateFrames)
+import AnimationState exposing (AnimatedObject, animateObject, rotateFrames)
 import MapObject exposing (MapObject)
 import Astar
 
@@ -17,25 +17,22 @@ type Location
 
 
 type alias DeliveryPerson =
-  MapObject
-    { location : Location
-    , route : List (Int, Int)
-    , elapsed: Time
-    , frames : List (Int)
-    , capacity : Int
-    }
+  AnimatedObject
+    ( MapObject
+        { location : Location
+        , route : List (Int, Int)
+        , frames : List (Int)
+        , capacity : Int
+        }
+    )
 
 
 pushThePedals : Time -> DeliveryPerson -> DeliveryPerson
 pushThePedals time deliveryPerson =
-  let
-    updateDeliveryPerson deliveryPerson =
-      {deliveryPerson | frames = rotateFrames deliveryPerson.frames}
-  in
-    case deliveryPerson.location of
-      OnTheWayToHouse _ -> animateObject 96 time updateDeliveryPerson deliveryPerson
-      OnTheWayToWarehouse _ -> animateObject 96 time updateDeliveryPerson deliveryPerson
-      _ -> deliveryPerson
+  case deliveryPerson.location of
+    OnTheWayToHouse _ -> animateObject time rotateFrames deliveryPerson
+    OnTheWayToWarehouse _ -> animateObject time rotateFrames deliveryPerson
+    _ -> deliveryPerson
 
 
 currentDestination : DeliveryPerson -> Maybe (Float, Float)
@@ -135,6 +132,7 @@ initial position =
   , size = (2, 1)
   , route = []
   , elapsed = 0
+  , timeout = 96
   , frames = [0, 1, 2]
   , capacity = 4
   }

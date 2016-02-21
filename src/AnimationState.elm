@@ -1,4 +1,4 @@
-module AnimationState (AnimationState, AnimatedObject, animateObject, animate, rotateFrames) where
+module AnimationState (AnimationState, AnimatedObject, Generator, generator, animateGenerator, animateObject, animate, rotateFrames) where
 
 import Time exposing (Time)
 
@@ -8,20 +8,45 @@ type alias AnimationState =
 
 
 type alias AnimatedObject a =
-  { a | elapsed: Time }
+  { a
+  | elapsed : Time
+  , timeout : Time
+  }
 
 
-animateObject : Time -> Time -> (AnimatedObject a -> AnimatedObject a) -> AnimatedObject a -> AnimatedObject a
-animateObject timeout elapsed animationFunc state =
+type alias Generator =
+  AnimatedObject {active : Bool}
+
+
+generator : Time -> Generator
+generator timeout =
+  { elapsed = 0
+  , timeout = timeout
+  , active = False
+  }
+
+
+animateGenerator : Time -> Generator -> Generator
+animateGenerator elapsed generator =
+  animateObject
+    elapsed
+    (\g -> {g | active = True})
+    {generator | active = False}
+
+
+{-| executes animationFunc every time timeout is reached -}
+animateObject : Time -> (AnimatedObject a -> AnimatedObject a) -> AnimatedObject a -> AnimatedObject a
+animateObject elapsed animationFunc state =
   let
     elapsed' = state.elapsed + elapsed
   in
-    if elapsed' > timeout then
-      animationFunc {state | elapsed = elapsed' - timeout}
+    if elapsed' > state.timeout then
+      animationFunc {state | elapsed = elapsed' - state.timeout}
     else
       {state | elapsed = elapsed'}
 
 
+{-| calculates time difference between two frames -}
 animate : Time -> AnimationState -> (Time, AnimationState)
 animate time animationState =
   let
@@ -39,8 +64,9 @@ animate time animationState =
     )
 
 
-rotateFrames : List Int -> List Int
-rotateFrames frames =
-  case frames of
-    [] -> []
-    frame :: list -> list ++ [frame]
+{-| takes the fist frame from list and puts it in the end -}
+rotateFrames : {a | frames : List Int} -> {a | frames : List Int}
+rotateFrames obj =
+  case obj.frames of
+    [] -> obj
+    frame :: list -> {obj | frames = list ++ [frame]}
