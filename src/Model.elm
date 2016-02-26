@@ -6,7 +6,7 @@ module Model
   , navigateToMapObject
   , State(..)
   , timeoutRequests
-  , updateCustomers
+  , dispatchCustomers
   , updateGameState
   , deliverArticle
   , returnArticle
@@ -77,6 +77,7 @@ type alias Model =
   , orderGenerator : Generator
   , articleGenerator : Generator
   , returnGenerator : Generator
+  , customersGenerator : Generator
   , score : Int
   , maxLives : Int
   }
@@ -100,6 +101,7 @@ initial dimensions imagesUrl =
   , orderGenerator = AnimationState.generator 11000
   , articleGenerator = AnimationState.generator 13000
   , returnGenerator = AnimationState.generator 31000
+  , customersGenerator = AnimationState.generator 5000
   , score = 0
   , maxLives = 3
   }
@@ -176,14 +178,6 @@ start model =
   |> dispatchArticles 6
   |> dispatchOrders 3
 
-
-dispatchCustomers : Model -> Model
-dispatchCustomers model =
-  let
-    houses = List.filter MapObject.isHouse model.mapObjects
-    (customers, seed) = Random.generate (Customer.rodnams houses) model.seed
-  in
-    { model | customers = customers, seed = seed }
 
 
 warehouseSlots : List MapObject -> List MapObject
@@ -370,8 +364,8 @@ houseEmpty customers house =
         houseEmpty otherCustomers house
 
 
-updateCustomers : Model -> Model
-updateCustomers model =
+dispatchCustomers : Model -> Model
+dispatchCustomers model =
   let
     emptyHouses = List.filter (houseEmpty model.customers) model.mapObjects
     (newCustomers, seed) = Random.generate (Customer.rodnams emptyHouses) model.seed

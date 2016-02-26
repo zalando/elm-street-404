@@ -54,7 +54,6 @@ update action model =
           |> Model.timeoutRequests
           |> Model.cleanupLostArticles
           |> Model.cleanupLostRequests
-          |> Model.updateCustomers
           |> Model.updateGameState
         , Effects.tick Tick
         )
@@ -98,10 +97,12 @@ animateGenerators elapsed model =
   | orderGenerator = animateGenerator elapsed model.orderGenerator
   , returnGenerator = animateGenerator elapsed model.returnGenerator
   , articleGenerator = animateGenerator elapsed model.articleGenerator
+  , customersGenerator = animateGenerator elapsed model.customersGenerator
   }
   |> dispatchArticles
   |> dispatchOrders
   |> dispatchReturns
+  |> dispatchCustomers
 
 
 dispatchArticles : Model -> Model
@@ -124,6 +125,14 @@ dispatchReturns : Model -> Model
 dispatchReturns model =
   if model.returnGenerator.active then
     Model.dispatchReturns 1 model
+  else
+    model
+
+
+dispatchCustomers : Model -> Model
+dispatchCustomers model =
+  if model.customersGenerator.active then
+    Model.dispatchCustomers model
   else
     model
 
