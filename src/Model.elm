@@ -112,7 +112,7 @@ resize dimensions model =
     {model | dimensions = dimensions}
   else
     let
-      newGridSize = gridSize model.tileSize model.dimensions
+      newGridSize = gridSize model.tileSize dimensions
     in
       { model
       | dimensions = dimensions

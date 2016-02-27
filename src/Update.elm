@@ -21,7 +21,7 @@ update : Action -> Model -> (Model, Effects Action)
 update action model =
   case action of
     Dimensions dimensions ->
-      (Model.resize dimensions model, Effects.none)  
+      (Model.resize dimensions model, Effects.none)
     Init time ->
       ( {model | seed = Random.initialSeed (floor time)}
       , (loadImage model.imagesUrl) "score.png"
@@ -82,6 +82,7 @@ animate elapsed model =
   , requests = List.map (Request.animate elapsed) model.requests
   , customers = List.map (Customer.animate elapsed) model.customers
   }
+  |> Model.dispatch elapsed
 
 
 -- click the 1st picked article that has the same category
@@ -100,21 +101,14 @@ onArticleClick : Article -> Model -> Model
 onArticleClick article model =
   case model.deliveryPerson.location of
     At mapObject ->
-      case mapObject.category of
-        HouseCategory _ ->
-          case article.state of
-            AwaitingReturn house ->
-              Model.pickupReturn mapObject house article model
-            Picked ->
-              Model.deliverArticle mapObject article model
-            _ ->
-              model
-        WarehouseCategory _ ->
-          case article.state of
-            InStock warehouse ->
-              Model.pickupArticle warehouse mapObject article model
-            Picked ->
-              Model.returnArticle mapObject article model
-            _ -> model
+      case (mapObject.category, article.state) of
+        (HouseCategory _, AwaitingReturn house) ->
+          Model.pickupReturn mapObject house article model
+        (HouseCategory _, Picked) ->
+          Model.deliverArticle mapObject article model
+        (WarehouseCategory _, InStock warehouse) ->
+          Model.pickupArticle warehouse mapObject article model
+        (WarehouseCategory _, Picked) ->
+          Model.returnArticle mapObject article model
         _ -> model
     _ -> model
