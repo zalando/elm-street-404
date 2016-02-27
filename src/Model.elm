@@ -245,34 +245,14 @@ dispatchReturns number model =
     }
 
 
-obstacleRow : (Int, Int) -> Int -> Int -> List (Int, Int)
-obstacleRow position rowIndex columns =
-  case columns of
-    0 -> []
-    _ ->
-      (fst position + rowIndex, snd position + columns - 1) ::
-      obstacleRow position rowIndex (columns - 1)
-
-
-obstacleToTiles : (Int, Int) -> (Int, Int) -> List (Int, Int)
-obstacleToTiles position size =
-  case fst size of
-    0 -> []
-    _ ->
-      obstacleRow position (fst size - 1) (snd size) ++
-      obstacleToTiles position (fst size - 1, snd size)
-
-
 obstacleTiles : List MapObject -> List (Int, Int)
-obstacleTiles obstacles =
+obstacleTiles  =
   let
+    col y h x = (++) (List.map ((,) x) [y..y + h - 1])
+    cols (x, y) (w, h) = (++) (List.foldl (col y h) [] [x..x + w - 1])
     toIntTuple (a, b) = (round a, round b)
   in
-    obstacles
-    |> List.map
-      (\ {position, size} ->
-        obstacleToTiles (toIntTuple position) (toIntTuple size))
-    |> List.concat
+    List.foldl (\{position, size} -> cols (toIntTuple position) (toIntTuple size)) []
 
 
 placeToLocation : MapObject -> (Int, Int)
