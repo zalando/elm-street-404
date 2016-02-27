@@ -257,26 +257,19 @@ obstacleTiles  =
 
 placeToLocation : MapObject -> (Int, Int)
 placeToLocation {position, size} =
-  ( round (fst position + snd size / 2 - 1)
+  ( round (fst position + fst size / 2 - 1)
   , round (snd position + snd size)
   )
 
 
 navigateToMapObject : MapObject -> Model -> Model
-navigateToMapObject mapObject =
-  navigateTo
-    (DeliveryPerson.OnTheWayTo mapObject)
-    (placeToLocation mapObject)
-
-
-navigateTo : DeliveryPerson.Location -> (Int, Int) -> Model -> Model
-navigateTo location destination model =
+navigateToMapObject mapObject model =
   { model
   | deliveryPerson = DeliveryPerson.navigateTo
       model.gridSize
       (obstacleTiles model.mapObjects)
-      location
-      destination
+      (DeliveryPerson.OnTheWayTo mapObject)
+      (placeToLocation mapObject)
       model.deliveryPerson
   }
 
@@ -289,31 +282,20 @@ animate time animationFunc model =
     animationFunc elapsed {model | animationState = animationState}
 
 
-decHappinessIfHome : List MapObject -> Customer -> Customer
-decHappinessIfHome houses customer =
-  case houses of
+decHappinessIfHome : List Request -> Customer -> Customer
+decHappinessIfHome requests customer =
+  case requests of
     [] -> customer
-    house :: rest ->
+    {house} :: rest ->
       if Customer.livesHere house customer then
         Customer.decHappiness customer
       else
         decHappinessIfHome rest customer
 
 
-decHappiness : List Request -> Customer -> Customer
-decHappiness timeouted customer =
-  decHappinessIfHome
-    (List.map .house timeouted)
-    customer
-
-
-countLives: Model -> Int
-countLives model =
-  model.maxLives -
-  ( model.customers
-    |> List.filter Customer.isLost
-    |> List.length
-  )
+countLives : Model -> Int
+countLives {maxLives, customers} =
+  maxLives - (List.length (List.filter Customer.isLost customers))
 
 
 timeoutRequests : Model -> Model
@@ -323,7 +305,7 @@ timeoutRequests model =
   in
     { model
     | requests = inTime
-    , customers = List.map (decHappiness timeouted) model.customers
+    , customers = List.map (decHappinessIfHome timeouted) model.customers
     }
 
 
@@ -402,7 +384,7 @@ incHappinessInTheHouse house model =
 
 deliverArticle : MapObject -> Article -> Model -> Model
 deliverArticle house article model =
-  if Request.hasOrder house article.category model.requests then
+  if List.any (Request.isOrdered house article.category) model.requests then
     { model
     | requests = IHopeItWorks.remove
         (Request.isOrdered house article.category)
