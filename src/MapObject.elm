@@ -1,4 +1,18 @@
-module MapObject (Box, MapObject, MapObjectCategory(..), placeRandom, tree, fountain, house, warehouse, isHouse, animate, splitBy) where
+module MapObject
+  ( Box
+  , MapObject
+  , MapObjectCategory(..)
+  , placeRandom
+  , tree
+  , fountain
+  , house
+  , warehouse
+  , isHouse
+  , animate
+  , splitBy
+  , houseSlots
+  , warehouseSlots
+  ) where
 
 import Random
 import Fountain exposing (Fountain)
@@ -57,6 +71,32 @@ house = mapObject (2, 2) (HouseCategory 3)
 
 warehouse : MapObject
 warehouse = mapObject (4, 3) (WarehouseCategory 6)
+
+
+warehouseSlots : List MapObject -> List MapObject
+warehouseSlots mapObjects =
+  case mapObjects of
+    obj :: rest ->
+      case obj.category of
+        WarehouseCategory capacity ->
+          (List.repeat (capacity - 1) obj) ++ warehouseSlots rest
+        _ ->
+          warehouseSlots rest
+    [] ->
+      []
+
+
+houseSlots : List MapObject -> List MapObject
+houseSlots mapObjects =
+  case mapObjects of
+    obj :: rest ->
+      case obj.category of
+        HouseCategory capacity ->
+          (List.repeat capacity obj) ++ houseSlots rest
+        _ ->
+          houseSlots rest
+    [] ->
+      []
 
 
 isHouse : MapObject -> Bool

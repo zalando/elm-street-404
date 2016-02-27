@@ -3,22 +3,23 @@ module PathView (render) where
 import Svg exposing (svg, polyline, rect)
 import Svg.Attributes exposing (..)
 import Html exposing (div, Html)
-import Html.Attributes exposing (style)
 import Layers exposing (layers)
 
 
-pointToSring : Int -> (Int, Int) -> String
-pointToSring tileSize (x, y) =
-  toString (x * tileSize + tileSize // 2) ++
-  "," ++
-  toString (y * tileSize + tileSize // 2)
+addPointToSring : Int -> (Int, Int) -> String -> String
+addPointToSring tileSize (x, y) =
+  (++)
+    ( toString (x * tileSize + tileSize) ++
+      "," ++
+      toString (y * tileSize + tileSize // 2) ++
+      " "
+    )
 
 
 renderPoints : Int -> List (Int, Int) -> Html
 renderPoints tileSize waypoints =
   polyline
-    [ points (List.map (pointToSring tileSize) waypoints
-      |> List.foldr (\a b -> a ++ " " ++ b) "")
+    [ points (List.foldl (addPointToSring tileSize) "" waypoints)
     , strokeLinejoin "round"
     , strokeLinecap "round"
     , stroke "#bdab82"
@@ -33,17 +34,12 @@ render : (Int, Int) -> Int -> List (Int, Int) -> Html
 render (w, h) tileSize route =
   svg
     [ version "1.1"
-    , "0 0 " ++ (toString (w * tileSize)) ++
-      " " ++ (toString (h * tileSize))
-      |> viewBox
+    , viewBox ("0 0 " ++ toString (w * tileSize) ++ " " ++ toString (h * tileSize))
     , width (toString (w * tileSize))
     , height (toString (h * tileSize))
-    , Html.Attributes.style
-      [ "z-index" => toString layers.route
-      , "position" => "absolute"
-      ]
+    , style ("z-index:" ++ toString layers.route ++ "; position: absolute;")
     ]
-    [ renderPoints tileSize route]
+    [ renderPoints tileSize route ]
 
 
 (=>) : a -> b -> (a, b)

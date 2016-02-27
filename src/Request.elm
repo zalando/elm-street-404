@@ -1,4 +1,4 @@
-module Request (Request, RequestCategory(..), isInReturn, isOrdered, hasOrder, animate, inTime, orders, orderedCategories, returnArticles) where
+module Request (Request, RequestCategory(..), isInReturn, isOrdered, animate, inTime, orders, orderedCategories, returnArticles) where
 
 import MapObject exposing (MapObject)
 import Article exposing (Article)
@@ -97,11 +97,6 @@ isOrdered house category request =
     Order category' ->
       house == request.house && category' == category
     _ -> False
-
-
-hasOrder : MapObject -> Category -> List Request -> Bool
-hasOrder house category =
-  List.any (isOrdered house category)
 
 
 -- time while it doesn't blink

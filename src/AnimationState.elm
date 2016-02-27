@@ -1,4 +1,14 @@
-module AnimationState (AnimationState, AnimatedObject, Generator, generator, animateGenerator, animateObject, animate, rotateFrames) where
+module AnimationState
+  ( AnimationState
+  , AnimatedObject
+  , Dispatcher
+  , dispatcher
+  , animateDispatcher
+  , dispatcherActions
+  , animateObject
+  , animate
+  , rotateFrames
+  ) where
 
 import Time exposing (Time)
 
@@ -14,24 +24,42 @@ type alias AnimatedObject a =
   }
 
 
-type alias Generator =
-  AnimatedObject {active : Bool}
+type alias Generator a = AnimatedObject {active : Bool, action : a}
 
 
-generator : Time -> Generator
-generator timeout =
+type alias Dispatcher a = List (Generator a)
+
+
+dispatcher : List (Time, a) -> Dispatcher a
+dispatcher =
+  List.map (uncurry generator)
+
+
+generator : Time -> a -> Generator a
+generator timeout action =
   { elapsed = 0
   , timeout = timeout
+  , action = action
   , active = False
   }
 
 
-animateGenerator : Time -> Generator -> Generator
+animateGenerator : Time -> Generator a -> Generator a
 animateGenerator elapsed generator =
   animateObject
     elapsed
     (\g -> {g | active = True})
     {generator | active = False}
+
+
+animateDispatcher : Time -> Dispatcher a -> Dispatcher a
+animateDispatcher =
+  animateGenerator >> List.map
+
+
+dispatcherActions : Dispatcher a -> List a
+dispatcherActions =
+  List.filter .active >> List.map .action
 
 
 {-| executes animationFunc every time timeout is reached -}
