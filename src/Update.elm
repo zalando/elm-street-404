@@ -15,21 +15,13 @@ import IHopeItWorks
 import ImageLoad
 import Json.Decode as Decoder
 import Task exposing (Task)
-import AnimationState exposing (animateGenerator)
 
 
 update : Action -> Model -> (Model, Effects Action)
 update action model =
   case action of
     Dimensions dimensions ->
-      if model.state == Playing then
-        ({model | dimensions = dimensions}, Effects.none)
-      else
-        ( {model | dimensions = dimensions}
-          |> Model.resize
-          |> Model.cleanupModel
-        , Effects.none
-        )
+      (Model.resize dimensions model, Effects.none)  
     Init time ->
       ( {model | seed = Random.initialSeed (floor time)}
       , (loadImage model.imagesUrl) "score.png"
@@ -84,77 +76,12 @@ loadImage imagesUrl image =
 
 animate : Time -> Model -> Model
 animate elapsed model =
-  model |> animateMapObjects elapsed
-        |> animateDeliveryPerson elapsed
-        |> animateRequests elapsed
-        |> animateGenerators elapsed
-        |> animateCustomers elapsed
-
-
-animateGenerators : Time -> Model -> Model
-animateGenerators elapsed model =
   { model
-  | orderGenerator = animateGenerator elapsed model.orderGenerator
-  , returnGenerator = animateGenerator elapsed model.returnGenerator
-  , articleGenerator = animateGenerator elapsed model.articleGenerator
-  , customersGenerator = animateGenerator elapsed model.customersGenerator
+  | mapObjects = List.map (MapObject.animate elapsed) model.mapObjects
+  , deliveryPerson = DeliveryPerson.animate elapsed model.deliveryPerson
+  , requests = List.map (Request.animate elapsed) model.requests
+  , customers = List.map (Customer.animate elapsed) model.customers
   }
-  |> dispatchArticles
-  |> dispatchOrders
-  |> dispatchReturns
-  |> dispatchCustomers
-
-
-dispatchArticles : Model -> Model
-dispatchArticles model =
-  if model.articleGenerator.active then
-    Model.dispatchArticles 1 model
-  else
-    model
-
-
-dispatchOrders : Model -> Model
-dispatchOrders model =
-  if model.orderGenerator.active then
-    Model.dispatchOrders 1 model
-  else
-    model
-
-
-dispatchReturns : Model -> Model
-dispatchReturns model =
-  if model.returnGenerator.active then
-    Model.dispatchReturns 1 model
-  else
-    model
-
-
-dispatchCustomers : Model -> Model
-dispatchCustomers model =
-  if model.customersGenerator.active then
-    Model.dispatchCustomers model
-  else
-    model
-
-
-animateMapObjects : Time -> Model -> Model
-animateMapObjects elapsed model =
-  { model | mapObjects = List.map (MapObject.animate elapsed) model.mapObjects }
-
-
-animateDeliveryPerson : Time -> Model -> Model
-animateDeliveryPerson elapsed model =
-  { model | deliveryPerson = DeliveryPerson.animate elapsed model.deliveryPerson }
-
-
-animateRequests : Time -> Model -> Model
-animateRequests elapsed model =
- {model | requests = List.map (Request.animate elapsed) model.requests }
-
-
-animateCustomers : Time -> Model -> Model
-animateCustomers elapsed model =
- {model | customers = List.map (Customer.animate elapsed) model.customers }
 
 
 -- click the 1st picked article that has the same category
