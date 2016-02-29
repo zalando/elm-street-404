@@ -62,7 +62,7 @@ render address articles capacity warehouse =
       else
         { sprite = warehouseBubbleSprite
         , position = warehouse.position
-        , layer = layers.bubble
+        , layer = (layers.bubble, 0)
         , frame = 0
         , attributes = []
         } ::
@@ -71,19 +71,19 @@ render address articles capacity warehouse =
   in
     [ { sprite = warehouseSprite
       , position = warehouse.position
-      , layer = layers.obstacle
+      , layer = (layers.obstacle, 0)
       , frame = 0
       , attributes = []
       }
     , { sprite = warehouseShadowSprite
       , position = warehouse.position
-      , layer = layers.shadow
+      , layer = (layers.shadow, 0)
       , frame = 0
       , attributes = []
       }
     , { sprite = Sprite.empty (4, 4) (0, -1)
       , position = warehouse.position
-      , layer = layers.clickAbove
+      , layer = (layers.clickAbove, 0)
       , frame = 0
       , attributes =
         [ onClick address (Actions.ClickMapObject warehouse) ]

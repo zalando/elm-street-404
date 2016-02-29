@@ -32,7 +32,7 @@ render (x, y) value =
     renderDigit number digit =
       { sprite = scoreSprite
       , position = (x - toFloat number - 1, y)
-      , layer = layers.customer
+      , layer = (layers.customer, 0)
       , frame = digit
       , attributes = []
       }

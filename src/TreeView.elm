@@ -18,7 +18,7 @@ render : MapObject -> List Sprite.Box
 render obstacle =
   [ { sprite = treeSprite
     , position = obstacle.position
-    , layer = layers.obstacle
+    , layer = (layers.obstacle, 0)
     , frame = 0
     , attributes = []
     }

@@ -86,7 +86,7 @@ render address requests articles customers house =
         Just sprite ->
           [ { sprite = sprite
             , position = house.position
-            , layer = layers.bubble
+            , layer = (layers.bubble, 0)
             , frame = 0
             , attributes = []
             }
@@ -103,19 +103,19 @@ render address requests articles customers house =
   in
     [ { sprite = sprite
       , position = house.position
-      , layer = layers.obstacle
+      , layer = (layers.obstacle, 0)
       , frame = 0
       , attributes = []
       }
     , { sprite = shadowSprite
       , position = house.position
-      , layer = layers.shadow
+      , layer = (layers.shadow, 0)
       , frame = 0
       , attributes = []
       }
     , { sprite = Sprite.empty (2, 3) (0, -1)
       , position = house.position
-      , layer = layers.clickAbove
+      , layer = (layers.clickAbove, 0)
       , frame = 0
       , attributes =
         [ onClick address (Actions.ClickMapObject house) ]

@@ -85,32 +85,32 @@ render requests articles house customer =
       []
     else
       [ { sprite = sprite
-        , position = position 0.001
-        , layer = layers.customer
+        , position = house.position
+        , layer = (layers.obstacle, 1)
         , frame = customerFrameOffset customer
         , attributes = []
         }
       , { sprite = shirtSprite
-        , position = position 0.002
-        , layer = layers.customer
+        , position = house.position
+        , layer = (layers.obstacle, 2)
         , frame = shirtFrameOffset shirtColor customer
         , attributes = []
         }
       , { sprite = shoesSprite
-        , position = position 0.003
-        , layer = layers.customer
+        , position = house.position
+        , layer = (layers.obstacle, 3)
         , frame = shoesColor
         , attributes = []
         }
       , { sprite = pantsSprite
-        , position = position 0.004
-        , layer = layers.customer
+        , position = house.position
+        , layer = (layers.obstacle, 4)
         , frame = pantsColor
         , attributes = []
         }
       , { sprite = scarfSprite
         , position = position 0.005
-        , layer = layers.customer
+        , layer = (layers.obstacle, 5)
         , frame = scarfColor
         , attributes = []
         }

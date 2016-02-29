@@ -37,19 +37,19 @@ render : Fountain -> MapObject -> List Sprite.Box
 render fountain obstacle =
   [ { sprite = fountainSprite
     , position = obstacle.position
-    , layer = layers.obstacle
+    , layer = (layers.obstacle, 0)
     , frame = 0
     , attributes = []
     }
   , { sprite = fountainSpringSprite
     , position = obstacle.position
-    , layer = layers.fountainSpring
+    , layer = (layers.obstacle, 1)
     , frame = Maybe.withDefault 0 (List.head fountain.frames)
     , attributes = []
     }
   , { sprite = fountainShadowSprite
     , position = obstacle.position
-    , layer = layers.shadow
+    , layer = (layers.shadow, 0)
     , frame = 0
     , attributes = []
     }

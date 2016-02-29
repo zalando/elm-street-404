@@ -30,13 +30,13 @@ render address (width, height) state =
   if state == Model.Stopped then
     [ { sprite = clickToStartSprite
       , position = (toFloat width / 2 - 5, toFloat height / 2 - 1)
-      , layer = layers.clickToStart
+      , layer = (layers.clickToStart, 0)
       , frame = 0
       , attributes = [onClick address Actions.Start]
       }
     , { sprite = elmStreet404Sprite
       , position = (toFloat width / 2 - 6.5, toFloat height / 4 - 1)
-      , layer = layers.clickToStart
+      , layer = (layers.clickToStart, 0)
       , frame = 0
       , attributes = []
       }

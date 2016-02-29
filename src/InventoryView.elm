@@ -36,7 +36,7 @@ render address (width, height) articles =
   in
     { sprite = bubbleSprite
     , position = (x, y)
-    , layer = layers.bubble
+    , layer = (layers.bubble, 0)
     , frame = 0
     , attributes = []
     }

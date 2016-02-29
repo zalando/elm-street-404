@@ -23,7 +23,7 @@ render (width, height) score maxLives lives =
     renderLife number _ =
       { sprite = scoreSprite
       , position = (toFloat (maxLives - number), y)
-      , layer = layers.customer
+      , layer = (layers.obstacle, 0)
       , frame = if number >= (maxLives - lives) then 11 else 12
       , attributes = []
       }
@@ -31,7 +31,7 @@ render (width, height) score maxLives lives =
   in
     { sprite = scoreSprite
     , position = (x, y)
-    , layer = layers.customer
+    , layer = (layers.obstacle, 0)
     , frame = 10
     , attributes = []
     }

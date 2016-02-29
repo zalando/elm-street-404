@@ -36,7 +36,7 @@ render numberOfBoxes deliveryPerson =
     box frame =
     [ { sprite = sprite
       , position = deliveryPerson.position
-      , layer = layers.deliveryPerson
+      , layer = (layers.obstacle, 0)
       , frame = frame
       , attributes = []
       }

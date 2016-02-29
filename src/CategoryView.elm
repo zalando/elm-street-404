@@ -20,7 +20,7 @@ render position attributes category =
   [ { sprite = categorySprite
     , position = position
     , frame = Category.getFrame category
-    , layer = if category == Category.Return then layers.articleReturn else layers.article
+    , layer = (layers.article, if category == Category.Return then 1 else 0)
     , attributes = attributes
     }
   ]

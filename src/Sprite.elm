@@ -16,7 +16,7 @@ type alias Box =
   { position : (Float, Float)
   , sprite : Sprite
   , frame : Int
-  , layer : Int
+  , layer : (Int, Int)
   , attributes : List Html.Attribute
   }
 
@@ -36,7 +36,7 @@ empty size offset =
 
 sort : List Box -> List Box
 sort boxes =
-  List.sortBy (\box -> snd box.position) boxes
+  List.sortBy (\box -> (fst box.layer, snd box.position, snd box.layer)) boxes
 
 
 render : String -> Int -> Box -> Html.Html
@@ -59,7 +59,7 @@ render imagesUrl tileSize ({sprite, position, frame, layer, attributes} as box) 
         , "background-size" => (toString (width * sprite.frames * tileSize) ++ "px " ++ (toString (height * tileSize)) ++ "px")
         , "width" => (toString (width * tileSize) ++ "px")
         , "height" => (toString (height * tileSize) ++ "px")
-        , "z-index" => (toString layer)
+        , "z-index" => (toString (fst layer))
         ]
       ] ++ attributes
     )
