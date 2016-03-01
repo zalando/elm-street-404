@@ -12,9 +12,10 @@ import Request exposing (Request)
 import Category exposing (Category)
 import Customer exposing (Customer)
 import IHopeItWorks
-import ImageLoad
-import Json.Decode as Decoder
 import Task exposing (Task)
+import WebGL
+import Sprite exposing (TextureId)
+import AllDict
 
 
 update : Action -> Model -> (Model, Effects Action)
@@ -24,16 +25,25 @@ update action model =
       (Model.resize dimensions model, Effects.none)
     Init time ->
       ( {model | seed = Random.initialSeed (floor time)}
-      , (loadImage model.imagesUrl) "score.png"
+      , (loadImage model.imagesUrl) Sprite.Score
       )
-    ImageLoaded image ->
-      if image == "score.png" then
-        ({model | state = Loading}, Effects.batch (List.map (loadImage model.imagesUrl) model.images))
-      else
-        let
-          newModel = {model | images = List.filter ((/=) image) model.images}
-        in
-          if List.length newModel.images == 0 then
+    TextureLoaded textureId texture ->
+      let
+        loadTexture =
+          case AllDict.get textureId model.textures of
+            Just data ->
+              AllDict.insert textureId {data | texture = texture} model.textures
+            Nothing ->
+              model.textures
+        newModel = {model | textures = loadTexture}
+        texturesToLoad = Sprite.loadTextures newModel.textures
+      in
+        if textureId == Sprite.Score then
+          ( {newModel | state = Loading}
+          , Effects.batch (List.map (loadImage model.imagesUrl) texturesToLoad)
+          )
+        else
+          if List.length texturesToLoad == 0 then
             ({newModel | state = Stopped}, Effects.none)
           else
             (newModel, Effects.none)
@@ -67,10 +77,11 @@ ifPlaying fun model =
     (model, Effects.none)
 
 
-loadImage : String -> String -> Effects Action
-loadImage imagesUrl image =
-  ImageLoad.load (imagesUrl ++ "/" ++ image) (Decoder.succeed image) `Task.onError` always (Task.succeed image)
-  |> Task.map (always (ImageLoaded image))
+loadImage : String -> TextureId -> Effects Action
+loadImage imagesUrl textureId =
+  ( WebGL.loadTexture (imagesUrl ++ "/" ++ Sprite.filename textureId)
+    |> Task.map (\r -> TextureLoaded textureId (Just r))
+  ) `Task.onError` always (Task.succeed (TextureLoaded textureId Nothing))
   |> Effects.task
 
 

@@ -44,7 +44,7 @@ boxes address model =
     else if model.state == Model.Loading then
       DigitsView.render
         (toFloat (fst model.gridSize) / 2 + 1, toFloat (snd model.gridSize) / 2)
-        (round (100 * (1 - toFloat (List.length model.images) / toFloat (List.length Model.images))))
+        (Sprite.loadedTextures model.textures)
     else
       StartGameView.render address model.gridSize model.state ++
       InventoryView.render address model.gridSize model.articles ++

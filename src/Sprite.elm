@@ -1,4 +1,4 @@
-module Sprite (TextureId(..), TextureData, Box, box, empty, sort, render, textures) where
+module Sprite (TextureId(..), TextureData, Box, filename, box, empty, sort, render, loadedTextures, textures, loadTextures) where
 
 import Html.Attributes exposing (style, key)
 import Html exposing (div)
@@ -86,6 +86,21 @@ textures =
     , (ElmStreet404, initData (13, 2) (0, 0) 1)
     , (Score, initData (1, 1) (0, 0) 13)
     ]
+
+
+loadedTextures : AllDict TextureId TextureData String -> Int
+loadedTextures textures =
+  ( 1 -
+    toFloat (List.length (loadTextures textures)) /
+    toFloat (AllDict.size textures)
+  ) * 100 |> round
+
+
+loadTextures : AllDict TextureId TextureData String -> List TextureId
+loadTextures textures =
+  AllDict.toList textures
+  |> List.filter (\(id, data) -> data.texture == Nothing)
+  |> List.map fst
 
 
 type alias TextureData =
