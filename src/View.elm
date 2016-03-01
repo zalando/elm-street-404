@@ -17,7 +17,6 @@ import ScoreView
 import StartGameView
 import DigitsView
 import MapObject exposing (MapObject, MapObjectCategory(..))
-import Layers exposing (layers)
 
 
 (=>) : a -> b -> (a, b)
@@ -67,7 +66,6 @@ debug model =
         , "top" => "0"
         , "width" => "100%"
         , "height" => "100%"
-        , "z-index" => toString layers.grid
         ]
     ]
     []
@@ -86,5 +84,5 @@ view address model =
     ]
   ]
   ( PathView.render model.gridSize model.tileSize model.deliveryPerson.route ::
-    List.map (Sprite.render model.imagesUrl model.tileSize) (Sprite.sort (boxes address model))
+    List.map (Sprite.render model.imagesUrl model.tileSize model.textures) (Sprite.sort (boxes address model))
   )

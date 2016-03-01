@@ -30,6 +30,8 @@ import Customer exposing (Customer)
 import IHopeItWorks
 import Article exposing (Article)
 import MapObject exposing (MapObject)
+import AllDict exposing (AllDict)
+import Sprite exposing (TextureId, TextureData)
 
 
 type State = Initialising | Loading | Paused | Playing | Stopped
@@ -68,6 +70,7 @@ type alias Model =
   { animationState : AnimationState.AnimationState
   , state : State
   , images : List String
+  , textures : AllDict TextureId TextureData String
   , seed : Random.Seed
   , tileSize : Int
   , imagesUrl : String
@@ -89,6 +92,7 @@ initial dimensions imagesUrl =
   { animationState = Nothing
   , state = Initialising
   , images = images
+  , textures = Sprite.textures
   , seed = Random.initialSeed 0
   , tileSize = 40
   , imagesUrl = imagesUrl

@@ -3,24 +3,20 @@ module CategoryView (render) where
 import Category exposing (Category)
 import Html
 import Layers exposing (layers)
-import Sprite exposing (Sprite)
-
-
-categorySprite : Sprite
-categorySprite =
-  { size = (1, 1)
-  , offset = (0, 0)
-  , frames = 14
-  , src = "categories.png"
-  }
+import Sprite
 
 
 render : (Float, Float) -> List Html.Attribute -> Category -> List Sprite.Box
 render position attributes category =
-  [ { sprite = categorySprite
-    , position = position
-    , frame = Category.getFrame category
-    , layer = (layers.article, if category == Category.Return then 1 else 0)
-    , attributes = attributes
-    }
+  [ Sprite.box
+      Sprite.Categories
+      position
+      (Category.getFrame category)
+      (layers.article, if category == Category.Return then 1 else 0)
+  , Sprite.empty
+      (1, 1)
+      (0, 0)
+      position
+      (layers.clickAbove, 0)
+      attributes
   ]

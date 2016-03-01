@@ -1,16 +1,7 @@
 module DigitsView (render) where
 
-import Sprite exposing (Sprite)
+import Sprite
 import Layers exposing (layers)
-
-
-scoreSprite : Sprite
-scoreSprite =
-  { size = (1, 1)
-  , offset = (0, 0)
-  , frames = 13
-  , src = "score.png"
-  }
 
 
 digitsList : Int -> List Int
@@ -30,11 +21,10 @@ render (x, y) value =
   let
     digits = if value == 0 then [0] else digitsList value
     renderDigit number digit =
-      { sprite = scoreSprite
-      , position = (x - toFloat number - 1, y)
-      , layer = (layers.customer, 0)
-      , frame = digit
-      , attributes = []
-      }
+      Sprite.box
+        Sprite.Score
+        (x - toFloat number - 1, y)
+        digit
+        (layers.bubble, 0)
   in
     (List.indexedMap renderDigit digits)

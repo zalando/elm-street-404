@@ -1,17 +1,8 @@
 module ScoreView (render) where
 
-import Sprite exposing (Sprite)
+import Sprite
 import Layers exposing (layers)
 import DigitsView
-
-
-scoreSprite : Sprite
-scoreSprite =
-  { size = (1, 1)
-  , offset = (0, 0)
-  , frames = 13
-  , src = "score.png"
-  }
 
 
 render : (Int, Int) -> Int -> Int -> Int -> List Sprite.Box
@@ -21,19 +12,18 @@ render (width, height) score maxLives lives =
     y = 1
 
     renderLife number _ =
-      { sprite = scoreSprite
-      , position = (toFloat (maxLives - number), y)
-      , layer = (layers.obstacle, 0)
-      , frame = if number >= (maxLives - lives) then 11 else 12
-      , attributes = []
-      }
+      Sprite.box
+        Sprite.Score
+        (toFloat (maxLives - number), y)
+        (if number >= (maxLives - lives) then 11 else 12)
+        (layers.bubble, 0)
 
   in
-    { sprite = scoreSprite
-    , position = (x, y)
-    , layer = (layers.obstacle, 0)
-    , frame = 10
-    , attributes = []
-    }
+    ( Sprite.box
+        Sprite.Score
+        (x, y)
+        10
+        (layers.bubble, 0)
+    )
     :: (DigitsView.render (x, y) (score * 10))
     ++ (List.indexedMap renderLife (List.repeat maxLives True))

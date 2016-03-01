@@ -1,21 +1,12 @@
 module InventoryView (render) where
 
 import Article exposing (Article)
-import Sprite exposing (Sprite)
+import Sprite
 import Actions exposing (Action)
 import Category
 import ArticleView
 import CategoryView
 import Layers exposing (layers)
-
-
-bubbleSprite : Sprite
-bubbleSprite =
-  { size = (7, 3)
-  , offset = (0, 0)
-  , frames = 1
-  , src = "inventory-bubble.png"
-  }
 
 
 render : Signal.Address Action -> (Int, Int) -> List Article -> List Sprite.Box
@@ -34,11 +25,11 @@ render address (width, height) articles =
     renderCategory number category =
       CategoryView.render (toFloat (number + articlesNumber) + x + 2, y + 1) [] category
   in
-    { sprite = bubbleSprite
-    , position = (x, y)
-    , layer = (layers.bubble, 0)
-    , frame = 0
-    , attributes = []
-    }
+    ( Sprite.box
+        Sprite.InventoryBubble
+        (x, y)
+        0
+        (layers.bubble, 0)
+    )
     :: List.concat (List.indexedMap renderArticle articlesInDelivery)
     ++ List.concat (List.indexedMap renderCategory placeholders)

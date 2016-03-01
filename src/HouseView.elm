@@ -3,7 +3,7 @@ module HouseView (render) where
 import Actions exposing (Action)
 import Html.Events exposing (onClick)
 import Layers exposing (layers)
-import Sprite exposing (Sprite)
+import Sprite
 import MapObject exposing (MapObject)
 import Customer exposing (Customer)
 import Request exposing (Request)
@@ -13,58 +13,11 @@ import CustomerView
 import IHopeItWorks
 
 
-sprite : Sprite
-sprite =
-  { size = (2, 3)
-  , offset = (0, -1)
-  , frames = 1
-  , src = "house.png"
-  }
-
-
-shadowSprite : Sprite
-shadowSprite =
-  { size = (3, 2)
-  , offset = (0, 1)
-  , frames = 1
-  , src = "house-shadow.png"
-  }
-
-
-bubbleSprite1 : Sprite
-bubbleSprite1 =
-  { size = (3, 3)
-  , offset = (-2, -1)
-  , frames = 1
-  , src = "house-bubble-1.png"
-  }
-
-
-bubbleSprite2 : Sprite
-bubbleSprite2 =
-  { size = (3, 4)
-  , offset = (-2, -2)
-  , frames = 1
-  , src = "house-bubble-2.png"
-  }
-
-
-bubbleSprite3 : Sprite
-bubbleSprite3 =
-  { size = (3, 5)
-  , offset = (-2, -3)
-  , frames = 1
-  , src = "house-bubble-3.png"
-  }
-
-
-getBubbleSprite : Int -> Maybe Sprite
+getBubbleSprite : Int -> Maybe Sprite.TextureId
 getBubbleSprite number =
   case number of
     0 -> Nothing
-    1 -> Just bubbleSprite1
-    2 -> Just bubbleSprite2
-    _ -> Just bubbleSprite3
+    n -> Just (Sprite.HouseBubble n)
 
 
 render : Signal.Address Action -> List Request -> List Article -> List Customer -> MapObject -> List Sprite.Box
@@ -84,12 +37,11 @@ render address requests articles customers house =
     renderBubble =
       case getBubbleSprite (List.length requestsFromHouse) of
         Just sprite ->
-          [ { sprite = sprite
-            , position = house.position
-            , layer = (layers.bubble, 0)
-            , frame = 0
-            , attributes = []
-            }
+          [ Sprite.box
+              sprite
+              house.position
+              0
+              (layers.bubble, 0)
           ]
         _ -> []
     renderCustomer =
@@ -101,25 +53,22 @@ render address requests articles customers house =
           else
             CustomerView.render requestsFromHouse deliveredArticles house customer
   in
-    [ { sprite = sprite
-      , position = house.position
-      , layer = (layers.obstacle, 0)
-      , frame = 0
-      , attributes = []
-      }
-    , { sprite = shadowSprite
-      , position = house.position
-      , layer = (layers.shadow, 0)
-      , frame = 0
-      , attributes = []
-      }
-    , { sprite = Sprite.empty (2, 3) (0, -1)
-      , position = house.position
-      , layer = (layers.clickAbove, 0)
-      , frame = 0
-      , attributes =
-        [ onClick address (Actions.ClickMapObject house) ]
-      }
+    [ Sprite.box
+        Sprite.House
+        house.position
+        0
+        (layers.obstacle, 0)
+    , Sprite.box
+        Sprite.HouseShadow
+        house.position
+        0
+        (layers.shadow, 0)
+    , Sprite.empty
+        (2, 3)
+        (0, -1)
+        house.position
+        (layers.clickAbove, 0)
+        [onClick address (Actions.ClickMapObject house)]
     ]
     ++ List.concat (List.indexedMap renderRequest requestsFromHouse)
     ++ renderBubble

@@ -1,18 +1,9 @@
 module DeliveryPersonView (render) where
 
 import DeliveryPerson exposing (DeliveryPerson)
-import Sprite exposing (Sprite)
+import Sprite
 import Basics exposing (atan2)
 import Layers exposing (layers)
-
-
-sprite : Sprite
-sprite =
-  { size = (2, 3)
-  , offset = (0, -1)
-  , frames = 29
-  , src = "delivery-person.png"
-  }
 
 
 calculateDirection : (Float, Float) -> Int
@@ -34,13 +25,12 @@ render : Int -> DeliveryPerson -> List Sprite.Box
 render numberOfBoxes deliveryPerson =
   let
     box frame =
-    [ { sprite = sprite
-      , position = deliveryPerson.position
-      , layer = (layers.obstacle, 0)
-      , frame = frame
-      , attributes = []
-      }
-    ]
+      [ Sprite.box
+          Sprite.DeliveryPerson
+          deliveryPerson.position
+          frame
+          (layers.obstacle, 0)
+      ]
   in
     case deliveryPerson.location of
       DeliveryPerson.OnTheWayTo _ ->

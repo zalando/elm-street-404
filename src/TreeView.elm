@@ -5,21 +5,6 @@ import Layers exposing (layers)
 import MapObject exposing (MapObject)
 
 
-treeSprite : Sprite.Sprite
-treeSprite =
-  { size = (3, 5)
-  , offset = (0, -3)
-  , frames = 1
-  , src = "tree.png"
-  }
-
-
 render : MapObject -> List Sprite.Box
-render obstacle =
-  [ { sprite = treeSprite
-    , position = obstacle.position
-    , layer = (layers.obstacle, 0)
-    , frame = 0
-    , attributes = []
-    }
-  ]
+render {position} =
+  [ Sprite.box Sprite.Tree position 0 (layers.obstacle, 0) ]

@@ -1,62 +1,12 @@
 module CustomerView (render) where
 
 import Customer exposing (Customer)
-import Sprite exposing (Sprite)
+import Sprite
 import Layers exposing (layers)
 import MapObject exposing (MapObject)
 import Request exposing (Request)
 import Article exposing (Article)
 import Category exposing (Category)
-
-
-size : (Int, Int)
-size = (2, 3)
-
-
-sprite : Sprite
-sprite =
-  { size = size
-  , offset = (0, 0)
-  , frames = 18
-  , src = "customers.png"
-  }
-
-
-shoesSprite: Sprite
-shoesSprite =
-  { size = size
-  , offset = (0, 0)
-  , frames = 4
-  , src = "shoes.png"
-  }
-
-
-shirtSprite: Sprite
-shirtSprite =
-  { size = size
-  , offset = (0, 0)
-  , frames = 12
-  , src = "shirts.png"
-  }
-
-
-scarfSprite: Sprite
-scarfSprite =
-  { size = size
-  , offset = (0, 0)
-  , frames = 3
-  , src = "scarves.png"
-  }
-
-
-pantsSprite: Sprite
-pantsSprite =
-  { size = size
-  , offset = (0, 0)
-  , frames = 3
-  , src = "trousers.png"
-  }
-
 
 shirtFrameOffset : Int -> Customer -> Int
 shirtFrameOffset color {happiness, frames} =
@@ -79,39 +29,33 @@ render requests articles house customer =
     shoesColor = Category.getColor Category.isShoes categories
     pantsColor = Category.getColor Category.isPants categories
     scarfColor = Category.getColor Category.isScarf categories
-    position offset = (fst house.position, snd house.position + offset)
   in
     if Customer.isLost customer then
       []
     else
-      [ { sprite = sprite
-        , position = house.position
-        , layer = (layers.obstacle, 1)
-        , frame = customerFrameOffset customer
-        , attributes = []
-        }
-      , { sprite = shirtSprite
-        , position = house.position
-        , layer = (layers.obstacle, 2)
-        , frame = shirtFrameOffset shirtColor customer
-        , attributes = []
-        }
-      , { sprite = shoesSprite
-        , position = house.position
-        , layer = (layers.obstacle, 3)
-        , frame = shoesColor
-        , attributes = []
-        }
-      , { sprite = pantsSprite
-        , position = house.position
-        , layer = (layers.obstacle, 4)
-        , frame = pantsColor
-        , attributes = []
-        }
-      , { sprite = scarfSprite
-        , position = position 0.005
-        , layer = (layers.obstacle, 5)
-        , frame = scarfColor
-        , attributes = []
-        }
+      [ Sprite.box
+          Sprite.Customers
+          house.position
+          (customerFrameOffset customer)
+          (layers.obstacle, 1)
+      , Sprite.box
+          Sprite.Shirts
+          house.position
+          (shirtFrameOffset shirtColor customer)
+          (layers.obstacle, 2)
+      , Sprite.box
+          Sprite.Shoes
+          house.position
+          shoesColor
+          (layers.obstacle, 3)
+      , Sprite.box
+          Sprite.Trousers
+          house.position
+          pantsColor
+          (layers.obstacle, 4)
+      , Sprite.box
+          Sprite.Scarves
+          house.position
+          scarfColor
+          (layers.obstacle, 5)
       ]
