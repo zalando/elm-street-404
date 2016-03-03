@@ -65,7 +65,7 @@ textures =
     [ (Categories, initData (1, 1) (0, 0) 14)
     , (ClickToStart, initData (10, 2) (0, 0) 1)
     , (Customers, initData (2, 3) (0, 0) 18)
-    , (DeliveryPerson, initData (2, 3) (0, -1) 29)
+    , (DeliveryPerson, initData (2, 4) (0, -2) 29)
     , (ElmStreet404, initData (13, 2) (0, 0) 1)
     , (Fountain, initData (3, 2) (0, 0) 1)
     , (FountainShadow, initData (4, 2) (0, 1) 1)
@@ -158,6 +158,29 @@ sort =
   List.sortBy (\box -> (fst box.layer, snd box.position, snd box.layer))
 
 
+backgroundOffset : Int -> Int -> (Float, Float) -> WebGL.Texture -> String
+backgroundOffset tileSize frame (xSize, ySize) texture =
+  let
+    (tw, th) = WebGL.textureSize texture
+    fw = (round xSize) * tileSize
+    fh = (round ySize) * tileSize
+    cols = tw // (fw * 2)
+    x = -(frame % cols) * fw
+    y = -(frame // cols) * fh
+  in
+    toString x ++ "px " ++ toString y ++ "px"
+
+
+backgroundSize : WebGL.Texture -> String
+backgroundSize texture =
+  let
+    (w, h) = WebGL.textureSize texture
+    width = w // 2
+    height = h // 2
+  in
+    toString width ++ "px " ++ toString height ++ "px"
+
+
 render : String -> Int -> AllDict TextureId TextureData String -> Box -> Html.Html
 render imagesUrl tileSize textures ({textureId, position, frame, layer, attributes}) =
   case textureId of
@@ -178,21 +201,25 @@ render imagesUrl tileSize textures ({textureId, position, frame, layer, attribut
       case AllDict.get opaqueTextureId textures of
         Nothing ->
           div [] []
-        Just {size, offset, frames} ->
-          div
-          ( [ style
-              [ "left" => "0"
-              , "top" => "0"
-              , "transform" => ("translate(" ++ (toString ((fst position + fst offset) * toFloat tileSize)) ++ "px," ++ (toString ((snd position + snd offset) * toFloat tileSize)) ++ "px)")
-              , "position" => "absolute"
-              , "overflow" => "hidden"
-              , "background-image" => ("url(" ++ imagesUrl ++ "/" ++ (filename opaqueTextureId) ++ ")")
-              , "background-position" => (toString -(frame * round (fst size) * tileSize) ++ "px 0")
-              , "background-repeat" => "no-repeat"
-              , "background-size" => (toString (round (fst size) * frames * tileSize) ++ "px " ++ (toString (round (snd size) * tileSize)) ++ "px")
-              , "width" => (toString (round (fst size) * tileSize) ++ "px")
-              , "height" => (toString (round (snd size) * tileSize) ++ "px")
-              ]
-            ] ++ attributes
-          )
-          []
+        Just {size, offset, frames, texture} ->
+          case texture of
+            Nothing ->
+              div [] []
+            Just texture ->
+              div
+              ( [ style
+                  [ "left" => "0"
+                  , "top" => "0"
+                  , "transform" => ("translate(" ++ (toString ((fst position + fst offset) * toFloat tileSize)) ++ "px," ++ (toString ((snd position + snd offset) * toFloat tileSize)) ++ "px)")
+                  , "position" => "absolute"
+                  , "overflow" => "hidden"
+                  , "background-image" => ("url(" ++ imagesUrl ++ "/" ++ (filename opaqueTextureId) ++ ")")
+                  , "background-position" => (backgroundOffset tileSize frame size texture)
+                  , "background-repeat" => "no-repeat"
+                  , "background-size" => (backgroundSize texture)
+                  , "width" => (toString (round (fst size) * tileSize) ++ "px")
+                  , "height" => (toString (round (snd size) * tileSize) ++ "px")
+                  ]
+                ] ++ attributes
+              )
+              []
