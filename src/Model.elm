@@ -16,7 +16,6 @@ module Model
   , cleanupLostArticles
   , cleanupLostRequests
   , countLives
-  , images
   , resize
   ) where
 
@@ -30,6 +29,8 @@ import Customer exposing (Customer)
 import IHopeItWorks
 import Article exposing (Article)
 import MapObject exposing (MapObject)
+import AllDict exposing (AllDict)
+import Sprite exposing (TextureId, TextureData)
 
 
 type State = Initialising | Loading | Paused | Playing | Stopped
@@ -47,16 +48,6 @@ gridSize tileSize (width, height) =
   limitSize (width // tileSize, height // tileSize)
 
 
-images : List String
-images =
-  [ "fountain-spring.png", "house-bubble-2.png", "house.png", "customers.png", "tree.png"
-  , "warehouse-shadow.png", "categories.png", "delivery-person.png", "fountain.png"
-  , "house-bubble-3.png", "inventory-bubble.png", "shirts.png", "trousers.png"
-  , "warehouse.png", "click-to-start.png", "fountain-shadow.png", "house-bubble-1.png"
-  , "house-shadow.png", "scarves.png", "shoes.png", "warehouse-bubble.png", "404-elm-street.png"
-  ]
-
-
 type DispatcherAction
   = DispatchArticles Int
   | DispatchOrders Int
@@ -67,7 +58,7 @@ type DispatcherAction
 type alias Model =
   { animationState : AnimationState.AnimationState
   , state : State
-  , images : List String
+  , textures : AllDict TextureId TextureData String
   , seed : Random.Seed
   , tileSize : Int
   , imagesUrl : String
@@ -88,7 +79,7 @@ initial : (Int, Int) -> String -> Model
 initial dimensions imagesUrl =
   { animationState = Nothing
   , state = Initialising
-  , images = images
+  , textures = Sprite.textures
   , seed = Random.initialSeed 0
   , tileSize = 40
   , imagesUrl = imagesUrl
@@ -120,7 +111,7 @@ resize dimensions model =
       , deliveryPerson =
           DeliveryPerson.initial
             ( toFloat (fst newGridSize // 2 - 1)
-            , toFloat (snd newGridSize // 4 * 3 - 1)
+            , toFloat (snd newGridSize // 4 * 3)
             )
       , articles = []
       , requests = []

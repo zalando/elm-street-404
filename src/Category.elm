@@ -85,11 +85,11 @@ color category =
    _ -> 0
 
 
-getColor : (Category -> Bool) -> List Category -> Int
+getColor : (Category -> Bool) -> List Category -> Maybe Int
 getColor fn categories =
   case IHopeItWorks.find fn categories of
-    Just shirt -> color shirt
-    _ -> 3
+    Just shirt -> Just (color shirt)
+    _ -> Nothing
 
 
 random : Random.Generator Category

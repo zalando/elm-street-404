@@ -1,62 +1,12 @@
 module CustomerView (render) where
 
 import Customer exposing (Customer)
-import Sprite exposing (Sprite)
+import Sprite
 import Layers exposing (layers)
 import MapObject exposing (MapObject)
 import Request exposing (Request)
 import Article exposing (Article)
 import Category exposing (Category)
-
-
-size : (Int, Int)
-size = (2, 3)
-
-
-sprite : Sprite
-sprite =
-  { size = size
-  , offset = (0, 0)
-  , frames = 18
-  , src = "customers.png"
-  }
-
-
-shoesSprite: Sprite
-shoesSprite =
-  { size = size
-  , offset = (0, 0)
-  , frames = 4
-  , src = "shoes.png"
-  }
-
-
-shirtSprite: Sprite
-shirtSprite =
-  { size = size
-  , offset = (0, 0)
-  , frames = 12
-  , src = "shirts.png"
-  }
-
-
-scarfSprite: Sprite
-scarfSprite =
-  { size = size
-  , offset = (0, 0)
-  , frames = 3
-  , src = "scarves.png"
-  }
-
-
-pantsSprite: Sprite
-pantsSprite =
-  { size = size
-  , offset = (0, 0)
-  , frames = 3
-  , src = "trousers.png"
-  }
-
 
 shirtFrameOffset : Int -> Customer -> Int
 shirtFrameOffset color {happiness, frames} =
@@ -75,43 +25,42 @@ render : List Request -> List Article -> MapObject -> Customer -> List Sprite.Bo
 render requests articles house customer =
   let
     categories = (List.map .category articles)
-    shirtColor = Category.getColor Category.isShirt categories
-    shoesColor = Category.getColor Category.isShoes categories
+    shirtColor = Maybe.withDefault 3 (Category.getColor Category.isShirt categories)
+    shoesColor = Maybe.withDefault 3 (Category.getColor Category.isShoes categories)
     pantsColor = Category.getColor Category.isPants categories
     scarfColor = Category.getColor Category.isScarf categories
-    position offset = (fst house.position, snd house.position + offset)
+    renderColor maybeColor layer sprite =
+      case maybeColor of
+        Just color ->
+          [ Sprite.box
+              sprite
+              house.position
+              color
+              (layers.obstacle, layer)
+          ]
+        Nothing ->
+          []
   in
     if Customer.isLost customer then
       []
     else
-      [ { sprite = sprite
-        , position = position 0.001
-        , layer = layers.customer
-        , frame = customerFrameOffset customer
-        , attributes = []
-        }
-      , { sprite = shirtSprite
-        , position = position 0.002
-        , layer = layers.customer
-        , frame = shirtFrameOffset shirtColor customer
-        , attributes = []
-        }
-      , { sprite = shoesSprite
-        , position = position 0.003
-        , layer = layers.customer
-        , frame = shoesColor
-        , attributes = []
-        }
-      , { sprite = pantsSprite
-        , position = position 0.004
-        , layer = layers.customer
-        , frame = pantsColor
-        , attributes = []
-        }
-      , { sprite = scarfSprite
-        , position = position 0.005
-        , layer = layers.customer
-        , frame = scarfColor
-        , attributes = []
-        }
+      List.concat
+      [ renderColor pantsColor 4 Sprite.Trousers
+      , renderColor scarfColor 5 Sprite.Scarves
+      , [ Sprite.box
+            Sprite.Shoes
+            house.position
+            shoesColor
+            (layers.obstacle, 3)
+        , Sprite.box
+            Sprite.Customers
+            house.position
+            (customerFrameOffset customer)
+            (layers.obstacle, 1)
+        , Sprite.box
+            Sprite.Shirts
+            house.position
+            (shirtFrameOffset shirtColor customer)
+            (layers.obstacle, 2)
+        ]
       ]

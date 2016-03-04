@@ -17,8 +17,7 @@ import ScoreView
 import StartGameView
 import DigitsView
 import MapObject exposing (MapObject, MapObjectCategory(..))
-import Layers exposing (layers)
-
+import WebGLView
 
 (=>) : a -> b -> (a, b)
 (=>) = (,)
@@ -40,18 +39,18 @@ renderMapObject address model mapObject =
 boxes : Signal.Address Action -> Model -> List Sprite.Box
 boxes address model =
   StartGameView.render address model.gridSize model.state ++
-    if model.state == Model.Initialising then
-      []
-    else if model.state == Model.Loading then
-      DigitsView.render
-        (toFloat (fst model.gridSize) / 2 + 1, toFloat (snd model.gridSize) / 2)
-        (round (100 * (1 - toFloat (List.length model.images) / toFloat (List.length Model.images))))
-    else
-      StartGameView.render address model.gridSize model.state ++
-      InventoryView.render address model.gridSize model.articles ++
-      ScoreView.render model.gridSize model.score model.maxLives (Model.countLives model) ++
-      DeliveryPersonView.render (List.length (List.filter Article.isPicked model.articles)) model.deliveryPerson ++
-      List.concat (List.map (renderMapObject address model) model.mapObjects)
+  if model.state == Model.Initialising then
+    []
+  else if model.state == Model.Loading then
+    DigitsView.render
+      (toFloat (fst model.gridSize) / 2 + 1, toFloat (snd model.gridSize) / 2)
+      (Sprite.loadedTextures model.textures)
+  else
+    StartGameView.render address model.gridSize model.state ++
+    InventoryView.render address model.gridSize model.articles ++
+    ScoreView.render model.gridSize model.score model.maxLives (Model.countLives model) ++
+    DeliveryPersonView.render (List.length (List.filter Article.isPicked model.articles)) model.deliveryPerson ++
+    List.concat (List.map (renderMapObject address model) model.mapObjects)
 
 
 debug : Model -> Html
@@ -67,7 +66,6 @@ debug model =
         , "top" => "0"
         , "width" => "100%"
         , "height" => "100%"
-        , "z-index" => toString layers.grid
         ]
     ]
     []
@@ -75,6 +73,9 @@ debug model =
 
 view : Signal.Address Action -> Model -> Html
 view address model =
+  let
+    (texturedBoxes, clickableBoxes) = Sprite.split (boxes address model)
+  in
   div
   [ style
     [ "height" => (toString (snd model.gridSize * model.tileSize) ++ "px")
@@ -86,5 +87,6 @@ view address model =
     ]
   ]
   ( PathView.render model.gridSize model.tileSize model.deliveryPerson.route ::
-    List.map (Sprite.render model.imagesUrl model.tileSize) (Sprite.sort (boxes address model))
+    WebGLView.render model.gridSize model.tileSize model.textures texturedBoxes ::
+    List.map (Sprite.renderClickable model.tileSize) clickableBoxes
   )
