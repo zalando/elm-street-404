@@ -11,5 +11,5 @@ render : Signal.Address Action -> (Float, Float) -> Article -> List Sprite.Box
 render address position article =
   CategoryView.render
     position
-    [onClick address (Actions.ClickArticle article)]
+    (Just (onClick address (Actions.ClickArticle article)))
     article.category

@@ -23,7 +23,7 @@ render address (width, height) articles =
       ArticleView.render address (toFloat number + x + 2, y + 1) article
 
     renderCategory number category =
-      CategoryView.render (toFloat (number + articlesNumber) + x + 2, y + 1) [] category
+      CategoryView.render (toFloat (number + articlesNumber) + x + 2, y + 1) Nothing category
   in
     ( Sprite.box
         Sprite.InventoryBubble

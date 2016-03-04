@@ -25,37 +25,42 @@ render : List Request -> List Article -> MapObject -> Customer -> List Sprite.Bo
 render requests articles house customer =
   let
     categories = (List.map .category articles)
-    shirtColor = Category.getColor Category.isShirt categories
-    shoesColor = Category.getColor Category.isShoes categories
+    shirtColor = Maybe.withDefault 3 (Category.getColor Category.isShirt categories)
+    shoesColor = Maybe.withDefault 3 (Category.getColor Category.isShoes categories)
     pantsColor = Category.getColor Category.isPants categories
     scarfColor = Category.getColor Category.isScarf categories
+    renderColor maybeColor layer sprite =
+      case maybeColor of
+        Just color ->
+          [ Sprite.box
+              sprite
+              house.position
+              color
+              (layers.obstacle, layer)
+          ]
+        Nothing ->
+          []
   in
     if Customer.isLost customer then
       []
     else
-      [ Sprite.box
-          Sprite.Customers
-          house.position
-          (customerFrameOffset customer)
-          (layers.obstacle, 1)
-      , Sprite.box
-          Sprite.Shirts
-          house.position
-          (shirtFrameOffset shirtColor customer)
-          (layers.obstacle, 2)
-      , Sprite.box
-          Sprite.Shoes
-          house.position
-          shoesColor
-          (layers.obstacle, 3)
-      , Sprite.box
-          Sprite.Trousers
-          house.position
-          pantsColor
-          (layers.obstacle, 4)
-      , Sprite.box
-          Sprite.Scarves
-          house.position
-          scarfColor
-          (layers.obstacle, 5)
+      List.concat
+      [ renderColor pantsColor 4 Sprite.Trousers
+      , renderColor scarfColor 5 Sprite.Scarves
+      , [ Sprite.box
+            Sprite.Shoes
+            house.position
+            shoesColor
+            (layers.obstacle, 3)
+        , Sprite.box
+            Sprite.Customers
+            house.position
+            (customerFrameOffset customer)
+            (layers.obstacle, 1)
+        , Sprite.box
+            Sprite.Shirts
+            house.position
+            (shirtFrameOffset shirtColor customer)
+            (layers.obstacle, 2)
+        ]
       ]

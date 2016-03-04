@@ -111,7 +111,7 @@ resize dimensions model =
       , deliveryPerson =
           DeliveryPerson.initial
             ( toFloat (fst newGridSize // 2 - 1)
-            , toFloat (snd newGridSize // 4 * 3 - 1)
+            , toFloat (snd newGridSize // 4 * 3)
             )
       , articles = []
       , requests = []

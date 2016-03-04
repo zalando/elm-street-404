@@ -1,4 +1,19 @@
-module Sprite (TextureId(..), TextureData, Box, filename, box, empty, sort, render, loadedTextures, textures, loadTextures) where
+module Sprite
+  ( TextureId(..)
+  , TextureData
+  , TexturedBoxData
+  , ClickableBoxData
+  , Box(..)
+  , filename
+  , split
+  , box
+  , clickable
+  , renderTextured
+  , renderClickable
+  , loadedTextures
+  , textures
+  , loadTextures
+  ) where
 
 import Html.Attributes exposing (style, key)
 import Html exposing (div)
@@ -28,7 +43,6 @@ type TextureId
   | WarehouseBubble
   | ElmStreet404
   | Score
-  | Transparent (Float, Float) (Float, Float)
 
 
 filename : TextureId -> String
@@ -55,7 +69,6 @@ filename textureId =
     WarehouseBubble -> "warehouse-bubble.png"
     ElmStreet404 -> "404-elm-street.png"
     Score -> "score.png"
-    Transparent _ _ -> ""
 
 
 textures : AllDict TextureId TextureData String
@@ -120,42 +133,82 @@ initData size offset frames =
   }
 
 
-type alias Box =
+type Box
+  = Clickable ClickableBoxData
+  | Textured TexturedBoxData
+
+
+type alias ClickableBoxData =
+  { position : (Float, Float)
+  , size : (Float, Float)
+  , offset : (Float, Float)
+  , onClick : Html.Attribute
+  }
+
+
+type alias TexturedBoxData =
   { position : (Float, Float)
   , textureId : TextureId
   , frame : Int
   , layer : (Int, Int)
-  , attributes : List Html.Attribute
   }
 
 
 box : TextureId -> (Float, Float) -> Int -> (Int, Int) -> Box
 box textureId position frame layer =
-  { position = position
-  , textureId = textureId
-  , frame = frame
-  , layer = layer
-  , attributes = []
-  }
+  Textured
+    { position = position
+    , textureId = textureId
+    , frame = frame
+    , layer = layer
+    }
 
 
-empty : (Float, Float) -> (Float, Float) -> (Float, Float) -> (Int, Int) -> List Html.Attribute -> Box
-empty size offset position layer attributes =
-  { position = position
-  , textureId = Transparent size offset
-  , frame = 0
-  , layer = layer
-  , attributes = attributes
-  }
+clickable : (Float, Float) -> (Float, Float) -> (Float, Float) -> (Int, Int) -> Html.Attribute -> Box
+clickable size offset position layer onClick =
+  Clickable
+    { position = position
+    , size = size
+    , offset = offset
+    , onClick = onClick
+    }
 
 
 (=>) : a -> b -> (a, b)
 (=>) = (,)
 
 
-sort : List Box -> List Box
-sort =
+sortTextured : List TexturedBoxData -> List TexturedBoxData
+sortTextured =
   List.sortBy (\box -> (fst box.layer, snd box.position, snd box.layer))
+
+
+sortClickable : List ClickableBoxData -> List ClickableBoxData
+sortClickable =
+  List.sortBy (\box -> snd box.position)
+
+
+split : List Box -> (List TexturedBoxData, List ClickableBoxData)
+split boxes =
+  let
+    (textured, clickable) = split' boxes
+  in
+    (sortTextured textured, sortClickable clickable)
+
+
+split' : List Box -> (List TexturedBoxData, List ClickableBoxData)
+split' boxes =
+  case boxes of
+    [] -> ([], [])
+    box :: rest ->
+      let
+        (restTextured, restClickable) = split rest
+      in
+        case box of
+          Textured texturedBox ->
+            (texturedBox :: restTextured, restClickable)
+          Clickable clickableBox ->
+            (restTextured, clickableBox :: restClickable)
 
 
 backgroundOffset : Int -> Int -> (Float, Float) -> WebGL.Texture -> String
@@ -181,45 +234,47 @@ backgroundSize texture =
     toString width ++ "px " ++ toString height ++ "px"
 
 
-render : String -> Int -> AllDict TextureId TextureData String -> Box -> Html.Html
-render imagesUrl tileSize textures ({textureId, position, frame, layer, attributes}) =
-  case textureId of
-    Transparent size offset ->
-      div
-      ( [ style
-          [ "left" => "0"
-          , "top" => "0"
-          , "transform" => ("translate(" ++ (toString ((fst position + fst offset) * toFloat tileSize)) ++ "px," ++ (toString ((snd position + snd offset) * toFloat tileSize)) ++ "px)")
-          , "position" => "absolute"
-          , "width" => (toString (fst size * toFloat tileSize) ++ "px")
-          , "height" => (toString (snd size * toFloat tileSize) ++ "px")
-          ]
-        ] ++ attributes
-      )
-      []
-    opaqueTextureId ->
-      case AllDict.get opaqueTextureId textures of
+renderClickable : Int -> ClickableBoxData -> Html.Html
+renderClickable tileSize {position, size, offset, onClick} =
+  div
+  ( [ style
+      [ "left" => "0"
+      , "top" => "0"
+      , "transform" => ("translate(" ++ (toString ((fst position + fst offset) * toFloat tileSize)) ++ "px," ++ (toString ((snd position + snd offset) * toFloat tileSize)) ++ "px)")
+      , "position" => "absolute"
+      , "width" => (toString (fst size * toFloat tileSize) ++ "px")
+      , "height" => (toString (snd size * toFloat tileSize) ++ "px")
+      ]
+    , onClick
+    ]
+  )
+  []
+
+
+renderTextured : String -> Int -> AllDict TextureId TextureData String -> TexturedBoxData -> Html.Html
+renderTextured imagesUrl tileSize textures {textureId, position, frame, layer} =
+  case AllDict.get textureId textures of
+    Nothing ->
+      div [] []
+    Just {size, offset, frames, texture} ->
+      case texture of
         Nothing ->
           div [] []
-        Just {size, offset, frames, texture} ->
-          case texture of
-            Nothing ->
-              div [] []
-            Just texture ->
-              div
-              ( [ style
-                  [ "left" => "0"
-                  , "top" => "0"
-                  , "transform" => ("translate(" ++ (toString ((fst position + fst offset) * toFloat tileSize)) ++ "px," ++ (toString ((snd position + snd offset) * toFloat tileSize)) ++ "px)")
-                  , "position" => "absolute"
-                  , "overflow" => "hidden"
-                  , "background-image" => ("url(" ++ imagesUrl ++ "/" ++ (filename opaqueTextureId) ++ ")")
-                  , "background-position" => (backgroundOffset tileSize frame size texture)
-                  , "background-repeat" => "no-repeat"
-                  , "background-size" => (backgroundSize texture)
-                  , "width" => (toString (round (fst size) * tileSize) ++ "px")
-                  , "height" => (toString (round (snd size) * tileSize) ++ "px")
-                  ]
-                ] ++ attributes
-              )
-              []
+        Just texture ->
+          div
+          ( [ style
+              [ "left" => "0"
+              , "top" => "0"
+              , "transform" => ("translate(" ++ (toString ((fst position + fst offset) * toFloat tileSize)) ++ "px," ++ (toString ((snd position + snd offset) * toFloat tileSize)) ++ "px)")
+              , "position" => "absolute"
+              , "overflow" => "hidden"
+              , "background-image" => ("url(" ++ imagesUrl ++ "/" ++ (filename textureId) ++ ")")
+              , "background-position" => (backgroundOffset tileSize frame size texture)
+              , "background-repeat" => "no-repeat"
+              , "background-size" => (backgroundSize texture)
+              , "width" => (toString (round (fst size) * tileSize) ++ "px")
+              , "height" => (toString (round (snd size) * tileSize) ++ "px")
+              ]
+            ]
+          )
+          []

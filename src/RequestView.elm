@@ -14,16 +14,16 @@ render address position request =
     Request.Return article ->
       CategoryView.render
         position
-        []
+        Nothing
         (if request.blinkHidden then Category.Empty else article.category)
       ++
       CategoryView.render
         position
-        [onClick address (Actions.ClickArticle article)]
+        (Just (onClick address (Actions.ClickArticle article)))
         (if request.blinkHidden then Category.Empty else Category.Return)
 
     Request.Order category ->
       CategoryView.render
         position
-        [onClick address (Actions.ClickCategory category)]
+        (Just (onClick address (Actions.ClickCategory category)))
         (if request.blinkHidden then Category.Empty else category)

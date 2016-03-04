@@ -27,7 +27,7 @@ render address articles capacity warehouse =
         ( toFloat ((numberOfArticles + number) % 2) + x - 1
         , toFloat ((numberOfArticles + number) // 2) + y - 2
         )
-        []
+        Nothing
 
     renderBubble =
       if List.length articlesInWarehouse == 0 then
@@ -52,11 +52,11 @@ render address articles capacity warehouse =
         warehouse.position
         0
         (layers.shadow, 0)
-    , Sprite.empty
+    , Sprite.clickable
         (4, 4)
         (0, -1)
         warehouse.position
         (layers.clickAbove, 0)
-        [ onClick address (Actions.ClickMapObject warehouse) ]
+        (onClick address (Actions.ClickMapObject warehouse))
     ]
     ++ renderBubble

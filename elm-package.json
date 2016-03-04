@@ -12,6 +12,7 @@
     "native-modules": true,
     "dependencies": {
         "eeue56/elm-all-dict": "1.1.1 <= v < 2.0.0",
+        "elm-community/elm-linear-algebra": "1.0.1 <= v < 2.0.0",
         "elm-community/elm-webgl": "1.0.0 <= v < 2.0.0",
         "elm-lang/core": "3.0.0 <= v < 4.0.0",
         "evancz/elm-effects": "2.0.1 <= v < 3.0.0",

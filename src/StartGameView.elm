@@ -15,12 +15,12 @@ render address (width, height) state =
         (toFloat width / 2 - 5, toFloat height / 2 - 1)
         0
         (layers.clickToStart, 0)
-    , Sprite.empty
+    , Sprite.clickable
         (10, 2)
         (0, 0)
         (toFloat width / 2 - 5, toFloat height / 2 - 1)
         (layers.clickToStartAbove, 0)
-        [onClick address Actions.Start]
+        (onClick address Actions.Start)
     , Sprite.box
         Sprite.ElmStreet404
         (toFloat width / 2 - 6.5, toFloat height / 4 - 1)

@@ -63,12 +63,12 @@ render address requests articles customers house =
         house.position
         0
         (layers.shadow, 0)
-    , Sprite.empty
+    , Sprite.clickable
         (2, 3)
         (0, -1)
         house.position
         (layers.clickAbove, 0)
-        [onClick address (Actions.ClickMapObject house)]
+        (onClick address (Actions.ClickMapObject house))
     ]
     ++ List.concat (List.indexedMap renderRequest requestsFromHouse)
     ++ renderBubble
