@@ -67,7 +67,7 @@ render address requests articles customers house =
         (2, 3)
         (0, -1)
         house.position
-        (layers.clickAbove, 0)
+        (layers.click, 0)
         (onClick address (Actions.ClickMapObject house))
     ]
     ++ List.concat (List.indexedMap renderRequest requestsFromHouse)

@@ -56,7 +56,7 @@ render address articles capacity warehouse =
         (4, 4)
         (0, -1)
         warehouse.position
-        (layers.clickAbove, 0)
+        (layers.click, 0)
         (onClick address (Actions.ClickMapObject warehouse))
     ]
     ++ renderBubble

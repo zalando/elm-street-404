@@ -5,6 +5,7 @@ type alias Layers =
   , obstacle : Int
   , bubble : Int
   , article : Int
+  , click : Int
   , clickAbove : Int
   , clickToStart : Int
   , clickToStartAbove : Int
@@ -16,7 +17,8 @@ layers =
   , obstacle = 2
   , bubble = 3
   , article = 4
-  , clickAbove = 5
-  , clickToStart = 6
-  , clickToStartAbove = 7
+  , click = 5
+  , clickAbove = 6
+  , clickToStart = 7
+  , clickToStartAbove = 8
   }

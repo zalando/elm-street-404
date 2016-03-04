@@ -143,6 +143,7 @@ type alias ClickableBoxData =
   , size : (Float, Float)
   , offset : (Float, Float)
   , onClick : Html.Attribute
+  , layer : (Int, Int)
   }
 
 
@@ -170,6 +171,7 @@ clickable size offset position layer onClick =
     { position = position
     , size = size
     , offset = offset
+    , layer = layer
     , onClick = onClick
     }
 
@@ -178,14 +180,11 @@ clickable size offset position layer onClick =
 (=>) = (,)
 
 
-sortTextured : List TexturedBoxData -> List TexturedBoxData
-sortTextured =
-  List.sortBy (\box -> (fst box.layer, snd box.position, snd box.layer))
-
-
-sortClickable : List ClickableBoxData -> List ClickableBoxData
-sortClickable =
-  List.sortBy (\box -> snd box.position)
+sortBoxData :
+  List {a | layer : (Int, Int), position : (Float, Float)} ->
+  List {a | layer : (Int, Int), position : (Float, Float)}
+sortBoxData =
+  List.sortBy (\{layer, position} -> (fst layer, snd position, snd layer))
 
 
 split : List Box -> (List TexturedBoxData, List ClickableBoxData)
@@ -193,7 +192,7 @@ split boxes =
   let
     (textured, clickable) = split' boxes
   in
-    (sortTextured textured, sortClickable clickable)
+    (sortBoxData textured, sortBoxData clickable)
 
 
 split' : List Box -> (List TexturedBoxData, List ClickableBoxData)
