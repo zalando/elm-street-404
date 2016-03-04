@@ -27,7 +27,7 @@ render : (Int, Int) -> Int -> AllDict Sprite.TextureId Sprite.TextureData String
 render ((w, h) as dimensions) tileSize textures boxes =
   GL.webglWithConfig
     [ GL.Enable GL.Blend
-    , GL.BlendFunc (GL.SrcAlpha, GL.OneMinusSrcAlpha)
+    , GL.BlendFunc (GL.One, GL.OneMinusSrcAlpha)
     ]
     (w * tileSize, h * tileSize)
     (List.filterMap (renderTextured dimensions textures) (List.reverse boxes))
@@ -96,7 +96,12 @@ fragmentShader = [glsl|
     int cols = int(1.0 / size.x);
     vec2 frameOffset = size * vec2(float(frame - frame / cols * cols), -float(frame / cols));
     vec2 textureClipSpace = size * texturePos - 1.0;
-    gl_FragColor = texture2D(texture, vec2(textureClipSpace.x, -textureClipSpace.y) + frameOffset);
+    vec4 temp  = texture2D(texture, vec2(textureClipSpace.x, -textureClipSpace.y) + frameOffset);
+    float a = temp.a;
+    float r = temp.r * a;
+    float g = temp.g * a;
+    float b = temp.b * a;
+    gl_FragColor = vec4(r,g,b,a);
   }
 
 |]
