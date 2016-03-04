@@ -8,7 +8,6 @@ module Sprite
   , split
   , box
   , clickable
-  , renderTextured
   , renderClickable
   , loadedTextures
   , textures
@@ -248,32 +247,3 @@ renderClickable tileSize {position, size, offset, onClick} =
     ]
   )
   []
-
-
-renderTextured : String -> Int -> AllDict TextureId TextureData String -> TexturedBoxData -> Html.Html
-renderTextured imagesUrl tileSize textures {textureId, position, frame, layer} =
-  case AllDict.get textureId textures of
-    Nothing ->
-      div [] []
-    Just {size, offset, frames, texture} ->
-      case texture of
-        Nothing ->
-          div [] []
-        Just texture ->
-          div
-          ( [ style
-              [ "left" => "0"
-              , "top" => "0"
-              , "transform" => ("translate(" ++ (toString ((fst position + fst offset) * toFloat tileSize)) ++ "px," ++ (toString ((snd position + snd offset) * toFloat tileSize)) ++ "px)")
-              , "position" => "absolute"
-              , "overflow" => "hidden"
-              , "background-image" => ("url(" ++ imagesUrl ++ "/" ++ (filename textureId) ++ ")")
-              , "background-position" => (backgroundOffset tileSize frame size texture)
-              , "background-repeat" => "no-repeat"
-              , "background-size" => (backgroundSize texture)
-              , "width" => (toString (round (fst size) * tileSize) ++ "px")
-              , "height" => (toString (round (snd size) * tileSize) ++ "px")
-              ]
-            ]
-          )
-          []
