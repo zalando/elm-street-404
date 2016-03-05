@@ -240,7 +240,8 @@ obstacleTiles : List MapObject -> List (Int, Int)
 obstacleTiles  =
   let
     col y h x = (++) (List.map ((,) x) [y..y + h - 1])
-    cols (x, y) (w, h) = (++) (List.foldl (col y h) [] [x..x + w - 1])
+    -- add an additional col of tiles at x - 1, because delivery person's width = 2 tiles
+    cols (x, y) (w, h) = (++) (List.foldl (col y h) [] [x - 1..x + w - 1])
     toIntTuple (a, b) = (round a, round b)
   in
     List.foldl (\{position, size} -> cols (toIntTuple position) (toIntTuple size)) []
