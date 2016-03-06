@@ -4,8 +4,9 @@ import Article exposing (Article)
 import MapObject exposing (MapObject)
 import Time exposing (Time)
 import Category exposing (Category)
-import Sprite exposing (TextureId)
-import WebGL
+import Textures exposing (TextureId)
+import WebGL exposing (Texture)
+
 
 type Action
   = Tick Time
@@ -13,5 +14,5 @@ type Action
   | ClickArticle Article
   | ClickCategory Category
   | ClickMapObject MapObject
-  | TextureLoaded TextureId (Maybe WebGL.Texture)
+  | TextureLoaded TextureId (Maybe Texture)
   | Dimensions (Int, Int)

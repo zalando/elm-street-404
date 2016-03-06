@@ -2,28 +2,30 @@ module RequestView (render) where
 
 import CategoryView
 import Actions exposing (Action)
-import Html.Events exposing (onClick)
 import Request exposing (Request)
-import Sprite
+import Box exposing (Box)
 import Category
+import Layers exposing (layers)
 
 
-render : Signal.Address Action -> (Float, Float) -> Request -> List Sprite.Box
-render address position request =
-  case request.category of
-    Request.Return article ->
-      CategoryView.render
-        position
-        Nothing
-        (if request.blinkHidden then Category.Empty else article.category)
-      ++
-      CategoryView.render
-        position
-        (Just (onClick address (Actions.ClickArticle article)))
-        (if request.blinkHidden then Category.Empty else Category.Return)
+render : (Float, Float) -> Request -> List Box
+render position request =
+  let
+    renderClickable = Box.clickable (1, 1) (0, 0) position (layers.clickAbove, 0)
+  in
+    case request.category of
+      Request.Return article ->
+        renderClickable (Actions.ClickArticle article) ::
+        if request.blinkHidden then
+          []
+        else
+          [ CategoryView.render position Category.Return
+          , CategoryView.render position article.category
+          ]
 
-    Request.Order category ->
-      CategoryView.render
-        position
-        (Just (onClick address (Actions.ClickCategory category)))
-        (if request.blinkHidden then Category.Empty else category)
+      Request.Order category ->
+        renderClickable (Actions.ClickCategory category) ::
+        if request.blinkHidden then
+          []
+        else
+          [CategoryView.render position category]

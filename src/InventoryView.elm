@@ -1,16 +1,16 @@
 module InventoryView (render) where
 
 import Article exposing (Article)
-import Sprite
-import Actions exposing (Action)
+import Box exposing (Box)
+import Textures
 import Category
-import ArticleView
 import CategoryView
 import Layers exposing (layers)
+import Actions
 
 
-render : Signal.Address Action -> (Int, Int) -> List Article -> List Sprite.Box
-render address (width, height) articles =
+render : (Int, Int) -> List Article -> List Box
+render (width, height) articles =
   let
     x = toFloat (width - 7) / 2
     y = toFloat height - 3
@@ -20,16 +20,17 @@ render address (width, height) articles =
     placeholders = List.repeat (4 - articlesNumber) Category.Placeholder
 
     renderArticle number article =
-      ArticleView.render address (toFloat number + x + 2, y + 1) article
+      let
+        pos = (toFloat number + x + 2, y + 1)
+      in
+        [ CategoryView.render pos article.category
+        , Box.clickable (1, 1) (0, 0) pos (layers.clickAbove, 0) (Actions.ClickArticle article)
+        ]
 
-    renderCategory number category =
-      CategoryView.render (toFloat (number + articlesNumber) + x + 2, y + 1) Nothing category
+    renderCategory number =
+      CategoryView.render (toFloat (number + articlesNumber) + x + 2, y + 1)
+
   in
-    ( Sprite.box
-        Sprite.InventoryBubble
-        (x, y)
-        0
-        (layers.bubble, 0)
-    )
+    Box.textured Textures.InventoryBubble (x, y) 0 (layers.bubble, 0)
     :: List.concat (List.indexedMap renderArticle articlesInDelivery)
-    ++ List.concat (List.indexedMap renderCategory placeholders)
+    ++ List.indexedMap renderCategory placeholders

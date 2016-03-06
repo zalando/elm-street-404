@@ -1,4 +1,19 @@
-module Article (Article, State(..), dispatch, warehouses, house, updateState, removeDelivered, inWarehouse, isPicked, isDelivered, availableCategories, return, markInReturn) where
+module Article
+  ( Article
+  , State(..)
+  , dispatch
+  , warehouses
+  , house
+  , updateState
+  , removeDelivered
+  , inWarehouse
+  , isPicked
+  , isDelivered
+  , availableCategories
+  , return
+  , markInReturn
+  ) where
+
 import Random
 import MapObject exposing (MapObject, MapObjectCategory(..))
 import Category exposing (Category)

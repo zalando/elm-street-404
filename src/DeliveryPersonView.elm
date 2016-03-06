@@ -1,7 +1,8 @@
 module DeliveryPersonView (render) where
 
 import DeliveryPerson exposing (DeliveryPerson)
-import Sprite
+import Box exposing (Box)
+import Textures
 import Basics exposing (atan2)
 import Layers exposing (layers)
 
@@ -21,16 +22,15 @@ direction {route, position} =
     [] -> 0
 
 
-render : Int -> DeliveryPerson -> List Sprite.Box
+render : Int -> DeliveryPerson -> Box
 render numberOfBoxes deliveryPerson =
   let
     box frame =
-      [ Sprite.box
-          Sprite.DeliveryPerson
-          deliveryPerson.position
-          frame
-          (layers.obstacle, 0)
-      ]
+      Box.textured
+        Textures.DeliveryPerson
+        deliveryPerson.position
+        frame
+        (layers.obstacle, 0)
   in
     case deliveryPerson.location of
       DeliveryPerson.OnTheWayTo _ ->

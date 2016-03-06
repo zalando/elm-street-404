@@ -1,4 +1,14 @@
-module Request (Request, RequestCategory(..), isInReturn, isOrdered, animate, inTime, orders, orderedCategories, returnArticles) where
+module Request
+  ( Request
+  , RequestCategory(..)
+  , isInReturn
+  , isOrdered
+  , animate
+  , inTime
+  , orders
+  , orderedCategories
+  , returnArticles
+  ) where
 
 import MapObject exposing (MapObject)
 import Article exposing (Article)
@@ -7,10 +17,6 @@ import Time exposing (Time)
 import IHopeItWorks
 import Random
 import AnimationState exposing (AnimatedObject)
-
-
-initialMaxWaitingTime : Time
-initialMaxWaitingTime = 60000
 
 
 type RequestCategory
@@ -28,7 +34,7 @@ type alias Request =
 
 request : RequestCategory -> MapObject -> Request
 request category house =
-  { timeout = initialMaxWaitingTime
+  { timeout = 60000
   , elapsed = 0
   , blinkHidden = False
   , house = house
@@ -99,41 +105,22 @@ isOrdered house category request =
     _ -> False
 
 
--- time while it doesn't blink
-z : Float
-z = 30000
-
-
--- acceleration of blinking speed
-a : Float
-a = 0.00000024
-
-
--- initial blinking speed
-b : Float
-b = 0.003
-
-
--- constant time shift (positive to make sure it starts with not blinking)
-c : Float
-c = 0
-
-
--- max speed
-m : Float
-m = 0.015
-
-
 flash : Time -> Bool
 flash elapsed =
-  if elapsed < z then
-    False
-  else
-    let
-      x = elapsed - z
-      s = if a * x + b > m then m else a * x + b
-    in
-      0 < sin (s * x + c)
+  let
+    z = 30000 -- time while it doesn't blink
+    a = 0.00000024 -- acceleration of blinking speed
+    b = 0.003 -- initial blinking speed
+    m = 0.015 -- max speed
+  in
+    if elapsed < z then
+      False
+    else
+      let
+        x = elapsed - z
+        s = if a * x + b > m then m else a * x + b
+      in
+        0 < sin (s * x)
 
 
 animate : Time -> Request -> Request

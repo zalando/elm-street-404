@@ -1,28 +1,15 @@
 module CategoryView (render) where
 
 import Category exposing (Category)
-import Html
 import Layers exposing (layers)
-import Sprite
+import Box exposing (Box)
+import Textures
 
 
-render : (Float, Float) -> Maybe Html.Attribute -> Category -> List Sprite.Box
-render position maybeOnClick category =
-  Sprite.box
-    Sprite.Categories
+render : (Float, Float) -> Category -> Box
+render position category =
+  Box.textured
+    Textures.Categories
     position
     (Category.getFrame category)
     (layers.article, if category == Category.Return then 1 else 0)
-  ::
-  ( case maybeOnClick of
-      Nothing ->
-        []
-      Just onClick ->
-        [ Sprite.clickable
-            (1, 1)
-            (0, 0)
-            position
-            (layers.clickAbove, 0)
-            onClick
-        ]
-  )

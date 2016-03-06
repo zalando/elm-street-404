@@ -1,4 +1,15 @@
-module Category (Category(..), getFrame, random, color, getColor, isShirt, isShoes, isPants, isScarf, isSame) where
+module Category
+  ( Category(..)
+  , getFrame
+  , random
+  , color
+  , getColor
+  , isShirt
+  , isShoes
+  , isPants
+  , isScarf
+  , isSame
+  ) where
 
 import Random
 import IHopeItWorks
@@ -11,7 +22,6 @@ type Category
   | Scarf Int
   | Placeholder
   | Return
-  | Empty
 
 
 categories : List (Int -> Category)
@@ -27,7 +37,6 @@ getFrame category =
     Scarf color -> color + 9
     Placeholder -> 12
     Return -> 13
-    Empty -> 14
 
 
 isShirt : Category -> Bool
@@ -67,7 +76,6 @@ baseCategory category =
     Scarf _ -> 4
     Placeholder -> 5
     Return -> 6
-    Empty -> 7
 
 
 isSame : Category -> Category -> Bool
