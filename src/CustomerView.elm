@@ -23,7 +23,7 @@ customerFrameOffset {typ, happiness} =
 
 
 render : List Request -> List Article -> MapObject -> Customer -> List Box
-render requests articles house customer =
+render requests articles ({position} as house) customer =
   let
     categories = (List.map .category articles)
     shirtColor = Maybe.withDefault 3 (Category.getColor Category.isShirt categories)
@@ -33,35 +33,16 @@ render requests articles house customer =
     renderColor maybeColor layer sprite =
       case maybeColor of
         Just color ->
-          [ Box.textured
-              sprite
-              house.position
-              color
-              (layers.obstacle, layer)
-          ]
+          [Box.textured sprite house.position color (layers.obstacle, layer)]
         Nothing ->
           []
   in
     if Customer.isLost customer then
       []
     else
-      List.concat
-      [ renderColor pantsColor 4 Textures.Trousers
-      , renderColor scarfColor 5 Textures.Scarves
-      , [ Box.textured
-            Textures.Shoes
-            house.position
-            shoesColor
-            (layers.obstacle, 3)
-        , Box.textured
-            Textures.Customers
-            house.position
-            (customerFrameOffset customer)
-            (layers.obstacle, 1)
-        , Box.textured
-            Textures.Shirts
-            house.position
-            (shirtFrameOffset shirtColor customer)
-            (layers.obstacle, 2)
-        ]
+      renderColor pantsColor 4 Textures.Trousers ++
+      renderColor scarfColor 5 Textures.Scarves ++
+      [ Box.textured Textures.Shoes position shoesColor (layers.obstacle, 3)
+      , Box.textured Textures.Customers position (customerFrameOffset customer) (layers.obstacle, 1)
+      , Box.textured Textures.Shirts position (shirtFrameOffset shirtColor customer) (layers.obstacle, 2)
       ]
