@@ -22,7 +22,7 @@ renderPoints tileSize waypoints =
     , strokeLinejoin "round"
     , strokeLinecap "round"
     , stroke "#bdab82"
-    , strokeWidth "40"
+    , strokeWidth (toString tileSize)
     , opacity "0.5"
     , fill "transparent"
     ]

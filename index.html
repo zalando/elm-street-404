@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <title>Elm Street 404</title>
-  <style>html, body {padding: 0; margin: 0;}</style>
+  <style>html, body {padding: 0; margin: 0; height: 100%;}</style>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
@@ -11,7 +11,7 @@
   <script>
     Elm.fullscreen(Elm.Main, {
       windowDimensions: [
-        window.innerWidth,
+        document.body.clientWidth,
         window.innerHeight
       ],
       imagesUrl: 'img/'
