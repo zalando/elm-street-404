@@ -1,6 +1,7 @@
 module DigitsView (render) where
 
-import Sprite
+import Box exposing (Box)
+import Textures
 import Layers exposing (layers)
 
 
@@ -16,13 +17,13 @@ digitsList n =
       r :: (digitsList nn)
 
 
-render : (Float, Float) -> Int -> List Sprite.Box
+render : (Float, Float) -> Int -> List Box
 render (x, y) value =
   let
     digits = if value == 0 then [0] else digitsList value
     renderDigit number digit =
-      Sprite.box
-        Sprite.Score
+      Box.textured
+        Textures.Score
         (x - toFloat number - 1, y)
         digit
         (layers.bubble, 0)

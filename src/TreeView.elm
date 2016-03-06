@@ -1,10 +1,11 @@
 module TreeView (render) where
 
-import Sprite
+import Textures
+import Box exposing (Box)
 import Layers exposing (layers)
 import MapObject exposing (MapObject)
 
 
-render : MapObject -> List Sprite.Box
+render : MapObject -> List Box
 render {position} =
-  [ Sprite.box Sprite.Tree position 0 (layers.obstacle, 0) ]
+  [ Box.textured Textures.Tree position 0 (layers.obstacle, 0) ]

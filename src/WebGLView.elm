@@ -2,7 +2,8 @@ module WebGLView (render) where
 
 import WebGL as GL
 import Math.Vector2 exposing (Vec2, vec2)
-import Sprite
+import Box
+import Textures exposing (Textures)
 import AllDict exposing (AllDict)
 import Html exposing (div)
 import Html.Attributes exposing (style)
@@ -24,7 +25,7 @@ mesh =
     ]
 
 
-render : (Int, Int) -> Int -> AllDict Sprite.TextureId Sprite.TextureData String -> List Sprite.TexturedBoxData -> Html.Html
+render : (Int, Int) -> Int -> Textures -> List Box.TexturedBoxData -> Html.Html
 render ((w, h) as dimensions) tileSize textures boxes =
   div
     [ style
@@ -43,7 +44,7 @@ render ((w, h) as dimensions) tileSize textures boxes =
     ]
 
 
-renderTextured : (Int, Int) -> AllDict Sprite.TextureId Sprite.TextureData String -> Sprite.TexturedBoxData -> Maybe GL.Renderable
+renderTextured : (Int, Int) -> Textures -> Box.TexturedBoxData -> Maybe GL.Renderable
 renderTextured (w, h) textures {textureId, position, frame} =
   case AllDict.get textureId textures of
     Nothing -> Nothing

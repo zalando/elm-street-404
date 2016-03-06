@@ -1,7 +1,8 @@
 module CustomerView (render) where
 
 import Customer exposing (Customer)
-import Sprite
+import Box exposing (Box)
+import Textures
 import Layers exposing (layers)
 import MapObject exposing (MapObject)
 import Request exposing (Request)
@@ -21,7 +22,7 @@ customerFrameOffset {typ, happiness} =
   typ * 3 + 2 - happiness
 
 
-render : List Request -> List Article -> MapObject -> Customer -> List Sprite.Box
+render : List Request -> List Article -> MapObject -> Customer -> List Box
 render requests articles house customer =
   let
     categories = (List.map .category articles)
@@ -32,7 +33,7 @@ render requests articles house customer =
     renderColor maybeColor layer sprite =
       case maybeColor of
         Just color ->
-          [ Sprite.box
+          [ Box.textured
               sprite
               house.position
               color
@@ -45,20 +46,20 @@ render requests articles house customer =
       []
     else
       List.concat
-      [ renderColor pantsColor 4 Sprite.Trousers
-      , renderColor scarfColor 5 Sprite.Scarves
-      , [ Sprite.box
-            Sprite.Shoes
+      [ renderColor pantsColor 4 Textures.Trousers
+      , renderColor scarfColor 5 Textures.Scarves
+      , [ Box.textured
+            Textures.Shoes
             house.position
             shoesColor
             (layers.obstacle, 3)
-        , Sprite.box
-            Sprite.Customers
+        , Box.textured
+            Textures.Customers
             house.position
             (customerFrameOffset customer)
             (layers.obstacle, 1)
-        , Sprite.box
-            Sprite.Shirts
+        , Box.textured
+            Textures.Shirts
             house.position
             (shirtFrameOffset shirtColor customer)
             (layers.obstacle, 2)

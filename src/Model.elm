@@ -30,7 +30,7 @@ import IHopeItWorks
 import Article exposing (Article)
 import MapObject exposing (MapObject)
 import AllDict exposing (AllDict)
-import Sprite exposing (TextureId, TextureData)
+import Textures exposing (TextureId, TextureData)
 
 
 type State = Initialising | Loading | Paused | Playing | Stopped
@@ -92,7 +92,7 @@ initial : Int -> (Int, Int) -> String -> Model
 initial randomSeed dimensions imagesUrl =
   { animationState = Nothing
   , state = Initialising
-  , textures = Sprite.textures
+  , textures = Textures.textures
   , seed = Random.initialSeed randomSeed
   , tileSize = 0
   , imagesUrl = imagesUrl

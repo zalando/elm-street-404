@@ -13,7 +13,7 @@ import Customer exposing (Customer)
 import IHopeItWorks
 import Task exposing (Task)
 import WebGL
-import Sprite exposing (TextureId)
+import Textures exposing (TextureId)
 import AllDict
 
 
@@ -31,9 +31,9 @@ update action model =
             Nothing ->
               model.textures
         newModel = {model | textures = loadTexture}
-        texturesToLoad = Sprite.loadTextures newModel.textures
+        texturesToLoad = Textures.loadTextures newModel.textures
       in
-        if textureId == Sprite.Score then
+        if textureId == Textures.Score then
           ( {newModel | state = Loading}
           , Effects.batch (List.map (loadImage model.imagesUrl) texturesToLoad)
           )
@@ -74,7 +74,7 @@ ifPlaying fun model =
 
 loadImage : String -> TextureId -> Effects Action
 loadImage imagesUrl textureId =
-  ( WebGL.loadTexture (imagesUrl ++ "/" ++ Sprite.filename textureId)
+  ( WebGL.loadTexture (imagesUrl ++ "/" ++ Textures.filename textureId)
     |> Task.map (\r -> TextureLoaded textureId (Just r))
   ) `Task.onError` always (Task.succeed (TextureLoaded textureId Nothing))
   |> Effects.task

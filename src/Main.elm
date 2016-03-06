@@ -7,14 +7,15 @@ import Task exposing (Task)
 import Update
 import View
 import Window
-import Sprite
+import Textures
+
 
 app : App Model
 app =
   StartApp.start
     { init =
         ( Model.initial randomSeed windowDimensions imagesUrl
-        , (Update.loadImage imagesUrl) Sprite.Score
+        , (Update.loadImage imagesUrl) Textures.Score
         )
     , update = Update.update
     , view = View.view

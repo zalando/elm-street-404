@@ -1,26 +1,29 @@
 module WarehouseView (render) where
 
 import MapObject exposing (MapObject)
-import Sprite
+import Box exposing (Box)
 import Article exposing (Article)
 import Category exposing (Category)
 import CategoryView
-import ArticleView
 import Actions exposing (Action)
-import Html.Events exposing (onClick)
 import Layers exposing (layers)
+import Textures
 
 
-render : Signal.Address Action -> List Article -> Int -> MapObject -> List Sprite.Box
-render address articles capacity warehouse =
+render : List Article -> Int -> MapObject -> List Box
+render articles capacity ({position} as warehouse) =
   let
-    (x, y) = warehouse.position
+    (x, y) = position
     articlesInWarehouse = List.filter (Article.inWarehouse warehouse) articles
     numberOfArticles = List.length articlesInWarehouse
     placeholders = List.repeat (capacity - numberOfArticles) Category.Placeholder
 
-    renderArticle number =
-      ArticleView.render address (toFloat (number % 2) + x - 1, toFloat (number // 2) + y - 2)
+    renderArticle number article =
+      CategoryView.render
+        ( toFloat (number % 2) + x - 1
+        , toFloat (number // 2) + y - 2)
+        (Just (Actions.ClickArticle article))
+        article.category
 
     renderCategory number =
       CategoryView.render
@@ -33,8 +36,8 @@ render address articles capacity warehouse =
       if List.length articlesInWarehouse == 0 then
         []
       else
-        ( Sprite.box
-            Sprite.WarehouseBubble
+        ( Box.textured
+            Textures.WarehouseBubble
             warehouse.position
             0
             (layers.bubble, 0)
@@ -42,21 +45,8 @@ render address articles capacity warehouse =
         List.concat (List.indexedMap renderArticle articlesInWarehouse) ++
         List.concat (List.indexedMap renderCategory placeholders)
   in
-    [ Sprite.box
-        Sprite.Warehouse
-        warehouse.position
-        0
-        (layers.obstacle, 0)
-    , Sprite.box
-        Sprite.WarehouseShadow
-        warehouse.position
-        0
-        (layers.shadow, 0)
-    , Sprite.clickable
-        (4, 4)
-        (0, -1)
-        warehouse.position
-        (layers.click, 0)
-        (onClick address (Actions.ClickMapObject warehouse))
+    [ Box.textured Textures.Warehouse position 0 (layers.obstacle, 0)
+    , Box.textured Textures.WarehouseShadow position 0 (layers.shadow, 0)
+    , Box.clickable (4, 4) (0, -1) position (layers.click, 0) (Actions.ClickMapObject warehouse)
     ]
     ++ renderBubble

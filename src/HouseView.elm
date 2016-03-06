@@ -1,9 +1,8 @@
 module HouseView (render) where
 
 import Actions exposing (Action)
-import Html.Events exposing (onClick)
 import Layers exposing (layers)
-import Sprite
+import Box exposing (Box)
 import MapObject exposing (MapObject)
 import Customer exposing (Customer)
 import Request exposing (Request)
@@ -11,17 +10,18 @@ import Article exposing (Article)
 import RequestView
 import CustomerView
 import IHopeItWorks
+import Textures
 
 
-getBubbleSprite : Int -> Maybe Sprite.TextureId
+getBubbleSprite : Int -> Maybe Textures.TextureId
 getBubbleSprite number =
   case number of
     0 -> Nothing
-    n -> Just (Sprite.HouseBubble n)
+    n -> Just (Textures.HouseBubble n)
 
 
-render : Signal.Address Action -> List Request -> List Article -> List Customer -> MapObject -> List Sprite.Box
-render address requests articles customers house =
+render : List Request -> List Article -> List Customer -> MapObject -> List Box
+render requests articles customers house =
   let
     requestsFromHouse = List.filter (\r -> r.house == house) requests
     deliveredArticles = List.filter (Article.isDelivered house) articles
@@ -29,7 +29,6 @@ render address requests articles customers house =
     hasArticles = (List.length deliveredArticles) > 0
     renderRequest number =
       RequestView.render
-        address
         ( fst house.position - 1
         , snd house.position - toFloat number
         )
@@ -37,7 +36,7 @@ render address requests articles customers house =
     renderBubble =
       case getBubbleSprite (List.length requestsFromHouse) of
         Just sprite ->
-          [ Sprite.box
+          [ Box.textured
               sprite
               house.position
               0
@@ -53,22 +52,22 @@ render address requests articles customers house =
           else
             CustomerView.render requestsFromHouse deliveredArticles house customer
   in
-    [ Sprite.box
-        Sprite.House
+    [ Box.textured
+        Textures.House
         house.position
         0
         (layers.obstacle, 0)
-    , Sprite.box
-        Sprite.HouseShadow
+    , Box.textured
+        Textures.HouseShadow
         house.position
         0
         (layers.shadow, 0)
-    , Sprite.clickable
+    , Box.clickable
         (2, 3)
         (0, -1)
         house.position
         (layers.click, 0)
-        (onClick address (Actions.ClickMapObject house))
+        (Actions.ClickMapObject house)
     ]
     ++ List.concat (List.indexedMap renderRequest requestsFromHouse)
     ++ renderBubble
