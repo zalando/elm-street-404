@@ -8,7 +8,23 @@ import AllDict exposing (AllDict)
 import Html exposing (div)
 import Html.Attributes exposing (style)
 
-type alias Vertex = { position : Vec2 }
+
+type alias Vertex =
+  { position : Vec2 }
+
+
+type alias Uniform =
+  { frameSize : Vec2
+  , screenSize : Vec2
+  , offset : Vec2
+  , texture : GL.Texture
+  , textureSize : Vec2
+  , frame : Int
+  }
+
+
+type alias Varying =
+  { texturePos : Vec2 }
 
 
 mesh : GL.Drawable Vertex
@@ -46,33 +62,31 @@ render ((w, h) as dimensions) tileSize textures boxes =
 
 renderTextured : (Int, Int) -> Textures -> Box.TexturedBoxData -> Maybe GL.Renderable
 renderTextured (w, h) textures {textureId, position, frame} =
-  case AllDict.get textureId textures of
-    Nothing -> Nothing
-    Just {size, offset, texture} ->
-      case texture of
-        Nothing -> Nothing
-        Just textureValue ->
-          Just (
-            GL.render
-              vertexShader
-              fragmentShader
-              mesh
-              { screenSize = vec2 (toFloat w) (toFloat h)
-              , offset = vec2 (fst offset + fst position) (snd offset + snd position)
-              , texture = textureValue
-              , frame = frame
-              , textureSize =
-                  vec2
-                    (toFloat (fst (GL.textureSize textureValue)))
-                    (toFloat (snd (GL.textureSize textureValue)))
-              , frameSize = (uncurry vec2) size
-              }
-          )
+  AllDict.get textureId textures
+  `Maybe.andThen`
+  (\{size, offset, texture} ->
+    Maybe.map
+      (\textureValue ->
+        GL.render
+          vertexShader
+          fragmentShader
+          mesh
+          { screenSize = vec2 (toFloat w) (toFloat h)
+          , offset = vec2 (fst offset + fst position) (snd offset + snd position)
+          , texture = textureValue
+          , frame = frame
+          , textureSize =
+              vec2
+                (toFloat (fst (GL.textureSize textureValue)))
+                (toFloat (snd (GL.textureSize textureValue)))
+          , frameSize = (uncurry vec2) size
+          }
+      )
+    texture
+  )
 
 
--- Shaders
-
-vertexShader : GL.Shader {attr | position : Vec2} {unif | frameSize : Vec2, screenSize : Vec2, offset : Vec2} {texturePos : Vec2}
+vertexShader : GL.Shader Vertex Uniform Varying
 vertexShader = [glsl|
 
   precision mediump float;
@@ -91,7 +105,7 @@ vertexShader = [glsl|
 |]
 
 
-fragmentShader : GL.Shader {} {u | texture : GL.Texture, textureSize : Vec2, frameSize : Vec2, frame : Int } {texturePos : Vec2}
+fragmentShader : GL.Shader {} Uniform Varying
 fragmentShader = [glsl|
 
   precision mediump float;

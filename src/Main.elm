@@ -15,7 +15,7 @@ app =
   StartApp.start
     { init =
         ( Model.initial randomSeed windowDimensions imagesUrl
-        , (Update.loadImage imagesUrl) Textures.Score
+        , Update.loadImage imagesUrl Textures.Score
         )
     , update = Update.update
     , view = View.view

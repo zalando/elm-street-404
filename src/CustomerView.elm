@@ -9,6 +9,7 @@ import Request exposing (Request)
 import Article exposing (Article)
 import Category exposing (Category)
 
+
 shirtFrameOffset : Int -> Customer -> Int
 shirtFrameOffset color {happiness, frames} =
   if happiness > 0 then
@@ -25,7 +26,7 @@ customerFrameOffset {typ, happiness} =
 render : List Request -> List Article -> MapObject -> Customer -> List Box
 render requests articles ({position} as house) customer =
   let
-    categories = (List.map .category articles)
+    categories = List.map .category articles
     shirtColor = Maybe.withDefault 3 (Category.getColor Category.isShirt categories)
     shoesColor = Maybe.withDefault 3 (Category.getColor Category.isShoes categories)
     pantsColor = Category.getColor Category.isPants categories
@@ -33,7 +34,7 @@ render requests articles ({position} as house) customer =
     renderColor maybeColor layer sprite =
       case maybeColor of
         Just color ->
-          [Box.textured sprite house.position color (layers.obstacle, layer)]
+          [Box.textured sprite position color (layers.obstacle, layer)]
         Nothing ->
           []
   in

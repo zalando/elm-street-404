@@ -18,8 +18,8 @@ render requests articles customers ({position} as house) =
   let
     requestsFromHouse = List.filter (\r -> r.house == house) requests
     deliveredArticles = List.filter (Article.isDelivered house) articles
-    hasRequests = (List.length requestsFromHouse) > 0
-    hasArticles = (List.length deliveredArticles) > 0
+    hasRequests = List.length requestsFromHouse > 0
+    hasArticles = List.length deliveredArticles > 0
 
     renderRequest number =
       RequestView.render (fst position - 1, snd position - toFloat number)
@@ -33,7 +33,8 @@ render requests articles customers ({position} as house) =
 
     renderCustomer =
       case IHopeItWorks.find (Customer.livesHere house) customers of
-        Nothing -> []
+        Nothing ->
+          []
         Just customer ->
           if customer.happiness == 2 && not hasRequests && not hasArticles then
             []

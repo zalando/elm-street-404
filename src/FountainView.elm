@@ -10,7 +10,7 @@ import Fountain exposing (Fountain)
 render : Fountain -> MapObject -> List Box
 render {frames} {position} =
   let
-    frame = (Maybe.withDefault 0 (List.head frames))
+    frame = Maybe.withDefault 0 (List.head frames)
   in
     [ Box.textured Textures.Fountain position 0 (layers.obstacle, 0)
     , Box.textured Textures.FountainSpring position frame (layers.obstacle, 1)

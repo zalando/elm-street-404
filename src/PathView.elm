@@ -1,17 +1,17 @@
 module PathView (render) where
 
-import Svg exposing (svg, polyline, rect)
+import Svg exposing (svg, polyline)
 import Svg.Attributes exposing (..)
-import Html exposing (div, Html)
+import Html exposing (Html)
 
 
 addPointToSring : Int -> (Int, Int) -> String -> String
 addPointToSring tileSize (x, y) =
   (++)
-    ( toString (x * tileSize + tileSize) ++
-      "," ++
-      toString (y * tileSize + tileSize // 2) ++
-      " "
+    ( " "
+      ++ toString (x * tileSize + tileSize)
+      ++ ","
+      ++ toString (y * tileSize + tileSize // 2)
     )
 
 
@@ -36,10 +36,6 @@ render (w, h) tileSize route =
     , viewBox ("0 0 " ++ toString (w * tileSize) ++ " " ++ toString (h * tileSize))
     , width (toString (w * tileSize))
     , height (toString (h * tileSize))
-    , style ("position: absolute;")
+    , style "position: absolute"
     ]
     [ renderPoints tileSize route ]
-
-
-(=>) : a -> b -> (a, b)
-(=>) = (,)

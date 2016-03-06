@@ -41,7 +41,6 @@ renderMapObject model mapObject =
 
 boxes : Model -> List Box
 boxes model =
-  StartGameView.render model.gridSize model.state ++
   if model.state == Model.Initialising then
     []
   else if model.state == Model.Loading then
@@ -49,11 +48,11 @@ boxes model =
       (toFloat (fst model.gridSize) / 2 + 1, toFloat (snd model.gridSize) / 2)
       (Textures.loadedTextures model.textures)
   else
-    StartGameView.render model.gridSize model.state ++
-    InventoryView.render model.gridSize model.articles ++
-    ScoreView.render model.gridSize model.score model.maxLives (Model.countLives model) ++
-    DeliveryPersonView.render (List.length (List.filter Article.isPicked model.articles)) model.deliveryPerson ++
-    List.concat (List.map (renderMapObject model) model.mapObjects)
+    DeliveryPersonView.render (List.length (List.filter Article.isPicked model.articles)) model.deliveryPerson
+    :: InventoryView.render model.gridSize model.articles
+    ++ ScoreView.render model.gridSize model.score model.maxLives (Model.countLives model)
+    ++ List.concat (List.map (renderMapObject model) model.mapObjects)
+    ++ if model.state == Model.Stopped then StartGameView.render model.gridSize else []
 
 
 debug : Model -> Html

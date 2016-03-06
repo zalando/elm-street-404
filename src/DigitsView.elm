@@ -14,7 +14,7 @@ digitsList n =
     if nn == 0 && r == 0 then
       []
     else
-      r :: (digitsList nn)
+      r :: digitsList nn
 
 
 render : (Float, Float) -> Int -> List Box
@@ -28,4 +28,4 @@ render (x, y) value =
         digit
         (layers.bubble, 0)
   in
-    (List.indexedMap renderDigit digits)
+    List.indexedMap renderDigit digits

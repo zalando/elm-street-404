@@ -1,4 +1,11 @@
-module Textures (Textures, TextureId(..), filename, textures, loadTextures, loadedTextures, TextureData, initData) where
+module Textures
+  ( Textures
+  , TextureId(..)
+  , filename
+  , textures
+  , loadTextures
+  , loadedTextures
+  ) where
 
 import AllDict exposing (AllDict)
 import WebGL

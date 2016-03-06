@@ -1,4 +1,14 @@
-module Request (Request, RequestCategory(..), isInReturn, isOrdered, animate, inTime, orders, orderedCategories, returnArticles) where
+module Request
+  ( Request
+  , RequestCategory(..)
+  , isInReturn
+  , isOrdered
+  , animate
+  , inTime
+  , orders
+  , orderedCategories
+  , returnArticles
+  ) where
 
 import MapObject exposing (MapObject)
 import Article exposing (Article)

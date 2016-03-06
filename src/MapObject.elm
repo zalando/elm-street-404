@@ -79,7 +79,7 @@ warehouseSlots mapObjects =
     obj :: rest ->
       case obj.category of
         WarehouseCategory capacity ->
-          (List.repeat (capacity - 1) obj) ++ warehouseSlots rest
+          List.repeat (capacity - 1) obj ++ warehouseSlots rest
         _ ->
           warehouseSlots rest
     [] ->
@@ -92,7 +92,7 @@ houseSlots mapObjects =
     obj :: rest ->
       case obj.category of
         HouseCategory capacity ->
-          (List.repeat capacity obj) ++ houseSlots rest
+          List.repeat capacity obj ++ houseSlots rest
         _ ->
           houseSlots rest
     [] ->
@@ -124,7 +124,7 @@ placeRandom objects boxes =
         [] ->
           Random.map (always []) (Random.int 0 0)
         box :: restBoxes ->
-          (fitRandom box (size object))
+          fitRandom box (size object)
           `Random.andThen`
           (\position ->
             Random.map

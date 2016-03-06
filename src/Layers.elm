@@ -1,5 +1,6 @@
 module Layers (layers) where
 
+
 type alias Layers =
   { shadow : Int
   , obstacle : Int
@@ -10,6 +11,7 @@ type alias Layers =
   , clickToStart : Int
   , clickToStartAbove : Int
   }
+
 
 layers : Layers
 layers =

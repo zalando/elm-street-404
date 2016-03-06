@@ -5,7 +5,7 @@ import MapObject exposing (MapObject)
 import Time exposing (Time)
 import Category exposing (Category)
 import Textures exposing (TextureId)
-import WebGL
+import WebGL exposing (Texture)
 
 
 type Action
@@ -14,5 +14,5 @@ type Action
   | ClickArticle Article
   | ClickCategory Category
   | ClickMapObject MapObject
-  | TextureLoaded TextureId (Maybe WebGL.Texture)
+  | TextureLoaded TextureId (Maybe Texture)
   | Dimensions (Int, Int)

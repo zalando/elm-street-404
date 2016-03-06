@@ -1,4 +1,15 @@
-module Category (Category(..), getFrame, random, color, getColor, isShirt, isShoes, isPants, isScarf, isSame) where
+module Category
+  ( Category(..)
+  , getFrame
+  , random
+  , color
+  , getColor
+  , isShirt
+  , isShoes
+  , isPants
+  , isScarf
+  , isSame
+  ) where
 
 import Random
 import IHopeItWorks

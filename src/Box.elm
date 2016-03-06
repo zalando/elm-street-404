@@ -7,7 +7,6 @@ module Box
   , clickable
   ) where
 
-
 import Actions
 import Textures exposing (TextureId)
 

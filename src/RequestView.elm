@@ -10,17 +10,22 @@ import Layers exposing (layers)
 
 render : (Float, Float) -> Request -> List Box
 render position request =
-  if request.blinkHidden then
-    []
-  else
+  let
+    renderClickable = Box.clickable (1, 1) (0, 0) position (layers.clickAbove, 0)
+  in
     case request.category of
       Request.Return article ->
-        [ CategoryView.render position Category.Return
-        , CategoryView.render position article.category
-        , Box.clickable (1, 1) (0, 0) position (layers.clickAbove, 0) (Actions.ClickArticle article)
-        ]
+        renderClickable (Actions.ClickArticle article) ::
+        if request.blinkHidden then
+          []
+        else
+          [ CategoryView.render position Category.Return
+          , CategoryView.render position article.category
+          ]
 
       Request.Order category ->
-        [ CategoryView.render position category
-        , Box.clickable (1, 1) (0, 0) position (layers.clickAbove, 0) (Actions.ClickCategory category)
-        ]
+        renderClickable (Actions.ClickCategory category) ::
+        if request.blinkHidden then
+          []
+        else
+          [CategoryView.render position category]

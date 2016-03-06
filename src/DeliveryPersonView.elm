@@ -22,16 +22,15 @@ direction {route, position} =
     [] -> 0
 
 
-render : Int -> DeliveryPerson -> List Box
+render : Int -> DeliveryPerson -> Box
 render numberOfBoxes deliveryPerson =
   let
     box frame =
-      [ Box.textured
-          Textures.DeliveryPerson
-          deliveryPerson.position
-          frame
-          (layers.obstacle, 0)
-      ]
+      Box.textured
+        Textures.DeliveryPerson
+        deliveryPerson.position
+        frame
+        (layers.obstacle, 0)
   in
     case deliveryPerson.location of
       DeliveryPerson.OnTheWayTo _ ->

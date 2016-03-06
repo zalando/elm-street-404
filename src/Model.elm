@@ -29,8 +29,7 @@ import Customer exposing (Customer)
 import IHopeItWorks
 import Article exposing (Article)
 import MapObject exposing (MapObject)
-import AllDict exposing (AllDict)
-import Textures exposing (TextureId, TextureData)
+import Textures exposing (TextureId, Textures)
 
 
 type State = Initialising | Loading | Paused | Playing | Stopped
@@ -71,7 +70,7 @@ type DispatcherAction
 type alias Model =
   { animationState : AnimationState.AnimationState
   , state : State
-  , textures : AllDict TextureId TextureData String
+  , textures : Textures
   , seed : Random.Seed
   , tileSize : Int
   , imagesUrl : String
@@ -340,8 +339,8 @@ dispatchCustomers model =
 
 
 articleInEmptyHouse : List Customer -> Article -> Bool
-articleInEmptyHouse customers article =
-  case article.state of
+articleInEmptyHouse customers {state} =
+  case state of
     Article.Delivered house ->
       houseEmpty customers house
     _ -> False
