@@ -7,12 +7,15 @@ import Task exposing (Task)
 import Update
 import View
 import Window
-
+import Sprite
 
 app : App Model
 app =
   StartApp.start
-    { init = (Model.initial windowDimensions imagesUrl, Effects.tick Actions.Init)
+    { init =
+        ( Model.initial randomSeed windowDimensions imagesUrl
+        , (Update.loadImage imagesUrl) Sprite.Score
+        )
     , update = Update.update
     , view = View.view
     , inputs = [Signal.map Actions.Dimensions Window.dimensions]
@@ -21,6 +24,9 @@ app =
 
 main : Signal Html
 main = app.html
+
+
+port randomSeed : Int
 
 
 port imagesUrl : String

@@ -1,10 +1,9 @@
-module Update (update) where
+module Update (update, loadImage) where
 
 import Model exposing (..)
 import Actions exposing (..)
 import Effects exposing (Effects)
 import Time exposing (Time)
-import Random
 import DeliveryPerson exposing (Location(..))
 import Article exposing (State(..), Article)
 import MapObject exposing (MapObject, MapObjectCategory(..))
@@ -23,10 +22,6 @@ update action model =
   case action of
     Dimensions dimensions ->
       (Model.resize dimensions model, Effects.none)
-    Init time ->
-      ( {model | seed = Random.initialSeed (floor time)}
-      , (loadImage model.imagesUrl) Sprite.Score
-      )
     TextureLoaded textureId texture ->
       let
         loadTexture =

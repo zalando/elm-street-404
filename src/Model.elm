@@ -37,10 +37,10 @@ type State = Initialising | Loading | Paused | Playing | Stopped
 
 
 minMapWidth : Int
-minMapWidth = 15
+minMapWidth = 16
 
 minMapHeight : Int
-minMapHeight = 15
+minMapHeight = 16
 
 maxMapWidth : Int
 maxMapWidth = 24
@@ -88,12 +88,12 @@ type alias Model =
   }
 
 
-initial : (Int, Int) -> String -> Model
-initial dimensions imagesUrl =
+initial : Int -> (Int, Int) -> String -> Model
+initial randomSeed dimensions imagesUrl =
   { animationState = Nothing
   , state = Initialising
   , textures = Sprite.textures
-  , seed = Random.initialSeed 0
+  , seed = Random.initialSeed randomSeed
   , tileSize = 0
   , imagesUrl = imagesUrl
   , dimensions = (0, 0)
@@ -144,7 +144,7 @@ positionObstacles ({gridSize, deliveryPerson} as model) =
       { size = model.deliveryPerson.size
       , position = model.deliveryPerson.position
       }
-      { size = (toFloat width - 2, toFloat height - 6)
+      { size = (toFloat width - 3, toFloat height - 6)
       , position = (2, 4)
       }
     (mapObjects, seed) =

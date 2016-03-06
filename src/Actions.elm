@@ -8,8 +8,7 @@ import Sprite exposing (TextureId)
 import WebGL
 
 type Action
-  = Init Time
-  | Tick Time
+  = Tick Time
   | Start
   | ClickArticle Article
   | ClickCategory Category
