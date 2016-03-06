@@ -16,7 +16,7 @@ type alias DeliveryPerson =
   AnimatedObject
     { location : Location
     , route : List (Int, Int)
-    , frames : List (Int)
+    , frames : List Int
     , position : (Float, Float)
     , capacity : Int
     , size : (Float, Float)

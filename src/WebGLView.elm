@@ -4,7 +4,8 @@ import WebGL as GL
 import Math.Vector2 exposing (Vec2, vec2)
 import Sprite
 import AllDict exposing (AllDict)
-import Html
+import Html exposing (div)
+import Html.Attributes exposing (style)
 
 type alias Vertex = { position : Vec2 }
 
@@ -25,13 +26,21 @@ mesh =
 
 render : (Int, Int) -> Int -> AllDict Sprite.TextureId Sprite.TextureData String -> List Sprite.TexturedBoxData -> Html.Html
 render ((w, h) as dimensions) tileSize textures boxes =
-  GL.webglWithConfig
-    [ GL.Enable GL.Blend
-    , GL.BlendFunc (GL.One, GL.OneMinusSrcAlpha)
+  div
+    [ style
+        [ ("transform", "scale(0.5)")
+        , ("transform-origin", "left top")
+        , ("position", "absolute")
+        ]
     ]
-    (w * tileSize, h * tileSize)
-    (List.filterMap (renderTextured dimensions textures) (List.reverse boxes))
-  |> Html.fromElement
+    [ GL.webglWithConfig
+        [ GL.Enable GL.Blend
+        , GL.BlendFunc (GL.One, GL.OneMinusSrcAlpha)
+        ]
+        (w * tileSize * 2, h * tileSize * 2)
+        (List.filterMap (renderTextured dimensions textures) (List.reverse boxes))
+      |> Html.fromElement
+    ]
 
 
 renderTextured : (Int, Int) -> AllDict Sprite.TextureId Sprite.TextureData String -> Sprite.TexturedBoxData -> Maybe GL.Renderable
@@ -53,8 +62,8 @@ renderTextured (w, h) textures {textureId, position, frame} =
               , frame = frame
               , textureSize =
                   vec2
-                    (toFloat (fst (GL.textureSize textureValue)) / 80)
-                    (toFloat (snd (GL.textureSize textureValue)) / 80)
+                    (toFloat (fst (GL.textureSize textureValue)))
+                    (toFloat (snd (GL.textureSize textureValue)))
               , frameSize = (uncurry vec2) size
               }
           )
@@ -92,7 +101,7 @@ fragmentShader = [glsl|
   varying vec2 texturePos;
 
   void main () {
-    vec2 size = frameSize / textureSize;
+    vec2 size = frameSize / textureSize * 80.0;
     int cols = int(1.0 / size.x);
     vec2 frameOffset = size * vec2(float(frame - frame / cols * cols), -float(frame / cols));
     vec2 textureClipSpace = size * texturePos - 1.0;

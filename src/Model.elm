@@ -36,10 +36,23 @@ import Sprite exposing (TextureId, TextureData)
 type State = Initialising | Loading | Paused | Playing | Stopped
 
 
+minMapWidth : Int
+minMapWidth = 15
+
+minMapHeight : Int
+minMapHeight = 15
+
+maxMapWidth : Int
+maxMapWidth = 24
+
+maxMapHeight : Int
+maxMapHeight = 24
+
+
 limitSize : (Int, Int) -> (Int, Int)
 limitSize (width, height) =
-  ( width |> max 14 |> min 24
-  , height |> max 14 |> min 24
+  ( width |> max minMapWidth |> min maxMapWidth
+  , height |> max minMapHeight |> min maxMapHeight
   )
 
 
@@ -81,7 +94,7 @@ initial dimensions imagesUrl =
   , state = Initialising
   , textures = Sprite.textures
   , seed = Random.initialSeed 0
-  , tileSize = 40
+  , tileSize = 0
   , imagesUrl = imagesUrl
   , dimensions = (0, 0)
   , gridSize = (0, 0)
@@ -103,11 +116,13 @@ resize dimensions model =
     {model | dimensions = dimensions}
   else
     let
-      newGridSize = gridSize model.tileSize dimensions
+      newTileSize = min (fst dimensions // minMapWidth) 40
+      newGridSize = gridSize newTileSize dimensions
     in
       { model
       | dimensions = dimensions
       , gridSize = newGridSize
+      , tileSize = newTileSize
       , deliveryPerson =
           DeliveryPerson.initial
             ( toFloat (fst newGridSize // 2 - 1)
@@ -130,7 +145,7 @@ positionObstacles ({gridSize, deliveryPerson} as model) =
       , position = model.deliveryPerson.position
       }
       { size = (toFloat width - 2, toFloat height - 6)
-      , position = (1, 4)
+      , position = (2, 4)
       }
     (mapObjects, seed) =
       Random.generate
