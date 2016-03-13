@@ -5,8 +5,7 @@ import Math.Vector2 exposing (Vec2, vec2)
 import Box
 import Textures exposing (Textures)
 import AllDict exposing (AllDict)
-import Html exposing (div)
-import Html.Attributes exposing (style)
+import Graphics.Element exposing (Element)
 
 
 type alias Vertex =
@@ -41,23 +40,14 @@ mesh =
     ]
 
 
-render : (Int, Int) -> Int -> Textures -> List Box.TexturedBoxData -> Html.Html
+render : (Int, Int) -> Int -> Textures -> List Box.TexturedBoxData -> Element
 render ((w, h) as dimensions) tileSize textures boxes =
-  div
-    [ style
-        [ ("transform", "scale(0.5)")
-        , ("transform-origin", "left top")
-        , ("position", "absolute")
-        ]
+  GL.webglWithConfig
+    [ GL.Enable GL.Blend
+    , GL.BlendFunc (GL.One, GL.OneMinusSrcAlpha)
     ]
-    [ GL.webglWithConfig
-        [ GL.Enable GL.Blend
-        , GL.BlendFunc (GL.One, GL.OneMinusSrcAlpha)
-        ]
-        (w * tileSize * 2, h * tileSize * 2)
-        (List.filterMap (renderTextured dimensions textures) (List.reverse boxes))
-      |> Html.fromElement
-    ]
+    (w * tileSize, h * tileSize)
+    (List.filterMap (renderTextured dimensions textures) (List.reverse boxes))
 
 
 renderTextured : (Int, Int) -> Textures -> Box.TexturedBoxData -> Maybe GL.Renderable

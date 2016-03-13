@@ -11,6 +11,7 @@ import WebGL exposing (Texture)
 type Action
   = Tick Time
   | Start
+  | Click (Int, Int)
   | ClickArticle Article
   | ClickCategory Category
   | ClickMapObject MapObject

@@ -21,7 +21,7 @@ update : Action -> Model -> (Model, Effects Action)
 update action model =
   case action of
     Dimensions dimensions ->
-      (Model.resize dimensions model, Effects.none)
+      (Model.resize dimensions model |> Model.render, Effects.none)
     TextureLoaded textureId texture ->
       let
         loadTexture =
@@ -39,9 +39,9 @@ update action model =
           )
         else
           if List.length texturesToLoad == 0 then
-            ({newModel | state = Stopped}, Effects.none)
+            ({newModel | state = Stopped} |> Model.render, Effects.none)
           else
-            (newModel, Effects.none)
+            (Model.render newModel, Effects.none)
     Start ->
       (Model.start model, Effects.tick Tick)
     Tick time ->
@@ -52,10 +52,20 @@ update action model =
           |> Model.cleanupLostArticles
           |> Model.cleanupLostRequests
           |> Model.updateGameState
+          |> Model.render
         , Effects.tick Tick
         )
       else
         ({model | animationState = Nothing}, Effects.none)
+    Click position ->
+      let
+        effect = case Model.click position model of
+          Just action ->
+            Effects.task (Task.succeed action)
+          Nothing ->
+            Effects.none
+      in
+        (model, effect)
     ClickArticle article ->
       ifPlaying (onArticleClick article) model
     ClickCategory category ->

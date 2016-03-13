@@ -8,6 +8,7 @@ import Update
 import View
 import Window
 import Textures
+import Touch
 
 
 app : App Model
@@ -19,7 +20,10 @@ app =
         )
     , update = Update.update
     , view = View.view
-    , inputs = [Signal.map Actions.Dimensions Window.dimensions]
+    , inputs =
+        [ Signal.map Actions.Dimensions Window.dimensions
+        , Signal.map Actions.Click (Signal.map (\{x,y} -> (x, y)) Touch.taps)
+        ]
     }
 
 

@@ -15,8 +15,9 @@ module Model
   , dispatch
   , cleanupLostArticles
   , cleanupLostRequests
-  , countLives
   , resize
+  , render
+  , click
   ) where
 
 import Random
@@ -28,8 +29,21 @@ import Request exposing (Request)
 import Customer exposing (Customer)
 import IHopeItWorks
 import Article exposing (Article)
-import MapObject exposing (MapObject)
+import MapObject exposing (MapObject, MapObjectCategory(..))
 import Textures exposing (TextureId, Textures)
+import Box exposing (Box)
+import Actions exposing (Action)
+-- Views:
+import TreeView
+import FountainView
+import HouseView
+import WarehouseView
+import DeliveryPersonView
+import InventoryView
+import Article
+import ScoreView
+import StartGameView
+import DigitsView
 
 
 type State = Initialising | Loading | Paused | Playing | Stopped
@@ -38,11 +52,14 @@ type State = Initialising | Loading | Paused | Playing | Stopped
 minMapWidth : Int
 minMapWidth = 16
 
+
 minMapHeight : Int
 minMapHeight = 16
 
+
 maxMapWidth : Int
 maxMapWidth = 24
+
 
 maxMapHeight : Int
 maxMapHeight = 24
@@ -84,6 +101,7 @@ type alias Model =
   , dispatcher : Dispatcher DispatcherAction
   , score : Int
   , maxLives : Int
+  , boxes : List Box
   }
 
 
@@ -105,6 +123,7 @@ initial randomSeed dimensions imagesUrl =
   , dispatcher = dispatcher []
   , score = 0
   , maxLives = 3
+  , boxes = []
   }
   |> resize dimensions
 
@@ -440,3 +459,60 @@ returnArticle warehouse article model =
         model
     _ ->
        model
+
+
+renderMapObject : Model -> MapObject -> List Box
+renderMapObject model mapObject =
+  case mapObject.category of
+    TreeCategory ->
+      TreeView.render mapObject
+    FountainCategory fountain ->
+      FountainView.render fountain mapObject
+    HouseCategory _ ->
+      HouseView.render model.requests model.articles model.customers mapObject
+    WarehouseCategory capacity ->
+      WarehouseView.render model.articles capacity mapObject
+
+
+click : (Int, Int) -> Model -> Maybe Action
+click coordinates model =
+  let
+    clickedCoordinates = clickToTile model coordinates
+    (_, clickableBoxes) = Box.split model.boxes
+    clickedBoxes = List.filterMap (Box.clicked clickedCoordinates) (List.reverse clickableBoxes)
+  in
+    List.head clickedBoxes
+
+
+clickToTile : Model -> (Int, Int) -> (Int, Int)
+clickToTile {dimensions, gridSize, tileSize} (x, y) =
+  let
+    mapWidth = fst gridSize * tileSize
+    mapHeight = snd gridSize * tileSize
+    screenWidth = max (fst dimensions) mapWidth
+    screenHeight = max (snd dimensions) mapHeight
+  in
+    ( (x - (screenWidth - mapWidth) // 2) // tileSize
+    , (y - (screenHeight - mapHeight) // 2) // tileSize
+    )
+
+
+render : Model -> Model
+render model =
+  {model | boxes = boxes model}
+
+
+boxes : Model -> List Box
+boxes model =
+  if model.state == Initialising then
+    []
+  else if model.state == Loading then
+    DigitsView.render
+      (toFloat (fst model.gridSize) / 2 + 1, toFloat (snd model.gridSize) / 2)
+      (Textures.loadedTextures model.textures)
+  else
+    DeliveryPersonView.render (List.length (List.filter Article.isPicked model.articles)) model.deliveryPerson
+    :: InventoryView.render model.gridSize model.articles
+    ++ ScoreView.render model.gridSize model.score model.maxLives (countLives model)
+    ++ List.concat (List.map (renderMapObject model) model.mapObjects)
+    ++ if model.state == Stopped then StartGameView.render model.gridSize else []
