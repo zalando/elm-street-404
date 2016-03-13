@@ -4,56 +4,13 @@ import Actions exposing (Action)
 import Html exposing (div, br, Html, text, button)
 import Html.Attributes exposing (style)
 import Model exposing (Model)
-import TreeView
-import FountainView
-import HouseView
-import WarehouseView
-import DeliveryPersonView
 import PathView
-import InventoryView
-import Article
-import ScoreView
-import StartGameView
-import DigitsView
-import MapObject exposing (MapObject, MapObjectCategory(..))
 import WebGLView
-import ClickableView
-import Textures
 import Box exposing (Box)
 
 
 (=>) : a -> b -> (a, b)
 (=>) = (,)
-
-
-renderMapObject : Model -> MapObject -> List Box
-renderMapObject model mapObject =
-  case mapObject.category of
-    TreeCategory ->
-      TreeView.render mapObject
-    FountainCategory fountain ->
-      FountainView.render fountain mapObject
-    HouseCategory _ ->
-      HouseView.render model.requests model.articles model.customers mapObject
-    WarehouseCategory capacity ->
-      WarehouseView.render model.articles capacity mapObject
-
-
-boxes : Model -> List Box
-boxes model =
-  if model.state == Model.Initialising then
-    []
-  else if model.state == Model.Loading then
-    DigitsView.render
-      (toFloat (fst model.gridSize) / 2 + 1, toFloat (snd model.gridSize) / 2)
-      (Textures.loadedTextures model.textures)
-  else
-    DeliveryPersonView.render (List.length (List.filter Article.isPicked model.articles)) model.deliveryPerson
-    :: InventoryView.render model.gridSize model.articles
-    ++ ScoreView.render model.gridSize model.score model.maxLives (Model.countLives model)
-    ++ List.concat (List.map (renderMapObject model) model.mapObjects)
-    ++ if model.state == Model.Stopped then StartGameView.render model.gridSize else []
-
 
 debug : Model -> Html
 debug model =
@@ -74,9 +31,9 @@ debug model =
 
 
 view : Signal.Address Action -> Model -> Html
-view address model =
+view _ model =
   let
-    (texturedBoxes, clickableBoxes) = Box.split (boxes model)
+    (texturedBoxes, _) = Box.split model.boxes
     mapWidth = fst model.gridSize * model.tileSize
     mapHeight = snd model.gridSize * model.tileSize
     screenWidth = max (fst model.dimensions) mapWidth
@@ -99,10 +56,11 @@ view address model =
             , "height" => (toString mapHeight ++ "px")
             , "left" => (toString ((screenWidth - mapWidth) // 2) ++ "px")
             , "top" => (toString ((screenHeight - mapHeight) // 2) ++ "px")
+            , "transform" => "scale(0.5)"
+            , "transform-origin" => "left top"
             ]
           ]
-          ( PathView.render model.gridSize model.tileSize model.deliveryPerson.route ::
-            WebGLView.render model.gridSize model.tileSize model.textures texturedBoxes ::
-            ClickableView.render address model.tileSize clickableBoxes
-          )
+          [ PathView.render model.gridSize (model.tileSize * 2) model.deliveryPerson.route
+          , WebGLView.render model.gridSize (model.tileSize * 2) model.textures texturedBoxes |> Html.fromElement
+          ]
       ]

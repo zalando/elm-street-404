@@ -54,5 +54,5 @@ exclude left right =
 pickRandom : List a -> Random.Generator (Maybe a)
 pickRandom list =
   Random.map
-    (\index -> (List.head (List.drop index list)))
+    (\index -> List.head (List.drop index list))
     (Random.int 0 (List.length list - 1))

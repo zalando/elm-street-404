@@ -5,6 +5,7 @@ module Box
   , split
   , textured
   , clickable
+  , clicked
   ) where
 
 import Actions
@@ -52,6 +53,22 @@ clickable size offset position layer onClickAction =
     , layer = layer
     , onClickAction = onClickAction
     }
+
+
+clicked : (Int, Int) -> ClickableBoxData -> Maybe Actions.Action
+clicked coordinates {position, offset, size, onClickAction} =
+  let
+    left = fst position + fst offset
+    top = snd position + snd offset
+    right = left + fst size
+    bottom = top + snd size
+    x = toFloat (fst coordinates)
+    y = toFloat (snd coordinates)
+  in
+    if x >= left && x < right && y >= top && y < bottom then
+      Just onClickAction
+    else
+      Nothing
 
 
 sortBoxData :
