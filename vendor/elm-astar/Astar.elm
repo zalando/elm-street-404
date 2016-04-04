@@ -8,9 +8,9 @@ type alias Point = (Int, Int)
 
 type alias NodeState =
   { node : Point
-  , f : Float
-  , g : Float
-  , h : Float
+  , f : Int
+  , g : Int
+  , h : Int
   , parent : Maybe Point
   }
 
@@ -52,15 +52,9 @@ moveTile : Point -> Point -> Point
 moveTile (tx, ty) (dx, dy) = (tx + dx, ty + dy)
 
 
-absDistance : Point -> Point -> Float
-absDistance (x1, y1) (x2, y2) =
-  ((toFloat x1 - toFloat x2) ^ 2) +
-  ((toFloat y1 - toFloat y2) ^ 2)
-
-
-heuristics : Point -> Point -> Float
-heuristics (x1, y1) (x2, y2) =
-  (abs (x1 - x2)) + (abs (y1 - y2)) |> toFloat
+distance : Point -> Point -> Int
+distance (x1, y1) (x2, y2) =
+  (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2)
 
 
 nodeState : Point -> State -> Maybe NodeState
@@ -87,23 +81,12 @@ closeNode current state =
   }
 
 
-getAreaTiles : Point -> Point -> List Point
-getAreaTiles (x1, y1) (x2, y2) =
-  if x1 == x2 || y1 == y2 then
-    []
-  else if x1 + 1 == x2 then
-    (x1, y1) :: getAreaTiles (x1, y1 + 1) (x2, y2)
-  else
-    getAreaTiles (x1, y1) (x1 + 1, y2) ++
-    getAreaTiles (x1 + 1, y1) (x2, y2)
-
-
 freeUnclosedNeighbors : Point -> State -> List Point
-freeUnclosedNeighbors node state =
-  getAreaTiles (moveTile node (-1, -1)) (moveTile node (2, 2))
-  |> List.filter ((/=) node)
+freeUnclosedNeighbors (px, py) state =
+  List.foldl (\x -> (++) (List.map ((,) x) [py-1..py+1])) [] [px-1..px+1]
+  |> List.filter ((/=) (px, py))
   |> List.filter (onGrid state.gridSize)
-  |> List.filter (\ n -> not (List.member n state.closedNodes))
+  |> List.filter (\n -> not (List.member n state.closedNodes))
 
 
 processNeighbors : NodeState -> List Point -> State -> State
@@ -115,11 +98,11 @@ processNeighbors current neighbors state =
         Nothing -> processNeighbors current rest state
         Just nstate ->
           let
-            g = current.g + absDistance current.node neighbor
+            g = current.g + distance current.node neighbor
             neighborOpen = List.member neighbor state.openNodes
-            best = (not neighborOpen) || (g < nstate.g)
+            best = not neighborOpen || g < nstate.g
             parent = if best then Just current.node else nstate.parent
-            h = if neighborOpen then nstate.h else heuristics neighbor state.dest
+            h = if neighborOpen then nstate.h else distance neighbor state.dest
             f = if best then g + h else nstate.f
             nupdate =
               { nstate
