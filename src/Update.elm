@@ -56,7 +56,7 @@ update action model =
         , Effects.tick Tick
         )
       else
-        ({model | animationState = Nothing}, Effects.none)
+        ({model | prevTime = Nothing}, Effects.none)
     Click position ->
       let
         effect = case Model.click position model of

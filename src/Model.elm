@@ -85,7 +85,7 @@ type DispatcherAction
 
 
 type alias Model =
-  { animationState : AnimationState.AnimationState
+  { prevTime : Maybe Time
   , state : State
   , textures : Textures
   , seed : Random.Seed
@@ -107,7 +107,7 @@ type alias Model =
 
 initial : Int -> (Int, Int) -> String -> Model
 initial randomSeed dimensions imagesUrl =
-  { animationState = Nothing
+  { prevTime = Nothing
   , state = Initialising
   , textures = Textures.textures
   , seed = Random.initialSeed randomSeed
@@ -302,9 +302,13 @@ navigateToMapObject mapObject model =
 animate : Time -> (Time -> Model -> Model) -> Model -> Model
 animate time animationFunc model =
   let
-    (elapsed, animationState) = AnimationState.animate time model.animationState
+    newModel = {model | prevTime = Just time}
   in
-    animationFunc elapsed {model | animationState = animationState}
+    case model.prevTime of
+      Nothing ->
+        newModel
+      Just prevTime ->
+        animationFunc (min (time - prevTime) 25) newModel
 
 
 decHappinessIfHome : List Request -> Customer -> Customer
