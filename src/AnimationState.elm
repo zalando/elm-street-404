@@ -1,20 +1,14 @@
 module AnimationState
-  ( AnimationState
-  , AnimatedObject
+  ( AnimatedObject
   , Dispatcher
   , dispatcher
   , animateDispatcher
   , dispatcherActions
   , animateObject
-  , animate
   , rotateFrames
   ) where
 
 import Time exposing (Time)
-
-
-type alias AnimationState =
-  Maybe { prevClockTime : Time, elapsed : Time }
 
 
 type alias AnimatedObject a =
@@ -72,24 +66,6 @@ animateObject elapsed animationFunc state =
       animationFunc {state | elapsed = elapsed' - state.timeout}
     else
       {state | elapsed = elapsed'}
-
-
-{-| calculates time difference between two frames -}
-animate : Time -> AnimationState -> (Time, AnimationState)
-animate time animationState =
-  let
-    elapsed =
-      case animationState of
-        Nothing ->
-          0
-        Just {prevClockTime} ->
-          min (time - prevClockTime) 25
-  in
-    ( elapsed
-    , Just { prevClockTime = time
-           , elapsed = elapsed
-           }
-    )
 
 
 {-| takes the fist frame from list and puts it in the end -}

@@ -5,16 +5,10 @@ module Model
   , animate
   , navigateToMapObject
   , State(..)
-  , timeoutRequests
-  , dispatchCustomers
-  , updateGameState
   , deliverArticle
   , returnArticle
   , pickupReturn
   , pickupArticle
-  , dispatch
-  , cleanupLostArticles
-  , cleanupLostRequests
   , resize
   , render
   , click
@@ -85,7 +79,7 @@ type DispatcherAction
 
 
 type alias Model =
-  { animationState : AnimationState.AnimationState
+  { prevTime : Maybe Time
   , state : State
   , textures : Textures
   , seed : Random.Seed
@@ -107,7 +101,7 @@ type alias Model =
 
 initial : Int -> (Int, Int) -> String -> Model
 initial randomSeed dimensions imagesUrl =
-  { animationState = Nothing
+  { prevTime = Nothing
   , state = Initialising
   , textures = Textures.textures
   , seed = Random.initialSeed randomSeed
@@ -206,12 +200,34 @@ start model =
   |> dispatchOrders 3
 
 
-dispatch : Time -> Model -> Model
-dispatch elapsed model =
-  let
-    dispatcher = animateDispatcher elapsed model.dispatcher
-  in
-    List.foldl dispatchAction {model | dispatcher = dispatcher} (dispatcherActions dispatcher)
+animate : Time -> Model -> Model
+animate time model =
+  case model.prevTime of
+    Nothing ->
+      {model | prevTime = Just time}
+    Just prevTime ->
+      animationLoop (min (time - prevTime) 25) {model | prevTime = Just time}
+
+
+animationLoop : Time -> Model -> Model
+animationLoop elapsed model =
+  { model
+  | mapObjects = List.map (MapObject.animate elapsed) model.mapObjects
+  , deliveryPerson = DeliveryPerson.animate elapsed model.deliveryPerson
+  , requests = List.map (Request.animate elapsed) model.requests
+  , customers = List.map (Customer.animate elapsed) model.customers
+  , dispatcher = animateDispatcher elapsed model.dispatcher
+  }
+  |> dispatch
+  |> timeoutRequests
+  |> updateGameState
+  |> cleanup
+  |> render
+
+
+dispatch : Model -> Model
+dispatch model =
+  List.foldl dispatchAction model (dispatcherActions model.dispatcher)
 
 
 dispatchAction : DispatcherAction -> Model -> Model
@@ -299,14 +315,6 @@ navigateToMapObject mapObject model =
   }
 
 
-animate : Time -> (Time -> Model -> Model) -> Model -> Model
-animate time animationFunc model =
-  let
-    (elapsed, animationState) = AnimationState.animate time model.animationState
-  in
-    animationFunc elapsed {model | animationState = animationState}
-
-
 decHappinessIfHome : List Request -> Customer -> Customer
 decHappinessIfHome requests customer =
   case requests of
@@ -365,20 +373,14 @@ articleInEmptyHouse customers {state} =
     _ -> False
 
 
-cleanupLostArticles : Model -> Model
-cleanupLostArticles model =
+cleanup : Model -> Model
+cleanup model =
   { model
   | articles =
       List.filter
         (\ article -> not (articleInEmptyHouse model.customers article))
         model.articles
-  }
-
-
-cleanupLostRequests : Model -> Model
-cleanupLostRequests model =
-  { model
-  | requests =
+  , requests =
       List.filter
         (\ request -> not (houseEmpty model.customers request.house))
         model.requests
