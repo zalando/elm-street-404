@@ -3,13 +3,10 @@ module Update (update, loadImage) where
 import Model exposing (..)
 import Actions exposing (..)
 import Effects exposing (Effects)
-import Time exposing (Time)
 import DeliveryPerson exposing (Location(..))
 import Article exposing (State(..), Article)
 import MapObject exposing (MapObject, MapObjectCategory(..))
-import Request exposing (Request)
 import Category exposing (Category)
-import Customer exposing (Customer)
 import IHopeItWorks
 import Task exposing (Task)
 import WebGL
@@ -46,15 +43,7 @@ update action model =
       (Model.start model, Effects.tick Tick)
     Tick time ->
       if model.state == Playing then
-        ( model
-          |> Model.animate time animate
-          |> Model.timeoutRequests
-          |> Model.cleanupLostArticles
-          |> Model.cleanupLostRequests
-          |> Model.updateGameState
-          |> Model.render
-        , Effects.tick Tick
-        )
+        (Model.animate time model, Effects.tick Tick)
       else
         ({model | prevTime = Nothing}, Effects.none)
     Click position ->
@@ -88,17 +77,6 @@ loadImage imagesUrl textureId =
     |> Task.map (\r -> TextureLoaded textureId (Just r))
   ) `Task.onError` always (Task.succeed (TextureLoaded textureId Nothing))
   |> Effects.task
-
-
-animate : Time -> Model -> Model
-animate elapsed model =
-  { model
-  | mapObjects = List.map (MapObject.animate elapsed) model.mapObjects
-  , deliveryPerson = DeliveryPerson.animate elapsed model.deliveryPerson
-  , requests = List.map (Request.animate elapsed) model.requests
-  , customers = List.map (Customer.animate elapsed) model.customers
-  }
-  |> Model.dispatch elapsed
 
 
 -- click the 1st picked article that has the same category
