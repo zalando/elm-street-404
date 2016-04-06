@@ -146,7 +146,7 @@ splitBy box1 box2 =
   in
     List.filter
       (\{size} -> fst size > 0 && snd size > 0)
-      [ {position = (x2, y2), size = (x1 - x2, w1 + y1 - y2)}
+      [ {position = (x2, y2), size = (x1 - x2, h1 + y1 - y2)}
       , {position = (x1, y2), size = (x2 + w2 - x1, y1 - y2)}
       , {position = (x1 + w1, y1), size = (x2 + w2 - (x1 + w1), y2 + h2 - y1)}
       , {position = (x2, y1 + h1), size = (x1 + w1 - x2, y2 + h2 - (y1 + h1))}
