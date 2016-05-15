@@ -1,5 +1,6 @@
 module View exposing (view)
 
+import Element
 import Actions exposing (Action)
 import Html exposing (div, br, Html, text, button)
 import Html.Attributes exposing (style)
@@ -7,7 +8,6 @@ import Model exposing (Model)
 import PathView
 import WebGLView
 import Box exposing (Box)
-import Element
 
 
 (=>) : a -> b -> (a, b)

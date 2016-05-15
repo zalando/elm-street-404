@@ -99,8 +99,8 @@ type alias Model =
   }
 
 
-initial : Int -> (Int, Int) -> String -> Model
-initial randomSeed dimensions imagesUrl =
+initial : Int -> String -> Model
+initial randomSeed imagesUrl =
   { prevTime = Nothing
   , state = Initialising
   , textures = Textures.textures
@@ -119,7 +119,6 @@ initial randomSeed dimensions imagesUrl =
   , maxLives = 3
   , boxes = []
   }
-  |> resize dimensions
 
 
 resize : (Int, Int) -> Model -> Model

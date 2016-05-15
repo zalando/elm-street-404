@@ -7,6 +7,7 @@ import Window
 import Mouse
 import Textures
 import AnimationFrame
+import Task
 
 
 subscriptions : Model -> Sub Action
@@ -25,8 +26,14 @@ main : Program Never
 main =
   Html.program
     { init =
-        ( Model.initial 0 (0, 0) imagesUrl
-        , Update.loadImage imagesUrl Textures.Score
+        ( Model.initial randomSeed imagesUrl
+        , Cmd.batch
+            [ Update.loadImage imagesUrl Textures.Score
+            , Task.perform
+                (always Dimensions (0,0))
+                (\{width, height} -> Dimensions (width, height))
+                Window.size
+            ]
         )
     , update = Update.update
     , view = View.view
@@ -34,13 +41,9 @@ main =
     }
 
 
-randomSeed : Float
+randomSeed : Int
 randomSeed = 0
 
 
 imagesUrl : String
 imagesUrl = "img/"
-
-
-windowDimensions : (Int, Int)
-windowDimensions = (500, 500) -- test

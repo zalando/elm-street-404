@@ -1,11 +1,11 @@
 module WebGLView exposing (render)
 
+import Element exposing (Element)
 import WebGL as GL
 import Math.Vector2 exposing (Vec2, vec2)
 import Box
 import Textures exposing (Textures)
 import AllDict exposing (AllDict)
-import Element exposing (Element)
 
 
 type alias Vertex =
