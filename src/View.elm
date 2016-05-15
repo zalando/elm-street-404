@@ -7,12 +7,13 @@ import Model exposing (Model)
 import PathView
 import WebGLView
 import Box exposing (Box)
+import Element
 
 
 (=>) : a -> b -> (a, b)
 (=>) = (,)
 
-debug : Model -> Html
+debug : Model -> Html Action
 debug model =
   div
     [ style
@@ -30,8 +31,8 @@ debug model =
     []
 
 
-view : Signal.Address Action -> Model -> Html
-view _ model =
+view : Model -> Html Action
+view model =
   let
     (texturedBoxes, _) = Box.split model.boxes
     mapWidth = fst model.gridSize * model.tileSize
@@ -61,6 +62,6 @@ view _ model =
             ]
           ]
           [ PathView.render model.gridSize (model.tileSize * 2) model.deliveryPerson.route
-          , WebGLView.render model.gridSize (model.tileSize * 2) model.textures texturedBoxes |> Html.fromElement
+          , WebGLView.render model.gridSize (model.tileSize * 2) model.textures texturedBoxes |> Element.toHtml
           ]
       ]

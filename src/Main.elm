@@ -1,44 +1,46 @@
 import Actions exposing (..)
-import Effects exposing (Never)
-import Html exposing (Html)
 import Model exposing (Model)
-import StartApp exposing (App)
-import Task exposing (Task)
+import Html.App as Html
 import Update
 import View
 import Window
+import Mouse
 import Textures
-import Touch
+import AnimationFrame
 
 
-app : App Model
-app =
-  StartApp.start
+subscriptions : Model -> Sub Action
+subscriptions model =
+  Sub.batch
+    [ if model.state == Model.Playing then
+        AnimationFrame.diffs Actions.Tick
+      else
+        Sub.none
+    , Window.resizes (\{width, height} -> Dimensions (width, height))
+    , Mouse.clicks (\{x, y} -> Actions.Click (x, y))
+    ]
+
+
+main : Program Never
+main =
+  Html.program
     { init =
-        ( Model.initial randomSeed windowDimensions imagesUrl
+        ( Model.initial 0 (0, 0) imagesUrl
         , Update.loadImage imagesUrl Textures.Score
         )
     , update = Update.update
     , view = View.view
-    , inputs =
-        [ Signal.map Actions.Dimensions Window.dimensions
-        , Signal.map Actions.Click (Signal.map (\{x,y} -> (x, y)) Touch.taps)
-        ]
+    , subscriptions = subscriptions
     }
 
 
-main : Signal Html
-main = app.html
+randomSeed : Float
+randomSeed = 0
 
 
-port randomSeed : Int
+imagesUrl : String
+imagesUrl = "img/"
 
 
-port imagesUrl : String
-
-
-port windowDimensions : (Int, Int)
-
-
-port tasks : Signal (Task Never ())
-port tasks = app.tasks
+windowDimensions : (Int, Int)
+windowDimensions = (500, 500) -- test

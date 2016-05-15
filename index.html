@@ -9,14 +9,7 @@
 <body>
   <script src="elm.js"></script>
   <script>
-    Elm.fullscreen(Elm.Main, {
-      randomSeed: Math.floor(Math.random() * 0xFFFFFFFF),
-      windowDimensions: [
-        document.body.clientWidth,
-        window.innerHeight
-      ],
-      imagesUrl: 'img/'
-    });
+    Elm.Main.fullscreen();
   </script>
 </body>
 </html>

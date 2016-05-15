@@ -7,7 +7,7 @@ branches:
   only:
     - master
 install:
-  - npm install -g elm@0.16.0 uglify-js@2.6.1
+  - npm install -g elm@0.17.0 uglify-js@2.6.1
   - elm-package install -y
 script:
   - bash ./gh-pages.sh

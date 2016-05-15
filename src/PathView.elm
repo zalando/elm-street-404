@@ -3,7 +3,7 @@ module PathView exposing (render)
 import Svg exposing (svg, polyline)
 import Svg.Attributes exposing (..)
 import Html exposing (Html)
-
+import Actions exposing (Action)
 
 addPointToSring : Int -> (Int, Int) -> String -> String
 addPointToSring tileSize (x, y) =
@@ -15,7 +15,7 @@ addPointToSring tileSize (x, y) =
     )
 
 
-renderPoints : Int -> List (Int, Int) -> Html
+renderPoints : Int -> List (Int, Int) -> Html Action
 renderPoints tileSize waypoints =
   polyline
     [ points (List.foldl (addPointToSring tileSize) "" waypoints)
@@ -29,7 +29,7 @@ renderPoints tileSize waypoints =
     []
 
 
-render : (Int, Int) -> Int -> List (Int, Int) -> Html
+render : (Int, Int) -> Int -> List (Int, Int) -> Html Action
 render (w, h) tileSize route =
   svg
     [ version "1.1"
