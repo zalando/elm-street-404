@@ -44,7 +44,7 @@ update action model =
       if model.state == Playing then
         (Model.animate time model, Cmd.none)
       else
-        ({model | prevTime = Nothing}, Cmd.none)
+        (model, Cmd.none)
     Click position ->
       let
         effect = case Model.click position model of
