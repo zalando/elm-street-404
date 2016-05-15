@@ -79,8 +79,7 @@ type DispatcherAction
 
 
 type alias Model =
-  { prevTime : Maybe Time
-  , state : State
+  { state : State
   , textures : Textures
   , seed : Random.Seed
   , tileSize : Int
@@ -101,8 +100,7 @@ type alias Model =
 
 initial : Int -> String -> Model
 initial randomSeed imagesUrl =
-  { prevTime = Nothing
-  , state = Initialising
+  { state = Initialising
   , textures = Textures.textures
   , seed = Random.initialSeed randomSeed
   , tileSize = 0
@@ -200,12 +198,8 @@ start model =
 
 
 animate : Time -> Model -> Model
-animate time model =
-  case model.prevTime of
-    Nothing ->
-      {model | prevTime = Just time}
-    Just prevTime ->
-      animationLoop (min (time - prevTime) 25) {model | prevTime = Just time}
+animate time =
+  animationLoop (min time 25)
 
 
 animationLoop : Time -> Model -> Model

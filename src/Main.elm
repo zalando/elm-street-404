@@ -46,4 +46,4 @@ randomSeed = 0
 
 
 imagesUrl : String
-imagesUrl = "img/"
+imagesUrl = "../img/"
