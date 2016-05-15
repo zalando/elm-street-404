@@ -1,4 +1,4 @@
-module Model
+module Model exposing
   ( Model
   , initial
   , start
@@ -12,7 +12,7 @@ module Model
   , resize
   , render
   , click
-  ) where
+  )
 
 import Random
 import Time exposing (Time)

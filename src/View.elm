@@ -1,4 +1,4 @@
-module View (view) where
+module View exposing (view)
 
 import Actions exposing (Action)
 import Html exposing (div, br, Html, text, button)

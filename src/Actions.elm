@@ -1,4 +1,4 @@
-module Actions (Action(..)) where
+module Actions exposing (Action(..))
 
 import Article exposing (Article)
 import MapObject exposing (MapObject)

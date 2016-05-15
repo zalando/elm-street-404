@@ -1,4 +1,4 @@
-module Update (update, loadImage) where
+module Update exposing (update, loadImage)
 
 import Model exposing (..)
 import Actions exposing (..)

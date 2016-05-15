@@ -1,4 +1,4 @@
-module DeliveryPersonView (render) where
+module DeliveryPersonView exposing (render)
 
 import DeliveryPerson exposing (DeliveryPerson)
 import Box exposing (Box)

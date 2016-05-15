@@ -1,4 +1,4 @@
-module Astar (findPath) where
+module Astar exposing (findPath)
 
 import Dict exposing (Dict)
 

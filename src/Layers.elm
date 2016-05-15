@@ -1,4 +1,4 @@
-module Layers (layers) where
+module Layers exposing (layers)
 
 
 type alias Layers =

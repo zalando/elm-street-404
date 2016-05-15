@@ -1,4 +1,4 @@
-module WarehouseView (render) where
+module WarehouseView exposing (render)
 
 import MapObject exposing (MapObject)
 import Box exposing (Box)

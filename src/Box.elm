@@ -1,4 +1,4 @@
-module Box
+module Box exposing
   ( TexturedBoxData
   , ClickableBoxData
   , Box
@@ -6,7 +6,7 @@ module Box
   , textured
   , clickable
   , clicked
-  ) where
+  )
 
 import Actions
 import Textures exposing (TextureId)

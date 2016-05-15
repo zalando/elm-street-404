@@ -1,4 +1,10 @@
-module DeliveryPerson (DeliveryPerson, Location(..), initial, animate, navigateTo) where
+module DeliveryPerson exposing
+  ( DeliveryPerson
+  , Location(..)
+  , initial
+  , animate
+  , navigateTo
+  )
 
 import Time exposing (Time)
 import AnimationState exposing (AnimatedObject, animateObject, rotateFrames)

@@ -1,4 +1,4 @@
-module TreeView (render) where
+module TreeView exposing (render)
 
 import Textures
 import Box exposing (Box)

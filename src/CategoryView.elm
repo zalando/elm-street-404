@@ -1,4 +1,4 @@
-module CategoryView (render) where
+module CategoryView exposing (render)
 
 import Category exposing (Category)
 import Layers exposing (layers)

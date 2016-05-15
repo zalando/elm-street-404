@@ -1,4 +1,4 @@
-module FountainView (render) where
+module FountainView exposing (render)
 
 import Box exposing (Box)
 import Textures

@@ -1,4 +1,4 @@
-module Category
+module Category exposing
   ( Category(..)
   , getFrame
   , random
@@ -9,7 +9,7 @@ module Category
   , isPants
   , isScarf
   , isSame
-  ) where
+  )
 
 import Random
 import IHopeItWorks

@@ -1,4 +1,4 @@
-module PathView (render) where
+module PathView exposing (render)
 
 import Svg exposing (svg, polyline)
 import Svg.Attributes exposing (..)

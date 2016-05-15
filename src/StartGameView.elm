@@ -1,4 +1,4 @@
-module StartGameView (render) where
+module StartGameView exposing (render)
 
 import Box exposing (Box)
 import Textures

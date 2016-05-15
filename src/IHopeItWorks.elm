@@ -1,4 +1,4 @@
-module IHopeItWorks (exclude, remove, pickRandom, find) where
+module IHopeItWorks exposing (exclude, remove, pickRandom, find)
 
 import Random
 

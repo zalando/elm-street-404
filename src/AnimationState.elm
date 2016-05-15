@@ -1,4 +1,4 @@
-module AnimationState
+module AnimationState exposing
   ( AnimatedObject
   , Dispatcher
   , dispatcher
@@ -6,7 +6,7 @@ module AnimationState
   , dispatcherActions
   , animateObject
   , rotateFrames
-  ) where
+  )
 
 import Time exposing (Time)
 
