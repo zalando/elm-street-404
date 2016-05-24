@@ -1,6 +1,5 @@
 module View exposing (view)
 
-import Element
 import Actions exposing (Action)
 import Html exposing (div, br, Html, text, button)
 import Html.Attributes exposing (style)
@@ -57,11 +56,9 @@ view model =
             , "height" => (toString mapHeight ++ "px")
             , "left" => (toString ((screenWidth - mapWidth) // 2) ++ "px")
             , "top" => (toString ((screenHeight - mapHeight) // 2) ++ "px")
-            , "transform" => "scale(0.5)"
-            , "transform-origin" => "left top"
             ]
           ]
-          [ PathView.render model.gridSize (model.tileSize * 2) model.deliveryPerson.route
-          , WebGLView.render model.gridSize (model.tileSize * 2) model.textures texturedBoxes |> Element.toHtml
+          [ PathView.render model.gridSize model.tileSize model.deliveryPerson.route
+          , WebGLView.render model.gridSize model.tileSize model.textures texturedBoxes
           ]
       ]

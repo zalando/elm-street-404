@@ -30,7 +30,7 @@ main =
         , Cmd.batch
             [ Update.loadImage imagesUrl Textures.Score
             , Task.perform
-                (always Dimensions (0,0))
+                (always Dimensions (0, 0))
                 (\{width, height} -> Dimensions (width, height))
                 Window.size
             ]

@@ -1,11 +1,13 @@
 module WebGLView exposing (render)
 
-import Element exposing (Element)
+import Html exposing (Html)
+import Html.Attributes exposing (width, height, style)
 import WebGL as GL
 import Math.Vector2 exposing (Vec2, vec2)
 import Box
 import Textures exposing (Textures)
 import AllDict exposing (AllDict)
+import Actions exposing (Action)
 
 
 type alias Vertex =
@@ -40,13 +42,20 @@ mesh =
     ]
 
 
-render : (Int, Int) -> Int -> Textures -> List Box.TexturedBoxData -> Element
+render : (Int, Int) -> Int -> Textures -> List Box.TexturedBoxData -> Html Action
 render ((w, h) as dimensions) tileSize textures boxes =
-  GL.webglWithConfig
+  GL.toHtmlWith
     [ GL.Enable GL.Blend
     , GL.BlendFunc (GL.One, GL.OneMinusSrcAlpha)
     ]
-    (w * tileSize, h * tileSize)
+    [ width (w * tileSize * 2)
+    , height (h * tileSize * 2)
+    , style
+        [ ("position", "absolute")
+        , ("width", toString (w * tileSize) ++ "px")
+        , ("height", toString (h * tileSize) ++ "px")
+        ]
+    ]
     (List.filterMap (renderTextured dimensions textures) (List.reverse boxes))
 
 
