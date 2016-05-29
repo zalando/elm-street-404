@@ -480,16 +480,8 @@ click coordinates model =
 
 
 clickToTile : Model -> (Int, Int) -> (Int, Int)
-clickToTile {dimensions, gridSize, tileSize} (x, y) =
-  let
-    mapWidth = fst gridSize * tileSize
-    mapHeight = snd gridSize * tileSize
-    screenWidth = max (fst dimensions) mapWidth
-    screenHeight = max (snd dimensions) mapHeight
-  in
-    ( (x - (screenWidth - mapWidth) // 2) // tileSize
-    , (y - (screenHeight - mapHeight) // 2) // tileSize
-    )
+clickToTile {tileSize} (x, y) =
+  (x // tileSize, y // tileSize)
 
 
 render : Model -> Model

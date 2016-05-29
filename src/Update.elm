@@ -45,9 +45,9 @@ update action model =
         (Model.animate time model, Cmd.none)
       else
         (model, Cmd.none)
-    Click position ->
+    Click {x, y} ->
       let
-        effect = case Model.click position model of
+        effect = case Model.click (x, y) model of
           Just action ->
             Task.succeed action
               |> Task.perform identity identity

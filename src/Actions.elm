@@ -6,12 +6,13 @@ import Time exposing (Time)
 import Category exposing (Category)
 import Textures exposing (TextureId)
 import WebGL exposing (Texture)
+import RelativeEvents exposing (Position)
 
 
 type Action
   = Tick Time
   | Start
-  | Click (Int, Int)
+  | Click Position
   | ClickArticle Article
   | ClickCategory Category
   | ClickMapObject MapObject

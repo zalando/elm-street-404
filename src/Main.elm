@@ -4,7 +4,6 @@ import Html.App as Html
 import Update
 import View
 import Window
-import Mouse
 import Textures
 import AnimationFrame
 import Task
@@ -18,7 +17,6 @@ subscriptions model =
       else
         Sub.none
     , Window.resizes (\{width, height} -> Dimensions (width, height))
-    , Mouse.clicks (\{x, y} -> Actions.Click (x, y))
     ]
 
 
