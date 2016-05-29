@@ -6,7 +6,7 @@ import Html.Attributes exposing (style)
 import Model exposing (Model)
 import PathView
 import WebGLView
-import RelativeEvents
+import OffsetClick
 import Box exposing (Box)
 
 
@@ -59,7 +59,7 @@ view model =
             , "top" => (toString ((screenHeight - mapHeight) // 2) ++ "px")
             , "-webkit-tap-highlight-color" => "transparent"
             ]
-          , RelativeEvents.onClick Actions.Click
+          , OffsetClick.onClick Actions.Click
           ]
           [ PathView.render model.gridSize model.tileSize model.deliveryPerson.route
           , WebGLView.render model.gridSize model.tileSize model.textures texturedBoxes

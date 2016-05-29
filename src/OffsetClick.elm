@@ -1,4 +1,4 @@
-module RelativeEvents exposing
+module OffsetClick exposing
   ( Position
   , onClick
   )
@@ -6,7 +6,8 @@ module RelativeEvents exposing
 import Json.Decode as Json exposing (Decoder, (:=))
 import Html.Events as Events
 import Html
-import DOM
+import Result exposing (Result)
+import Native.Offset
 
 
 type alias Position =
@@ -24,16 +25,20 @@ relativePosition : Decoder Position
 relativePosition =
   Json.object2
     offsetBy
-    ("target" := DOM.boundingClientRect)
+    (Json.customDecoder ("target" := Json.value) Native.Offset.offset)
     position
 
 
-offsetBy : DOM.Rectangle ->  { a | x : Int, y : Int } -> { a | x : Int, y : Int }
-offsetBy {left, top} position =
-  { position
-  | x = position.x - round left
-  , y = position.y - round top
+offsetBy : Position -> Position -> Position
+offsetBy {x, y} position =
+  { x = position.x - x
+  , y = position.y - y
   }
+
+
+offset : Json.Value -> Result String Position
+offset =
+  Native.Offset.offset
 
 
 position : Json.Decoder Position

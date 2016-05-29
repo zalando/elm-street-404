@@ -6,7 +6,7 @@ import Time exposing (Time)
 import Category exposing (Category)
 import Textures exposing (TextureId)
 import WebGL exposing (Texture)
-import RelativeEvents exposing (Position)
+import OffsetClick exposing (Position)
 
 
 type Action
