@@ -1,4 +1,4 @@
-module Actions (Action(..)) where
+module Actions exposing (Action(..))
 
 import Article exposing (Article)
 import MapObject exposing (MapObject)
@@ -6,12 +6,13 @@ import Time exposing (Time)
 import Category exposing (Category)
 import Textures exposing (TextureId)
 import WebGL exposing (Texture)
+import OffsetClick exposing (Position)
 
 
 type Action
   = Tick Time
   | Start
-  | Click (Int, Int)
+  | Click Position
   | ClickArticle Article
   | ClickCategory Category
   | ClickMapObject MapObject

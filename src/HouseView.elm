@@ -1,4 +1,4 @@
-module HouseView (render) where
+module HouseView exposing (render)
 
 import Actions exposing (Action)
 import Layers exposing (layers)

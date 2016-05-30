@@ -1,4 +1,4 @@
-module Model
+module Model exposing
   ( Model
   , initial
   , start
@@ -12,7 +12,7 @@ module Model
   , resize
   , render
   , click
-  ) where
+  )
 
 import Random
 import Time exposing (Time)
@@ -79,8 +79,7 @@ type DispatcherAction
 
 
 type alias Model =
-  { prevTime : Maybe Time
-  , state : State
+  { state : State
   , textures : Textures
   , seed : Random.Seed
   , tileSize : Int
@@ -99,10 +98,9 @@ type alias Model =
   }
 
 
-initial : Int -> (Int, Int) -> String -> Model
-initial randomSeed dimensions imagesUrl =
-  { prevTime = Nothing
-  , state = Initialising
+initial : Int -> String -> Model
+initial randomSeed imagesUrl =
+  { state = Initialising
   , textures = Textures.textures
   , seed = Random.initialSeed randomSeed
   , tileSize = 0
@@ -119,7 +117,6 @@ initial randomSeed dimensions imagesUrl =
   , maxLives = 3
   , boxes = []
   }
-  |> resize dimensions
 
 
 resize : (Int, Int) -> Model -> Model
@@ -160,7 +157,7 @@ positionObstacles ({gridSize, deliveryPerson} as model) =
       , position = (2, 4)
       }
     (mapObjects, seed) =
-      Random.generate
+      Random.step
         ( MapObject.placeRandom
             ( List.map (always MapObject.warehouse) [0..1] ++
               List.map (always MapObject.house) [0..3] ++
@@ -201,12 +198,8 @@ start model =
 
 
 animate : Time -> Model -> Model
-animate time model =
-  case model.prevTime of
-    Nothing ->
-      {model | prevTime = Just time}
-    Just prevTime ->
-      animationLoop (min (time - prevTime) 25) {model | prevTime = Just time}
+animate time =
+  animationLoop (min time 25)
 
 
 animationLoop : Time -> Model -> Model
@@ -245,7 +238,7 @@ dispatchArticles number model =
     initialSlots = IHopeItWorks.exclude
       (MapObject.warehouseSlots model.mapObjects)
       (Article.warehouses model.articles)
-    (articles, seed) = Random.generate (Article.dispatch number initialSlots) model.seed
+    (articles, seed) = Random.step (Article.dispatch number initialSlots) model.seed
   in
     { model | articles = model.articles ++ articles, seed = seed }
 
@@ -259,7 +252,7 @@ dispatchOrders number model =
     slots = IHopeItWorks.exclude
       (MapObject.houseSlots model.mapObjects)
       (List.map .house model.requests)
-    (orders, seed) = Random.generate (Request.orders number slots categories) model.seed
+    (orders, seed) = Random.step (Request.orders number slots categories) model.seed
   in
     { model | requests = model.requests ++ orders, seed = seed }
 
@@ -273,7 +266,7 @@ dispatchReturns number model =
     slots = IHopeItWorks.exclude
       (MapObject.houseSlots housesWithArticles)
       (List.map .house model.requests)
-    (articlesToReturn, seed) = Random.generate (Article.return number slots model.articles) model.seed
+    (articlesToReturn, seed) = Random.step (Article.return number slots model.articles) model.seed
     articles = Article.markInReturn model.articles articlesToReturn
     returnedArticles = Article.markInReturn articlesToReturn articlesToReturn
     returns = Request.returnArticles returnedArticles
@@ -357,7 +350,7 @@ dispatchCustomers : Model -> Model
 dispatchCustomers model =
   let
     emptyHouses = List.filter (houseEmpty model.customers) model.mapObjects
-    (newCustomers, seed) = Random.generate (Customer.rodnams emptyHouses) model.seed
+    (newCustomers, seed) = Random.step (Customer.rodnams emptyHouses) model.seed
   in
     { model
     | customers = model.customers ++ newCustomers
@@ -487,16 +480,8 @@ click coordinates model =
 
 
 clickToTile : Model -> (Int, Int) -> (Int, Int)
-clickToTile {dimensions, gridSize, tileSize} (x, y) =
-  let
-    mapWidth = fst gridSize * tileSize
-    mapHeight = snd gridSize * tileSize
-    screenWidth = max (fst dimensions) mapWidth
-    screenHeight = max (snd dimensions) mapHeight
-  in
-    ( (x - (screenWidth - mapWidth) // 2) // tileSize
-    , (y - (screenHeight - mapHeight) // 2) // tileSize
-    )
+clickToTile {tileSize} (x, y) =
+  (x // tileSize, y // tileSize)
 
 
 render : Model -> Model

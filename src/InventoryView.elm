@@ -1,4 +1,4 @@
-module InventoryView (render) where
+module InventoryView exposing (render)
 
 import Article exposing (Article)
 import Box exposing (Box)

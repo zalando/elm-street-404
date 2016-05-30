@@ -1,4 +1,4 @@
-module Article
+module Article exposing
   ( Article
   , State(..)
   , dispatch
@@ -12,7 +12,7 @@ module Article
   , availableCategories
   , return
   , markInReturn
-  ) where
+  )
 
 import Random
 import MapObject exposing (MapObject, MapObjectCategory(..))

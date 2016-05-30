@@ -1,4 +1,4 @@
-module CustomerView (render) where
+module CustomerView exposing (render)
 
 import Customer exposing (Customer)
 import Box exposing (Box)

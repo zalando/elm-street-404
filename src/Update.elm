@@ -1,8 +1,7 @@
-module Update (update, loadImage) where
+module Update exposing (update, loadImage)
 
 import Model exposing (..)
 import Actions exposing (..)
-import Effects exposing (Effects)
 import DeliveryPerson exposing (Location(..))
 import Article exposing (State(..), Article)
 import MapObject exposing (MapObject, MapObjectCategory(..))
@@ -14,11 +13,11 @@ import Textures exposing (TextureId)
 import AllDict
 
 
-update : Action -> Model -> (Model, Effects Action)
+update : Action -> Model -> (Model, Cmd Action)
 update action model =
   case action of
     Dimensions dimensions ->
-      (Model.resize dimensions model |> Model.render, Effects.none)
+      (Model.resize dimensions model |> Model.render, Cmd.none)
     TextureLoaded textureId texture ->
       let
         loadTexture =
@@ -32,27 +31,28 @@ update action model =
       in
         if textureId == Textures.Score then
           ( {newModel | state = Loading}
-          , Effects.batch (List.map (loadImage model.imagesUrl) texturesToLoad)
+          , Cmd.batch (List.map (loadImage model.imagesUrl) texturesToLoad)
           )
         else
           if List.length texturesToLoad == 0 then
-            ({newModel | state = Stopped} |> Model.render, Effects.none)
+            ({newModel | state = Stopped} |> Model.render, Cmd.none)
           else
-            (Model.render newModel, Effects.none)
+            (Model.render newModel, Cmd.none)
     Start ->
-      (Model.start model, Effects.tick Tick)
+      (Model.start model, Cmd.none)
     Tick time ->
       if model.state == Playing then
-        (Model.animate time model, Effects.tick Tick)
+        (Model.animate time model, Cmd.none)
       else
-        ({model | prevTime = Nothing}, Effects.none)
-    Click position ->
+        (model, Cmd.none)
+    Click {x, y} ->
       let
-        effect = case Model.click position model of
+        effect = case Model.click (x, y) model of
           Just action ->
-            Effects.task (Task.succeed action)
+            Task.succeed action
+              |> Task.perform identity identity
           Nothing ->
-            Effects.none
+            Cmd.none
       in
         (model, effect)
     ClickArticle article ->
@@ -63,20 +63,20 @@ update action model =
       ifPlaying (Model.navigateToMapObject mapObject) model
 
 
-ifPlaying : (Model -> Model) -> Model -> (Model, Effects Action)
+ifPlaying : (Model -> Model) -> Model -> (Model, Cmd Action)
 ifPlaying fun model =
   if model.state == Playing then
-    (fun model, Effects.none)
+    (fun model, Cmd.none)
   else
-    (model, Effects.none)
+    (model, Cmd.none)
 
 
-loadImage : String -> TextureId -> Effects Action
+loadImage : String -> TextureId -> Cmd Action
 loadImage imagesUrl textureId =
-  ( WebGL.loadTexture (imagesUrl ++ "/" ++ Textures.filename textureId)
-    |> Task.map (\r -> TextureLoaded textureId (Just r))
-  ) `Task.onError` always (Task.succeed (TextureLoaded textureId Nothing))
-  |> Effects.task
+  WebGL.loadTexture (imagesUrl ++ "/" ++ Textures.filename textureId)
+    |> Task.perform
+        (\err -> TextureLoaded textureId Nothing)
+        (\texture -> TextureLoaded textureId (Just texture))
 
 
 -- click the 1st picked article that has the same category

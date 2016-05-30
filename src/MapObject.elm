@@ -1,4 +1,4 @@
-module MapObject
+module MapObject exposing
   ( Box
   , MapObject
   , MapObjectCategory(..)
@@ -12,7 +12,7 @@ module MapObject
   , splitBy
   , houseSlots
   , warehouseSlots
-  ) where
+  )
 
 import Random
 import Fountain exposing (Fountain)

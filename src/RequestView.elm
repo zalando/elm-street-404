@@ -1,4 +1,4 @@
-module RequestView (render) where
+module RequestView exposing (render)
 
 import CategoryView
 import Actions exposing (Action)

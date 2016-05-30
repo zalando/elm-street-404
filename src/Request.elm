@@ -1,4 +1,4 @@
-module Request
+module Request exposing
   ( Request
   , RequestCategory(..)
   , isInReturn
@@ -8,7 +8,7 @@ module Request
   , orders
   , orderedCategories
   , returnArticles
-  ) where
+  )
 
 import MapObject exposing (MapObject)
 import Article exposing (Article)

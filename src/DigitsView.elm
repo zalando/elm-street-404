@@ -1,4 +1,4 @@
-module DigitsView (render) where
+module DigitsView exposing (render)
 
 import Box exposing (Box)
 import Textures

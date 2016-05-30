@@ -1,4 +1,4 @@
-module View (view) where
+module View exposing (view)
 
 import Actions exposing (Action)
 import Html exposing (div, br, Html, text, button)
@@ -6,13 +6,14 @@ import Html.Attributes exposing (style)
 import Model exposing (Model)
 import PathView
 import WebGLView
+import OffsetClick
 import Box exposing (Box)
 
 
 (=>) : a -> b -> (a, b)
 (=>) = (,)
 
-debug : Model -> Html
+debug : Model -> Html Action
 debug model =
   div
     [ style
@@ -30,8 +31,8 @@ debug model =
     []
 
 
-view : Signal.Address Action -> Model -> Html
-view _ model =
+view : Model -> Html Action
+view model =
   let
     (texturedBoxes, _) = Box.split model.boxes
     mapWidth = fst model.gridSize * model.tileSize
@@ -56,11 +57,11 @@ view _ model =
             , "height" => (toString mapHeight ++ "px")
             , "left" => (toString ((screenWidth - mapWidth) // 2) ++ "px")
             , "top" => (toString ((screenHeight - mapHeight) // 2) ++ "px")
-            , "transform" => "scale(0.5)"
-            , "transform-origin" => "left top"
+            , "-webkit-tap-highlight-color" => "transparent"
             ]
+          , OffsetClick.onClick Actions.Click
           ]
-          [ PathView.render model.gridSize (model.tileSize * 2) model.deliveryPerson.route
-          , WebGLView.render model.gridSize (model.tileSize * 2) model.textures texturedBoxes |> Html.fromElement
+          [ PathView.render model.gridSize model.tileSize model.deliveryPerson.route
+          , WebGLView.render model.gridSize model.tileSize model.textures texturedBoxes
           ]
       ]

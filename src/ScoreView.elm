@@ -1,4 +1,4 @@
-module ScoreView (render) where
+module ScoreView exposing (render)
 
 import Box exposing (Box)
 import Textures

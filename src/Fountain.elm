@@ -1,4 +1,4 @@
-module Fountain (Fountain, animate, fountain) where
+module Fountain exposing (Fountain, animate, fountain)
 
 import Time exposing (Time)
 import AnimationState exposing (AnimatedObject, animateObject, rotateFrames)

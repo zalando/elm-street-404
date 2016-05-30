@@ -1,4 +1,12 @@
-module Customer (Customer, animate, livesHere, decHappiness, incHappiness, isLost, rodnams) where
+module Customer exposing
+  ( Customer
+  , animate
+  , livesHere
+  , decHappiness
+  , incHappiness
+  , isLost
+  , rodnams
+  )
 
 import MapObject exposing (MapObject)
 import Random
