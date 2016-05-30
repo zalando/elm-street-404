@@ -7,6 +7,7 @@ import Window
 import Textures
 import AnimationFrame
 import Task
+import Process
 
 
 subscriptions : Model -> Sub Action
@@ -30,7 +31,7 @@ main =
             , Task.perform
                 (always Dimensions (0, 0))
                 (\{width, height} -> Dimensions (width, height))
-                Window.size
+                (Process.sleep 100 `Task.andThen` (always Window.size))
             ]
         )
     , update = Update.update
@@ -44,4 +45,4 @@ randomSeed = 0
 
 
 imagesUrl : String
-imagesUrl = "../img/"
+imagesUrl = "./img/"
