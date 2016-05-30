@@ -10,12 +10,12 @@ elm make src/Main.elm --output gh-pages/elm.js
 
 # copy the images and html
 cp index.html gh-pages/index.html
-cp -R img gh-pages
+cp -R src/img gh-pages
 
 cd gh-pages
 
 # minify js
-uglifyjs --compress warnings=false --mangle --source-map elm.js.map --output elm.js -- elm.js
+uglifyjs --compress warnings=false --mangle --output elm.js -- elm.js
 
 # init branch and commit
 git init
