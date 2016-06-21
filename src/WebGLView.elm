@@ -60,7 +60,7 @@ render ((w, h) as dimensions) tileSize textures boxes =
 
 
 renderTextured : (Int, Int) -> Textures -> Box.TexturedBoxData -> Maybe GL.Renderable
-renderTextured (w, h) textures {textureId, position, frame} =
+renderTextured (w, h) textures ({textureId, position, frame} as box) =
   AllDict.get textureId textures
   `Maybe.andThen`
   (\{size, offset, texture} ->
@@ -71,7 +71,7 @@ renderTextured (w, h) textures {textureId, position, frame} =
           fragmentShader
           mesh
           { screenSize = vec2 (toFloat w) (toFloat h)
-          , offset = vec2 (fst offset + fst position) (snd offset + snd position)
+          , offset = vec2 (fst offset + fst position + fst box.offset) (snd offset + snd position + snd box.offset)
           , texture = textureValue
           , frame = frame
           , textureSize =
