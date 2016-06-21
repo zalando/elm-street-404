@@ -498,8 +498,8 @@ boxes model =
       (toFloat (fst model.gridSize) / 2 + 1, toFloat (snd model.gridSize) / 2)
       (Textures.loadedTextures model.textures)
   else
-    DeliveryPersonView.render (List.length (List.filter Article.isPicked model.articles)) model.deliveryPerson
-    :: InventoryView.render model.gridSize model.articles
+    InventoryView.render model.gridSize model.articles
+    ++ DeliveryPersonView.render (List.length (List.filter Article.isPicked model.articles)) model.deliveryPerson
     ++ ScoreView.render model.gridSize model.score model.maxLives (countLives model)
     ++ List.concat (List.map (renderMapObject model) model.mapObjects)
     ++ if model.state == Stopped then StartGameView.render model.gridSize else []

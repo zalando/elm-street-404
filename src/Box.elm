@@ -4,6 +4,7 @@ module Box exposing
   , Box
   , split
   , textured
+  , offsetTextured
   , clickable
   , clicked
   )
@@ -28,20 +29,27 @@ type alias ClickableBoxData =
 
 type alias TexturedBoxData =
   { position : (Float, Float)
+  , offset : (Float, Float)
   , textureId : TextureId
   , frame : Int
   , layer : (Int, Int)
   }
 
 
-textured : TextureId -> (Float, Float) -> Int -> (Int, Int) -> Box
-textured textureId position frame layer =
+offsetTextured : (Float, Float) -> TextureId -> (Float, Float) -> Int -> (Int, Int) -> Box
+offsetTextured offset textureId position frame layer =
   Textured
     { position = position
+    , offset = offset
     , textureId = textureId
     , frame = frame
     , layer = layer
     }
+
+
+textured : TextureId -> (Float, Float) -> Int -> (Int, Int) -> Box
+textured =
+  offsetTextured (0, 0)
 
 
 clickable : (Float, Float) -> (Float, Float) -> (Float, Float) -> (Int, Int) -> Actions.Action -> Box

@@ -22,7 +22,8 @@ type TextureId
   | Tree
   | WarehouseShadow
   | Categories
-  | DeliveryPerson
+  | DeliveryPersonBack
+  | DeliveryPersonFront
   | Fountain
   | InventoryBubble
   | Shirts
@@ -36,6 +37,7 @@ type TextureId
   | WarehouseBubble
   | ElmStreet404
   | Score
+  | Boxes
 
 
 filename : TextureId -> String
@@ -48,7 +50,8 @@ filename textureId =
     Tree -> "tree.png"
     WarehouseShadow -> "warehouse-shadow.png"
     Categories -> "categories.png"
-    DeliveryPerson -> "delivery-person.png"
+    DeliveryPersonBack -> "delivery-person.png"
+    DeliveryPersonFront -> "obstructing-delivery-person.png"
     Fountain -> "fountain.png"
     InventoryBubble -> "inventory-bubble.png"
     Shirts -> "shirts.png"
@@ -62,6 +65,7 @@ filename textureId =
     WarehouseBubble -> "warehouse-bubble.png"
     ElmStreet404 -> "404-elm-street.png"
     Score -> "score.png"
+    Boxes -> "boxes.png"
 
 
 textures : Textures
@@ -71,7 +75,9 @@ textures =
     [ (Categories, initData (1, 1) (0, 0) 14)
     , (ClickToStart, initData (10, 2) (0, 0) 1)
     , (Customers, initData (2, 3) (0, 0) 18)
-    , (DeliveryPerson, initData (2, 4) (0, -2) 29)
+    , (DeliveryPersonFront, initData (2, 4) (0, -2) 29)
+    , (DeliveryPersonBack, initData (2, 4) (0, -2) 29)
+    , (Boxes, initData (2, 4) (0, -2) 29)
     , (ElmStreet404, initData (13, 2) (0, 0) 1)
     , (Fountain, initData (3, 2) (0, 0) 1)
     , (FountainShadow, initData (4, 2) (0, 1) 1)
