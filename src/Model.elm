@@ -84,6 +84,7 @@ type alias Model =
   , seed : Random.Seed
   , tileSize : Int
   , imagesUrl : String
+  , embedded : Bool
   , dimensions : (Int, Int)
   , gridSize : (Int, Int)
   , deliveryPerson : DeliveryPerson
@@ -98,9 +99,10 @@ type alias Model =
   }
 
 
-initial : Int -> String -> Model
-initial randomSeed imagesUrl =
+initial : Int -> String -> Bool -> Model
+initial randomSeed imagesUrl embedded =
   { state = Initialising
+  , embedded = embedded
   , textures = Textures.textures
   , seed = Random.initialSeed randomSeed
   , tileSize = 0
@@ -159,9 +161,10 @@ positionObstacles ({gridSize, deliveryPerson} as model) =
     (mapObjects, seed) =
       Random.step
         ( MapObject.placeRandom
-            ( List.map (always MapObject.warehouse) [0..1] ++
-              List.map (always MapObject.house) [0..3] ++
-              (MapObject.fountain :: List.map (always MapObject.tree) [0..3])
+            ( List.repeat 2 MapObject.warehouse ++
+              List.repeat 4 MapObject.house ++
+              MapObject.fountain ::
+              List.repeat 4 MapObject.tree
             )
             boxes
         )

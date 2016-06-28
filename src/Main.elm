@@ -33,8 +33,11 @@ main =
             randomSeed = flags
               |> Json.decodeValue ("randomSeed" := Json.int)
               |> Result.withDefault 0
+            embedded = flags
+              |> Json.decodeValue ("embedded" := Json.bool)
+              |> Result.withDefault True
           in
-            ( Model.initial randomSeed imagesUrl
+            ( Model.initial randomSeed imagesUrl embedded
             , Cmd.batch
                 [ Update.loadImage imagesUrl Textures.Score
                 , Task.perform
