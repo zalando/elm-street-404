@@ -10,7 +10,7 @@ elm make src/Main.elm --output gh-pages/elm.js
 
 # copy the images and html
 cp index.html gh-pages/index.html
-cp -R src/img gh-pages
+cp -R img gh-pages
 
 cd gh-pages
 

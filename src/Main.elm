@@ -8,7 +8,7 @@ import Textures
 import AnimationFrame
 import Task
 import Process
-
+import Json.Decode as Json exposing ((:=))
 
 subscriptions : Model -> Sub Action
 subscriptions model =
@@ -21,28 +21,30 @@ subscriptions model =
     ]
 
 
-main : Program Never
+main : Program Json.Value
 main =
-  Html.program
+  Html.programWithFlags
     { init =
-        ( Model.initial randomSeed imagesUrl
-        , Cmd.batch
-            [ Update.loadImage imagesUrl Textures.Score
-            , Task.perform
-                (always Dimensions (0, 0))
-                (\{width, height} -> Dimensions (width, height))
-                (Process.sleep 100 `Task.andThen` (always Window.size))
-            ]
+        (\flags ->
+          let
+            imagesUrl = flags
+              |> Json.decodeValue ("imagesUrl" := Json.string)
+              |> Result.withDefault "../img/"
+            randomSeed = flags
+              |> Json.decodeValue ("randomSeed" := Json.int)
+              |> Result.withDefault 0
+          in
+            ( Model.initial randomSeed imagesUrl
+            , Cmd.batch
+                [ Update.loadImage imagesUrl Textures.Score
+                , Task.perform
+                    (\_ -> Dimensions (0, 0))
+                    (\{width, height} -> Dimensions (width, height))
+                    (Process.sleep 100 `Task.andThen` \_ -> Window.size)
+                ]
+            )
         )
     , update = Update.update
     , view = View.view
     , subscriptions = subscriptions
     }
-
-
-randomSeed : Int
-randomSeed = 0
-
-
-imagesUrl : String
-imagesUrl = "./img/"

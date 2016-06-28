@@ -8,6 +8,11 @@
 </head>
 <body>
   <script src="elm.js"></script>
-  <script>Elm.Main.fullscreen();</script>
+  <script>
+    Elm.Main.fullscreen({
+      randomSeed: Date.now(),
+      imagesUrl: '/img/'
+    });
+  </script>
 </body>
 </html>
