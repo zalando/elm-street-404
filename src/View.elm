@@ -3,7 +3,7 @@ module View exposing (view)
 import Actions exposing (Action)
 import Html exposing (div, br, Html, text, button)
 import Html.Attributes exposing (style)
-import Html.Events exposing (onClick)
+import Html.Events exposing (onClick, onMouseOver, onMouseLeave)
 import Model exposing (Model)
 import PathView
 import WebGLView
@@ -44,7 +44,7 @@ view model =
   in
     case model.state of
       Model.Suspended _ ->
-        div [style ["position" => "absolute"]]  []
+        text ""
       _ ->
         div
           [ style
@@ -70,18 +70,32 @@ view model =
               [ PathView.render model.gridSize model.tileSize model.deliveryPerson.route
               , WebGLView.render model.gridSize model.tileSize model.textures texturedBoxes
               ]
-            :: if model.embed then [closeButton] else []
+            :: if model.embed then [closeButton model.closeButtonActive (toFloat model.tileSize) (model.imagesUrl ++ "/close.png")] else []
           )
 
 
-closeButton : Html Action
-closeButton =
+closeButton : Bool -> Float -> String -> Html Action
+closeButton active size url =
   button
     [ onClick Actions.Suspend
+    , onMouseLeave (Actions.HoverCloseButton False)
+    , onMouseOver (Actions.HoverCloseButton True)
     , style
         [ "position" => "absolute"
-        , "right" => "10px"
-        , "top" => "10px"
+        , "right" => "0px"
+        , "top" => "0px"
+        , "border" => "none"
+        , "padding" => "0"
+        , "margin" => "0"
+        , "width" => (toString (round (size * 110 / 80)) ++ "px")
+        , "height" => (toString (round (size * 110 / 97)) ++ "px")
+        , "background-color" => "transparent"
+        , "background-image" => ("url(" ++ url ++ ")")
+        , "background-size" => "200% 100%"
+        , "background-position" => (if active then "-100% 0" else "0 0")
+        , "outline" => "none"
+        , "cursor" => "pointer"
+        , "touch-action" => "manipulation"
         ]
     ]
-    [text "X"]
+    []

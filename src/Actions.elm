@@ -20,3 +20,4 @@ type Action
   | ClickMapObject MapObject
   | TextureLoaded TextureId (Maybe Texture)
   | Dimensions Size
+  | HoverCloseButton Bool

@@ -20,6 +20,8 @@ port suspended : Bool -> Cmd msg
 update : Action -> Model -> (Model, Cmd Action)
 update action model =
   case action of
+    HoverCloseButton active ->
+      {model | closeButtonActive = active} ! []
     Dimensions {width, height} ->
       (Model.resize (width, height) model |> Model.render, Cmd.none)
     TextureLoaded textureId texture ->
@@ -77,10 +79,10 @@ update action model =
       ifPlaying (Model.navigateToMapObject mapObject) model
     Suspend ->
       case (model.embed, model.state) of
-          (True, Suspended _) ->
-            model ! []
-          _ ->
-            { model | state = Suspended model.state } ! [suspended True]
+        (True, Suspended _) ->
+          model ! []
+        _ ->
+          { model | state = Suspended model.state, closeButtonActive = False } ! [suspended True]
     Restore ->
       case (model.embed, model.state) of
         (True, Suspended prevState) ->
@@ -101,8 +103,8 @@ loadImage : String -> TextureId -> Cmd Action
 loadImage imagesUrl textureId =
   WebGL.loadTexture (imagesUrl ++ "/" ++ Textures.filename textureId)
     |> Task.perform
-        (\_ -> TextureLoaded textureId Nothing)
-        (\texture -> TextureLoaded textureId (Just texture))
+      (\_ -> TextureLoaded textureId Nothing)
+      (\texture -> TextureLoaded textureId (Just texture))
 
 
 -- click the 1st picked article that has the same category

@@ -102,6 +102,7 @@ type alias Model =
   , score : Int
   , maxLives : Int
   , boxes : List Box
+  , closeButtonActive : Bool
   }
 
 
@@ -124,6 +125,7 @@ initial randomSeed imagesUrl embed =
   , score = 0
   , maxLives = 3
   , boxes = []
+  , closeButtonActive = False
   }
 
 
