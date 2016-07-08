@@ -40,7 +40,13 @@ import StartGameView
 import DigitsView
 
 
-type State = Initialising | Loading | Paused | Playing | Stopped
+type State
+  = Initialising
+  | Loading
+  | Paused
+  | Playing
+  | Stopped
+  | Suspended State -- to store the prev state
 
 
 minMapWidth : Int
@@ -84,7 +90,7 @@ type alias Model =
   , seed : Random.Seed
   , tileSize : Int
   , imagesUrl : String
-  , embedded : Bool
+  , embed : Bool
   , dimensions : (Int, Int)
   , gridSize : (Int, Int)
   , deliveryPerson : DeliveryPerson
@@ -96,13 +102,14 @@ type alias Model =
   , score : Int
   , maxLives : Int
   , boxes : List Box
+  , closeButtonActive : Bool
   }
 
 
 initial : Int -> String -> Bool -> Model
-initial randomSeed imagesUrl embedded =
+initial randomSeed imagesUrl embed =
   { state = Initialising
-  , embedded = embedded
+  , embed = embed
   , textures = Textures.textures
   , seed = Random.initialSeed randomSeed
   , tileSize = 0
@@ -118,6 +125,7 @@ initial randomSeed imagesUrl embedded =
   , score = 0
   , maxLives = 3
   , boxes = []
+  , closeButtonActive = False
   }
 
 

@@ -1,3 +1,5 @@
+port module Main exposing (..)
+
 import Actions exposing (..)
 import Model exposing (Model)
 import Html.App as Html
@@ -10,15 +12,27 @@ import Task
 import Process
 import Json.Decode as Json exposing ((:=))
 
+
+port suspend : (Bool -> msg) -> Sub msg
+
+
+port restore : (Bool -> msg) -> Sub msg
+
+
 subscriptions : Model -> Sub Action
 subscriptions model =
-  Sub.batch
-    [ if model.state == Model.Playing then
-        AnimationFrame.diffs Actions.Tick
-      else
-        Sub.none
-    , Window.resizes (\{width, height} -> Dimensions (width, height))
-    ]
+  case model.state of
+    Model.Suspended _ ->
+      restore (\_ -> Actions.Restore)
+    _ ->
+      Sub.batch
+        [ if model.state == Model.Playing then
+            AnimationFrame.diffs Actions.Tick
+          else
+            Sub.none
+        , Window.resizes Dimensions
+        , suspend (\_ -> Actions.Suspend)
+        ]
 
 
 main : Program Json.Value
@@ -29,20 +43,20 @@ main =
           let
             imagesUrl = flags
               |> Json.decodeValue ("imagesUrl" := Json.string)
-              |> Result.withDefault "../img/"
+              |> Result.withDefault "../img"
             randomSeed = flags
               |> Json.decodeValue ("randomSeed" := Json.int)
               |> Result.withDefault 0
-            embedded = flags
-              |> Json.decodeValue ("embedded" := Json.bool)
-              |> Result.withDefault True
+            embed = flags
+              |> Json.decodeValue ("embed" := Json.bool)
+              |> Result.withDefault False
           in
-            ( Model.initial randomSeed imagesUrl embedded
+            ( Model.initial randomSeed imagesUrl embed
             , Cmd.batch
                 [ Update.loadImage imagesUrl Textures.Score
                 , Task.perform
-                    (\_ -> Dimensions (0, 0))
-                    (\{width, height} -> Dimensions (width, height))
+                    identity
+                    Dimensions
                     (Process.sleep 100 `Task.andThen` \_ -> Window.size)
                 ]
             )

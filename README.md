@@ -16,10 +16,23 @@ To succeed, you'll have to plan your route carefully. You have to decide which p
 
 Unhappy customers: **you lose**.
 
-
 ## Instructions to run
 
 1. Install elm [elm-lang.org/install](http://elm-lang.org/install)
 2. Clone this repo and `cd` into it
-3. Run `elm make src/Main.elm --output elm.js`
-5. Open `index.html` in the browser to see the game
+3. Start `elm reactor`
+4. Open `http://localhost:8000/src/Main.elm` in the browser to see the game
+
+## Embedded mode (please use Elm 0.17.1)
+
+1. Run `elm make src/Main.elm --output elm.js`
+2. Start `elm reactor`
+3. Open `http://localhost:8000/index.html`
+4. Alternatively there is `http://localhost:8000/embed.html` that demonstrates how the game may be toggled by a button
+
+## Gotchas
+
+These two patches may need to be applied to the compiled `elm.js` artifact. 
+
+1. In order to serve the game from a different domain, `img.crossOrigin = 'anonymous'` should be set [in the webgl library](https://github.com/elm-community/elm-webgl/pull/31).
+2. In order to be able to correctly suspend/restore the game from ports, [this fix has to be applied](https://github.com/elm-lang/core/issues/628#issuecomment-225719492).
