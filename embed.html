@@ -24,7 +24,7 @@
         document.body.appendChild(container);
         app = Elm.Main.embed(container, {
           randomSeed: Date.now(),
-          imagesUrl: '/img',
+          imagesUrl: 'img',
           embed: true
         });
         app.ports.suspended.subscribe(function() {
