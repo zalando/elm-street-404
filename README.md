@@ -23,7 +23,7 @@ Unhappy customers: **you lose**.
 3. Start `elm reactor`
 4. Open `http://localhost:8000/src/Main.elm` in the browser to see the game
 
-## Embedded mode (please use Elm 0.17.1)
+## Embedded mode
 
 1. Run `elm make src/Main.elm --output elm.js`
 2. Start `elm reactor`
@@ -32,7 +32,10 @@ Unhappy customers: **you lose**.
 
 ## Gotchas
 
-These two patches may need to be applied to the compiled `elm.js` artifact. 
+In order to be able to correctly suspend/restore the game for embeded mode, [this fix has to be applied to the compiled elm.js](https://github.com/elm-lang/core/issues/628#issuecomment-225719492).
 
-1. In order to serve the game from a different domain, `img.crossOrigin = 'anonymous'` should be set [in the webgl library](https://github.com/elm-community/elm-webgl/pull/31).
-2. In order to be able to correctly suspend/restore the game from ports, [this fix has to be applied](https://github.com/elm-lang/core/issues/628#issuecomment-225719492).
+```diff
+- numSteps = step(numSteps, process);
++ if (process.root) { numSteps = step(numSteps, process); } 
+```
+
