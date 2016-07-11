@@ -490,9 +490,11 @@ click coordinates model =
     List.head clickedBoxes
 
 
-clickToTile : Model -> (Int, Int) -> (Int, Int)
+clickToTile : Model -> (Int, Int) -> (Float, Float)
 clickToTile {tileSize} (x, y) =
-  (x // tileSize, y // tileSize)
+  ( toFloat x / toFloat tileSize
+  , toFloat y / toFloat tileSize
+  )
 
 
 render : Model -> Model

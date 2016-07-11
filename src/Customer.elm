@@ -49,7 +49,7 @@ animate time customer =
 
 rodnam : MapObject -> Random.Generator Customer
 rodnam house =
-  Random.map (initial house) (Random.int 0 5)
+  Random.map (initial house) (Random.int 0 6)
 
 
 rodnams : List MapObject -> Random.Generator (List Customer)
