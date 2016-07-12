@@ -504,15 +504,18 @@ render model =
 
 boxes : Model -> List Box
 boxes model =
-  if model.state == Initialising then
-    []
-  else if model.state == Loading then
-    DigitsView.render
-      (toFloat (fst model.gridSize) / 2 + 1, toFloat (snd model.gridSize) / 2)
-      (Textures.loadedTextures model.textures)
-  else
-    InventoryView.render model.gridSize model.articles
-    ++ DeliveryPersonView.render (List.length (List.filter Article.isPicked model.articles)) model.deliveryPerson
-    ++ ScoreView.render model.gridSize model.score model.maxLives (countLives model)
-    ++ List.concat (List.map (renderMapObject model) model.mapObjects)
-    ++ if model.state == Stopped then StartGameView.render model.gridSize else []
+  case model.state of
+    Initialising ->
+      []
+    Suspended _ ->
+      []
+    Loading ->
+      DigitsView.render
+        (toFloat (fst model.gridSize) / 2 + 1, toFloat (snd model.gridSize) / 2)
+        (Textures.loadedTextures model.textures)
+    _ ->
+      InventoryView.render model.gridSize model.articles
+      ++ DeliveryPersonView.render (List.length (List.filter Article.isPicked model.articles)) model.deliveryPerson
+      ++ ScoreView.render model.gridSize model.score model.maxLives (countLives model)
+      ++ if model.state == Stopped then StartGameView.render model.gridSize else []
+      ++ List.concatMap (renderMapObject model) model.mapObjects
