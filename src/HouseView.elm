@@ -29,7 +29,7 @@ render requests articles customers ({position} as house) =
         0 ->
           []
         n ->
-          [Box.textured (Textures.HouseBubble n) house.position 0 (layers.bubble, 0)]
+          [Box.offsetTextured (-2, toFloat -n) (Textures.HouseBubble n) house.position 0 (layers.bubble, 0)]
 
     renderCustomer =
       case IHopeItWorks.find (Customer.livesHere house) customers of
@@ -41,8 +41,8 @@ render requests articles customers ({position} as house) =
           else
             CustomerView.render requestsFromHouse deliveredArticles house customer
   in
-    [ Box.textured Textures.House position 0 (layers.obstacle, 0)
-    , Box.textured Textures.HouseShadow position 0 (layers.shadow, 0)
+    [ Box.offsetTextured (0, -1) Textures.House position 0 (layers.obstacle, 0)
+    , Box.offsetTextured (0, 1) Textures.HouseShadow position 0 (layers.shadow, 0)
     , Box.clickable (2, 3) (0, -1) position (layers.click, 0) (Actions.ClickMapObject house)
     ]
     ++ List.concat (List.indexedMap renderRequest requestsFromHouse)

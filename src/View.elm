@@ -8,7 +8,6 @@ import Model exposing (Model)
 import PathView
 import WebGLView
 import OffsetClick
-import Box exposing (Box)
 
 
 (=>) : a -> b -> (a, b)
@@ -36,7 +35,6 @@ debug model =
 view : Model -> Html Action
 view model =
   let
-    (texturedBoxes, _) = Box.split model.boxes
     mapWidth = fst model.gridSize * model.tileSize
     mapHeight = snd model.gridSize * model.tileSize
     screenWidth = max (fst model.dimensions) mapWidth
@@ -68,7 +66,7 @@ view model =
               , OffsetClick.onClick Actions.Click
               ]
               [ PathView.render model.gridSize model.tileSize model.deliveryPerson.route
-              , WebGLView.render model.gridSize model.tileSize model.textures texturedBoxes
+              , WebGLView.render model.gridSize model.tileSize model.textures model.texturedBoxes
               ]
             :: if model.embed then [closeButton model.closeButtonActive (toFloat model.tileSize) (model.imagesUrl ++ "/close.png")] else []
           )

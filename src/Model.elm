@@ -25,7 +25,7 @@ import IHopeItWorks
 import Article exposing (Article)
 import MapObject exposing (MapObject, MapObjectCategory(..))
 import Textures exposing (TextureId, Textures)
-import Box exposing (Box)
+import Box exposing (Box, ClickableBoxData, TexturedBoxData)
 import Actions exposing (Action)
 -- Views:
 import TreeView
@@ -101,7 +101,8 @@ type alias Model =
   , dispatcher : Dispatcher DispatcherAction
   , score : Int
   , maxLives : Int
-  , boxes : List Box
+  , clickableBoxes : List ClickableBoxData
+  , texturedBoxes : List TexturedBoxData
   , closeButtonActive : Bool
   }
 
@@ -124,7 +125,8 @@ initial randomSeed imagesUrl embed =
   , dispatcher = dispatcher []
   , score = 0
   , maxLives = 3
-  , boxes = []
+  , clickableBoxes = []
+  , texturedBoxes = []
   , closeButtonActive = False
   }
 
@@ -332,7 +334,7 @@ decHappinessIfHome requests customer =
 
 countLives : Model -> Int
 countLives {maxLives, customers} =
-  maxLives - (List.length (List.filter Customer.isLost customers))
+  maxLives - List.length (List.filter Customer.isLost customers)
 
 
 timeoutRequests : Model -> Model
@@ -484,8 +486,8 @@ click : (Int, Int) -> Model -> Maybe Action
 click coordinates model =
   let
     clickedCoordinates = clickToTile model coordinates
-    (_, clickableBoxes) = Box.split model.boxes
-    clickedBoxes = List.filterMap (Box.clicked clickedCoordinates) (List.reverse clickableBoxes)
+    clickableBoxes = List.sortBy (Box.boxLayer >> negate) model.clickableBoxes
+    clickedBoxes = List.filterMap (Box.clicked clickedCoordinates) clickableBoxes
   in
     List.head clickedBoxes
 
@@ -499,7 +501,13 @@ clickToTile {tileSize} (x, y) =
 
 render : Model -> Model
 render model =
-  {model | boxes = boxes model}
+  let
+    (texturedBoxes, clickableBoxes) = Box.split (boxes model)
+  in
+    { model
+    | texturedBoxes = List.sortBy Box.boxLayer texturedBoxes
+    , clickableBoxes = clickableBoxes
+    }
 
 
 boxes : Model -> List Box
