@@ -80,6 +80,7 @@ gridSize tileSize (width, height) =
 type alias Model =
   { state : State
   , textures : Textures
+  , devicePixelRatio : Float
   , seed : Random.Seed
   , tileSize : Int
   , imagesUrl : String
@@ -100,10 +101,11 @@ type alias Model =
   }
 
 
-initial : Int -> String -> Bool -> Model
-initial randomSeed imagesUrl embed =
+initial : Int -> String -> Bool -> Float -> Model
+initial randomSeed imagesUrl embed devicePixelRatio =
   { state = Initialising
   , embed = embed
+  , devicePixelRatio = devicePixelRatio
   , textures = Textures.textures
   , seed = Random.initialSeed randomSeed
   , tileSize = 0

@@ -42,18 +42,20 @@ mesh =
     ]
 
 
-render : (Int, Int) -> Int -> Textures -> List Box.TexturedBoxData -> Html Action
-render ((w, h) as dimensions) tileSize textures boxes =
+render : Float -> (Int, Int) -> Int -> Textures -> List Box.TexturedBoxData -> Html Action
+render devicePixelRatio ((w, h) as dimensions) tileSize textures boxes =
   GL.toHtmlWith
     [ GL.Enable GL.Blend
     , GL.BlendFunc (GL.One, GL.OneMinusSrcAlpha)
     ]
-    [ width (w * tileSize * 2)
-    , height (h * tileSize * 2)
+    [ width (toFloat w * toFloat tileSize * devicePixelRatio |> round)
+    , height (toFloat h * toFloat tileSize * devicePixelRatio |> round)
     , style
         [ ("position", "absolute")
-        , ("width", toString (w * tileSize) ++ "px")
-        , ("height", toString (h * tileSize) ++ "px")
+        , ("-webkit-transform-origin", "0 0")
+        , ("-webkit-transform", "scale(" ++ toString (1 / devicePixelRatio) ++ ")")
+        , ("transform-origin", "0 0")
+        , ("transform", "scale(" ++ toString (1 / devicePixelRatio) ++ ")")
         ]
     ]
     (List.filterMap (renderTextured dimensions textures) (List.reverse boxes))

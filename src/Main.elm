@@ -54,8 +54,11 @@ main =
             embed = flags
               |> Json.decodeValue ("embed" := Json.bool)
               |> Result.withDefault False
+            devicePixelRatio = flags
+              |> Json.decodeValue ("devicePixelRatio" := Json.float)
+              |> Result.withDefault 1
           in
-            ( Model.initial randomSeed imagesUrl embed
+            ( Model.initial randomSeed imagesUrl embed devicePixelRatio
             , Cmd.batch
                 [ Update.loadImage imagesUrl Textures.Score
                 , Task.perform

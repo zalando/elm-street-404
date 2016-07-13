@@ -66,7 +66,7 @@ view model =
               , OffsetClick.onClick Actions.Click
               ]
               [ PathView.render model.gridSize model.tileSize model.deliveryPerson.route
-              , WebGLView.render model.gridSize model.tileSize model.textures model.texturedBoxes
+              , WebGLView.render model.devicePixelRatio model.gridSize model.tileSize model.textures model.texturedBoxes
               ]
             :: if model.embed then [closeButton model.closeButtonActive (toFloat model.tileSize) (model.imagesUrl ++ "/close.png")] else []
           )
