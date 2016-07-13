@@ -12,11 +12,11 @@ module Model exposing
   , resize
   , render
   , click
+  , dispatch
   )
 
 import Random
 import Time exposing (Time)
-import AnimationState exposing (Dispatcher, dispatcher, animateDispatcher, dispatcherActions)
 import DeliveryPerson exposing (DeliveryPerson)
 import Article exposing (Article)
 import Request exposing (Request)
@@ -26,7 +26,7 @@ import Article exposing (Article)
 import MapObject exposing (MapObject, MapObjectCategory(..))
 import Textures exposing (TextureId, Textures)
 import Box exposing (Box, ClickableBoxData, TexturedBoxData)
-import Actions exposing (Action)
+import Actions exposing (Action, EventAction(..))
 -- Views:
 import TreeView
 import FountainView
@@ -77,13 +77,6 @@ gridSize tileSize (width, height) =
   limitSize (width // tileSize, height // tileSize)
 
 
-type DispatcherAction
-  = DispatchArticles Int
-  | DispatchOrders Int
-  | DispatchReturns Int
-  | DispatchCustomers
-
-
 type alias Model =
   { state : State
   , textures : Textures
@@ -98,7 +91,7 @@ type alias Model =
   , requests : List Request
   , customers : List Customer
   , mapObjects : List MapObject
-  , dispatcher : Dispatcher DispatcherAction
+  , events : List (Time, EventAction)
   , score : Int
   , maxLives : Int
   , clickableBoxes : List ClickableBoxData
@@ -122,7 +115,7 @@ initial randomSeed imagesUrl embed =
   , requests = []
   , mapObjects = []
   , customers = []
-  , dispatcher = dispatcher []
+  , events = []
   , score = 0
   , maxLives = 3
   , clickableBoxes = []
@@ -153,7 +146,7 @@ resize dimensions model =
       , requests = []
       , mapObjects = []
       , customers = []
-      , dispatcher = dispatcher []
+      , events = []
       }
 
 
@@ -193,13 +186,12 @@ start model =
   , articles = []
   , requests = []
   , customers = []
-  , dispatcher =
-      dispatcher
-        [ (11000, DispatchOrders 1)
-        , (13000, DispatchArticles 1)
-        , (31000, DispatchReturns 1)
-        , (5000, DispatchCustomers)
-        ]
+  , events =
+      [ (11000, DispatchOrders 1)
+      , (13000, DispatchArticles 1)
+      , (31000, DispatchReturns 1)
+      , (5000, DispatchCustomers)
+      ]
   , score = 0
   , maxLives = 3
   }
@@ -222,22 +214,15 @@ animationLoop elapsed model =
   , deliveryPerson = DeliveryPerson.animate elapsed model.deliveryPerson
   , requests = List.map (Request.animate elapsed) model.requests
   , customers = List.map (Customer.animate elapsed) model.customers
-  , dispatcher = animateDispatcher elapsed model.dispatcher
   }
-  |> dispatch
   |> timeoutRequests
   |> updateGameState
   |> cleanup
   |> render
 
 
-dispatch : Model -> Model
-dispatch model =
-  List.foldl dispatchAction model (dispatcherActions model.dispatcher)
-
-
-dispatchAction : DispatcherAction -> Model -> Model
-dispatchAction action =
+dispatch : EventAction -> Model -> Model
+dispatch action =
   case action of
     DispatchArticles n -> dispatchArticles n
     DispatchOrders n -> dispatchOrders n
@@ -484,12 +469,11 @@ renderMapObject model mapObject =
 
 click : (Int, Int) -> Model -> Maybe Action
 click coordinates model =
-  let
-    clickedCoordinates = clickToTile model coordinates
-    clickableBoxes = List.sortBy (Box.boxLayer >> negate) model.clickableBoxes
-    clickedBoxes = List.filterMap (Box.clicked clickedCoordinates) clickableBoxes
-  in
-    List.head clickedBoxes
+  model.clickableBoxes
+    |> List.filter (Box.clicked (clickToTile model coordinates))
+    |> List.sortBy (Box.layer >> negate)
+    |> List.head
+    |> Maybe.map .onClickAction
 
 
 clickToTile : Model -> (Int, Int) -> (Float, Float)
@@ -505,7 +489,7 @@ render model =
     (texturedBoxes, clickableBoxes) = Box.split (boxes model)
   in
     { model
-    | texturedBoxes = List.sortBy Box.boxLayer texturedBoxes
+    | texturedBoxes = List.sortBy Box.layer texturedBoxes
     , clickableBoxes = clickableBoxes
     }
 

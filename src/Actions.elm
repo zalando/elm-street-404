@@ -1,4 +1,4 @@
-module Actions exposing (Action(..))
+module Actions exposing (Action(..), EventAction(..))
 
 import Article exposing (Article)
 import MapObject exposing (MapObject)
@@ -8,6 +8,14 @@ import Textures exposing (TextureId)
 import WebGL exposing (Texture)
 import OffsetClick exposing (Position)
 import Window exposing (Size)
+
+
+type EventAction
+  = DispatchArticles Int
+  | DispatchOrders Int
+  | DispatchReturns Int
+  | DispatchCustomers
+
 
 type Action
   = Tick Time
@@ -21,3 +29,4 @@ type Action
   | TextureLoaded TextureId (Maybe Texture)
   | Dimensions Size
   | HoverCloseButton Bool
+  | Event EventAction

@@ -7,7 +7,7 @@ module Box exposing
   , offsetTextured
   , clickable
   , clicked
-  , boxLayer
+  , layer
   )
 
 import Actions
@@ -64,8 +64,8 @@ clickable size offset position layer onClickAction =
     }
 
 
-clicked : (Float, Float) -> ClickableBoxData -> Maybe Actions.Action
-clicked coordinates {position, offset, size, onClickAction} =
+clicked : (Float, Float) -> ClickableBoxData -> Bool
+clicked coordinates ({position, offset, size, onClickAction} as box) =
   let
     left = fst position + fst offset
     top = snd position + snd offset
@@ -74,15 +74,14 @@ clicked coordinates {position, offset, size, onClickAction} =
     x = fst coordinates
     y = snd coordinates
   in
-    if x >= left && x < right && y >= top && y < bottom then
-      Just onClickAction
-    else
-      Nothing
+    x >= left && x < right && y >= top && y < bottom
 
 
-boxLayer : {a | layer : (Float, Float), position : (Float, Float)} -> Float
-boxLayer {layer, position} =
-  fst layer * 1000 + snd position * 100 + snd layer
+layer : {a | layer : (Float, Float), position : (Float, Float)} -> Float
+layer {layer, position} =
+  fst layer * 1000 +
+  snd position * 100 +
+  snd layer
 
 
 split : List Box -> (List TexturedBoxData, List ClickableBoxData)

@@ -89,6 +89,8 @@ update action model =
           { model | state = prevState } ! [Task.perform identity Dimensions Window.size]
         _ ->
           model ! []
+    Event eventAction ->
+      Model.dispatch eventAction model ! []
 
 
 ifPlaying : (Model -> Model) -> Model -> (Model, Cmd Action)
