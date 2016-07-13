@@ -216,7 +216,6 @@ animationLoop elapsed model =
   , requests = List.map (Request.animate elapsed) model.requests
   , customers = List.map (Customer.animate elapsed) model.customers
   }
-  |> updateGameState
   |> render
 
 
@@ -227,7 +226,7 @@ dispatch action =
     DispatchOrders n -> dispatchOrders n
     DispatchReturns n -> dispatchReturns n
     DispatchCustomers -> dispatchCustomers
-    TimeoutRequestsAndCleanup -> timeoutRequests >> cleanup
+    TimeoutRequestsAndCleanup -> timeoutRequests >> cleanup >> updateGameState
 
 
 dispatchArticles : Int -> Model -> Model
@@ -381,7 +380,7 @@ cleanup model =
 updateGameState : Model -> Model
 updateGameState model =
   if countLives model <= 0 then
-    { model | state = Stopped }
+    render { model | state = Stopped }
   else
     model
 
