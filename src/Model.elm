@@ -191,6 +191,7 @@ start model =
       , (13000, DispatchArticles 1)
       , (31000, DispatchReturns 1)
       , (5000, DispatchCustomers)
+      , (1000, TimeoutRequestsAndCleanup)
       ]
   , score = 0
   , maxLives = 3
@@ -215,9 +216,7 @@ animationLoop elapsed model =
   , requests = List.map (Request.animate elapsed) model.requests
   , customers = List.map (Customer.animate elapsed) model.customers
   }
-  |> timeoutRequests
   |> updateGameState
-  |> cleanup
   |> render
 
 
@@ -228,6 +227,7 @@ dispatch action =
     DispatchOrders n -> dispatchOrders n
     DispatchReturns n -> dispatchReturns n
     DispatchCustomers -> dispatchCustomers
+    TimeoutRequestsAndCleanup -> timeoutRequests >> cleanup
 
 
 dispatchArticles : Int -> Model -> Model
@@ -471,7 +471,7 @@ click : (Int, Int) -> Model -> Maybe Action
 click coordinates model =
   model.clickableBoxes
     |> List.filter (Box.clicked (clickToTile model coordinates))
-    |> List.sortBy (Box.layer >> negate)
+    |> List.sortBy (.layer >> negate)
     |> List.head
     |> Maybe.map .onClickAction
 
@@ -489,7 +489,7 @@ render model =
     (texturedBoxes, clickableBoxes) = Box.split (boxes model)
   in
     { model
-    | texturedBoxes = List.sortBy Box.layer texturedBoxes
+    | texturedBoxes = List.sortBy .layer texturedBoxes
     , clickableBoxes = clickableBoxes
     }
 

@@ -15,6 +15,7 @@ type EventAction
   | DispatchOrders Int
   | DispatchReturns Int
   | DispatchCustomers
+  | TimeoutRequestsAndCleanup
 
 
 type Action

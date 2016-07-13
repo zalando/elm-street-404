@@ -3,7 +3,7 @@ module WebGLView exposing (render)
 import Html exposing (Html)
 import Html.Attributes exposing (width, height, style)
 import WebGL as GL
-import Math.Vector2 exposing (Vec2, vec2)
+import Math.Vector2 exposing (Vec2, vec2, fromTuple)
 import Box
 import Textures exposing (Textures)
 import AllDict exposing (AllDict)
@@ -72,13 +72,10 @@ renderTextured (w, h) textures ({textureId, position, frame, offset} as box) =
           mesh
           { screenSize = vec2 (toFloat w) (toFloat h)
           , offset = vec2 (fst offset + fst position) (snd offset + snd position)
-          , texture = textureValue
+          , texture = textureValue.texture
           , frame = frame
-          , textureSize =
-              vec2
-                (toFloat (fst (GL.textureSize textureValue)))
-                (toFloat (snd (GL.textureSize textureValue)))
-          , frameSize = (uncurry vec2) size
+          , textureSize = fromTuple textureValue.size
+          , frameSize = fromTuple size
           }
       )
     texture

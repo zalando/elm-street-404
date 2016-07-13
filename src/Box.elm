@@ -7,7 +7,6 @@ module Box exposing
   , offsetTextured
   , clickable
   , clicked
-  , layer
   )
 
 import Actions
@@ -24,7 +23,7 @@ type alias ClickableBoxData =
   , size : (Float, Float)
   , offset : (Float, Float)
   , onClickAction : Actions.Action
-  , layer : (Float, Float)
+  , layer : Float
   }
 
 
@@ -33,7 +32,7 @@ type alias TexturedBoxData =
   , offset : (Float, Float)
   , textureId : TextureId
   , frame : Int
-  , layer : (Float, Float)
+  , layer : Float
   }
 
 
@@ -44,7 +43,7 @@ offsetTextured offset textureId position frame layer =
     , offset = offset
     , textureId = textureId
     , frame = frame
-    , layer = layer
+    , layer = boxLayer layer position
     }
 
 
@@ -59,7 +58,7 @@ clickable size offset position layer onClickAction =
     { position = position
     , size = size
     , offset = offset
-    , layer = layer
+    , layer = boxLayer layer position
     , onClickAction = onClickAction
     }
 
@@ -77,8 +76,8 @@ clicked coordinates ({position, offset, size, onClickAction} as box) =
     x >= left && x < right && y >= top && y < bottom
 
 
-layer : {a | layer : (Float, Float), position : (Float, Float)} -> Float
-layer {layer, position} =
+boxLayer : (Float, Float) -> (Float, Float) -> Float
+boxLayer layer position =
   fst layer * 1000 +
   snd position * 100 +
   snd layer

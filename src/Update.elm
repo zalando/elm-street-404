@@ -24,12 +24,27 @@ update action model =
       {model | closeButtonActive = active} ! []
     Dimensions {width, height} ->
       (Model.resize (width, height) model |> Model.render, Cmd.none)
-    TextureLoaded textureId texture ->
+    TextureLoaded textureId maybeTexture ->
       let
         loadTexture =
           case AllDict.get textureId model.textures of
             Just data ->
-              AllDict.insert textureId {data | texture = texture} model.textures
+              AllDict.insert
+                textureId
+                { data
+                | texture =
+                    Maybe.map
+                      (\texture ->
+                        { size =
+                          ( toFloat (fst (WebGL.textureSize texture))
+                          , toFloat (snd (WebGL.textureSize texture))
+                          )
+                        , texture = texture
+                        }
+                      )
+                      maybeTexture
+                }
+                model.textures
             Nothing ->
               model.textures
         newModel = {model | textures = loadTexture}

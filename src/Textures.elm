@@ -115,8 +115,14 @@ loadTextures textures =
   |> List.map fst
 
 
+type alias TextureWithSize =
+  { size : (Float, Float)
+  , texture : WebGL.Texture
+  }
+
+
 type alias TextureData =
   { size : (Float, Float)
   , frames : Int
-  , texture : Maybe WebGL.Texture
+  , texture : Maybe TextureWithSize
   }
