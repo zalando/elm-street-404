@@ -25,7 +25,8 @@
         app = Elm.Main.embed(container, {
           randomSeed: Date.now(),
           imagesUrl: 'img',
-          embed: true
+          embed: true,
+          devicePixelRatio: window.devicePixelRatio
         });
         app.ports.suspended.subscribe(function() {
           console.log('the game was suspended');

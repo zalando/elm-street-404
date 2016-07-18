@@ -12,11 +12,11 @@ module Model exposing
   , resize
   , render
   , click
+  , dispatch
   )
 
 import Random
 import Time exposing (Time)
-import AnimationState exposing (Dispatcher, dispatcher, animateDispatcher, dispatcherActions)
 import DeliveryPerson exposing (DeliveryPerson)
 import Article exposing (Article)
 import Request exposing (Request)
@@ -25,8 +25,8 @@ import IHopeItWorks
 import Article exposing (Article)
 import MapObject exposing (MapObject, MapObjectCategory(..))
 import Textures exposing (TextureId, Textures)
-import Box exposing (Box)
-import Actions exposing (Action)
+import Box exposing (Box, ClickableBoxData, TexturedBoxData)
+import Actions exposing (Action, EventAction(..))
 -- Views:
 import TreeView
 import FountainView
@@ -77,16 +77,10 @@ gridSize tileSize (width, height) =
   limitSize (width // tileSize, height // tileSize)
 
 
-type DispatcherAction
-  = DispatchArticles Int
-  | DispatchOrders Int
-  | DispatchReturns Int
-  | DispatchCustomers
-
-
 type alias Model =
   { state : State
   , textures : Textures
+  , devicePixelRatio : Float
   , seed : Random.Seed
   , tileSize : Int
   , imagesUrl : String
@@ -98,18 +92,20 @@ type alias Model =
   , requests : List Request
   , customers : List Customer
   , mapObjects : List MapObject
-  , dispatcher : Dispatcher DispatcherAction
+  , events : List (Time, EventAction)
   , score : Int
   , maxLives : Int
-  , boxes : List Box
+  , clickableBoxes : List ClickableBoxData
+  , texturedBoxes : List TexturedBoxData
   , closeButtonActive : Bool
   }
 
 
-initial : Int -> String -> Bool -> Model
-initial randomSeed imagesUrl embed =
+initial : Int -> String -> Bool -> Float -> Model
+initial randomSeed imagesUrl embed devicePixelRatio =
   { state = Initialising
   , embed = embed
+  , devicePixelRatio = devicePixelRatio
   , textures = Textures.textures
   , seed = Random.initialSeed randomSeed
   , tileSize = 0
@@ -121,10 +117,11 @@ initial randomSeed imagesUrl embed =
   , requests = []
   , mapObjects = []
   , customers = []
-  , dispatcher = dispatcher []
+  , events = []
   , score = 0
   , maxLives = 3
-  , boxes = []
+  , clickableBoxes = []
+  , texturedBoxes = []
   , closeButtonActive = False
   }
 
@@ -151,7 +148,7 @@ resize dimensions model =
       , requests = []
       , mapObjects = []
       , customers = []
-      , dispatcher = dispatcher []
+      , events = []
       }
 
 
@@ -191,13 +188,13 @@ start model =
   , articles = []
   , requests = []
   , customers = []
-  , dispatcher =
-      dispatcher
-        [ (11000, DispatchOrders 1)
-        , (13000, DispatchArticles 1)
-        , (31000, DispatchReturns 1)
-        , (5000, DispatchCustomers)
-        ]
+  , events =
+      [ (11000, DispatchOrders 1)
+      , (13000, DispatchArticles 1)
+      , (31000, DispatchReturns 1)
+      , (5000, DispatchCustomers)
+      , (1000, TimeoutRequestsAndCleanup)
+      ]
   , score = 0
   , maxLives = 3
   }
@@ -220,27 +217,18 @@ animationLoop elapsed model =
   , deliveryPerson = DeliveryPerson.animate elapsed model.deliveryPerson
   , requests = List.map (Request.animate elapsed) model.requests
   , customers = List.map (Customer.animate elapsed) model.customers
-  , dispatcher = animateDispatcher elapsed model.dispatcher
   }
-  |> dispatch
-  |> timeoutRequests
-  |> updateGameState
-  |> cleanup
   |> render
 
 
-dispatch : Model -> Model
-dispatch model =
-  List.foldl dispatchAction model (dispatcherActions model.dispatcher)
-
-
-dispatchAction : DispatcherAction -> Model -> Model
-dispatchAction action =
+dispatch : EventAction -> Model -> Model
+dispatch action =
   case action of
     DispatchArticles n -> dispatchArticles n
     DispatchOrders n -> dispatchOrders n
     DispatchReturns n -> dispatchReturns n
     DispatchCustomers -> dispatchCustomers
+    TimeoutRequestsAndCleanup -> timeoutRequests >> cleanup >> updateGameState
 
 
 dispatchArticles : Int -> Model -> Model
@@ -332,7 +320,7 @@ decHappinessIfHome requests customer =
 
 countLives : Model -> Int
 countLives {maxLives, customers} =
-  maxLives - (List.length (List.filter Customer.isLost customers))
+  maxLives - List.length (List.filter Customer.isLost customers)
 
 
 timeoutRequests : Model -> Model
@@ -394,7 +382,7 @@ cleanup model =
 updateGameState : Model -> Model
 updateGameState model =
   if countLives model <= 0 then
-    { model | state = Stopped }
+    render { model | state = Stopped }
   else
     model
 
@@ -482,35 +470,45 @@ renderMapObject model mapObject =
 
 click : (Int, Int) -> Model -> Maybe Action
 click coordinates model =
-  let
-    clickedCoordinates = clickToTile model coordinates
-    (_, clickableBoxes) = Box.split model.boxes
-    clickedBoxes = List.filterMap (Box.clicked clickedCoordinates) (List.reverse clickableBoxes)
-  in
-    List.head clickedBoxes
+  model.clickableBoxes
+    |> List.filter (Box.clicked (clickToTile model coordinates))
+    |> List.sortBy (.layer >> negate)
+    |> List.head
+    |> Maybe.map .onClickAction
 
 
-clickToTile : Model -> (Int, Int) -> (Int, Int)
+clickToTile : Model -> (Int, Int) -> (Float, Float)
 clickToTile {tileSize} (x, y) =
-  (x // tileSize, y // tileSize)
+  ( toFloat x / toFloat tileSize
+  , toFloat y / toFloat tileSize
+  )
 
 
 render : Model -> Model
 render model =
-  {model | boxes = boxes model}
+  let
+    (texturedBoxes, clickableBoxes) = Box.split (boxes model)
+  in
+    { model
+    | texturedBoxes = List.sortBy .layer texturedBoxes
+    , clickableBoxes = clickableBoxes
+    }
 
 
 boxes : Model -> List Box
 boxes model =
-  if model.state == Initialising then
-    []
-  else if model.state == Loading then
-    DigitsView.render
-      (toFloat (fst model.gridSize) / 2 + 1, toFloat (snd model.gridSize) / 2)
-      (Textures.loadedTextures model.textures)
-  else
-    InventoryView.render model.gridSize model.articles
-    ++ DeliveryPersonView.render (List.length (List.filter Article.isPicked model.articles)) model.deliveryPerson
-    ++ ScoreView.render model.gridSize model.score model.maxLives (countLives model)
-    ++ List.concat (List.map (renderMapObject model) model.mapObjects)
-    ++ if model.state == Stopped then StartGameView.render model.gridSize else []
+  case model.state of
+    Initialising ->
+      []
+    Suspended _ ->
+      []
+    Loading ->
+      DigitsView.render
+        (toFloat (fst model.gridSize) / 2 + 1, toFloat (snd model.gridSize) / 2)
+        (Textures.loadedTextures model.textures)
+    _ ->
+      InventoryView.render model.gridSize model.articles
+      ++ DeliveryPersonView.render (List.length (List.filter Article.isPicked model.articles)) model.deliveryPerson
+      ++ ScoreView.render model.gridSize model.score model.maxLives (countLives model)
+      ++ if model.state == Stopped then StartGameView.render model.gridSize else []
+      ++ List.concatMap (renderMapObject model) model.mapObjects

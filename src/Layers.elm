@@ -2,14 +2,14 @@ module Layers exposing (layers)
 
 
 type alias Layers =
-  { shadow : Int
-  , obstacle : Int
-  , bubble : Int
-  , article : Int
-  , click : Int
-  , clickAbove : Int
-  , clickToStart : Int
-  , clickToStartAbove : Int
+  { shadow : Float
+  , obstacle : Float
+  , bubble : Float
+  , article : Float
+  , click : Float
+  , clickAbove : Float
+  , clickToStart : Float
+  , clickToStartAbove : Float
   }
 
 

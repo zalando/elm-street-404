@@ -1,9 +1,5 @@
 module AnimationState exposing
   ( AnimatedObject
-  , Dispatcher
-  , dispatcher
-  , animateDispatcher
-  , dispatcherActions
   , animateObject
   , rotateFrames
   )
@@ -16,44 +12,6 @@ type alias AnimatedObject a =
   | elapsed : Time
   , timeout : Time
   }
-
-
-type alias Generator a = AnimatedObject {active : Bool, action : a}
-
-
-type alias Dispatcher a = List (Generator a)
-
-
-dispatcher : List (Time, a) -> Dispatcher a
-dispatcher =
-  List.map (uncurry generator)
-
-
-generator : Time -> a -> Generator a
-generator timeout action =
-  { elapsed = 0
-  , timeout = timeout
-  , action = action
-  , active = False
-  }
-
-
-animateGenerator : Time -> Generator a -> Generator a
-animateGenerator elapsed generator =
-  animateObject
-    elapsed
-    (\g -> {g | active = True})
-    {generator | active = False}
-
-
-animateDispatcher : Time -> Dispatcher a -> Dispatcher a
-animateDispatcher =
-  animateGenerator >> List.map
-
-
-dispatcherActions : Dispatcher a -> List a
-dispatcherActions =
-  List.filter .active >> List.map .action
 
 
 {-| executes animationFunc every time timeout is reached -}

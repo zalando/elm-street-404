@@ -3,7 +3,7 @@ module WebGLView exposing (render)
 import Html exposing (Html)
 import Html.Attributes exposing (width, height, style)
 import WebGL as GL
-import Math.Vector2 exposing (Vec2, vec2)
+import Math.Vector2 exposing (Vec2, vec2, fromTuple)
 import Box
 import Textures exposing (Textures)
 import AllDict exposing (AllDict)
@@ -42,28 +42,30 @@ mesh =
     ]
 
 
-render : (Int, Int) -> Int -> Textures -> List Box.TexturedBoxData -> Html Action
-render ((w, h) as dimensions) tileSize textures boxes =
+render : Float -> (Int, Int) -> Int -> Textures -> List Box.TexturedBoxData -> Html Action
+render devicePixelRatio ((w, h) as dimensions) tileSize textures boxes =
   GL.toHtmlWith
     [ GL.Enable GL.Blend
     , GL.BlendFunc (GL.One, GL.OneMinusSrcAlpha)
     ]
-    [ width (w * tileSize * 2)
-    , height (h * tileSize * 2)
+    [ width (toFloat w * toFloat tileSize * devicePixelRatio |> round)
+    , height (toFloat h * toFloat tileSize * devicePixelRatio |> round)
     , style
         [ ("position", "absolute")
-        , ("width", toString (w * tileSize) ++ "px")
-        , ("height", toString (h * tileSize) ++ "px")
+        , ("-webkit-transform-origin", "0 0")
+        , ("-webkit-transform", "scale(" ++ toString (1 / devicePixelRatio) ++ ")")
+        , ("transform-origin", "0 0")
+        , ("transform", "scale(" ++ toString (1 / devicePixelRatio) ++ ")")
         ]
     ]
     (List.filterMap (renderTextured dimensions textures) (List.reverse boxes))
 
 
 renderTextured : (Int, Int) -> Textures -> Box.TexturedBoxData -> Maybe GL.Renderable
-renderTextured (w, h) textures ({textureId, position, frame} as box) =
+renderTextured (w, h) textures ({textureId, position, frame, offset} as box) =
   AllDict.get textureId textures
   `Maybe.andThen`
-  (\{size, offset, texture} ->
+  (\{size, texture} ->
     Maybe.map
       (\textureValue ->
         GL.render
@@ -71,14 +73,11 @@ renderTextured (w, h) textures ({textureId, position, frame} as box) =
           fragmentShader
           mesh
           { screenSize = vec2 (toFloat w) (toFloat h)
-          , offset = vec2 (fst offset + fst position + fst box.offset) (snd offset + snd position + snd box.offset)
-          , texture = textureValue
+          , offset = vec2 (fst offset + fst position) (snd offset + snd position)
+          , texture = textureValue.texture
           , frame = frame
-          , textureSize =
-              vec2
-                (toFloat (fst (GL.textureSize textureValue)))
-                (toFloat (snd (GL.textureSize textureValue)))
-          , frameSize = (uncurry vec2) size
+          , textureSize = fromTuple textureValue.size
+          , frameSize = fromTuple size
           }
       )
     texture

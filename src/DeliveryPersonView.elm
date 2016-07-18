@@ -25,11 +25,11 @@ direction {route, position} =
 boxesOffset : Int -> (Float, Float)
 boxesOffset direction =
   case direction of
-    2 -> (-0.5, 0)
-    3 -> (-0.25, -0.25)
-    5 -> (0.25, -0.25)
-    6 -> (0.5, 0)
-    _ -> (0, 0)
+    2 -> (-0.5, -2)
+    3 -> (-0.25, -2.25)
+    5 -> (0.25, -2.25)
+    6 -> (0.5, -2)
+    _ -> (0, -2)
 
 
 render : Int -> DeliveryPerson -> List Box
@@ -38,7 +38,8 @@ render numberOfBoxes deliveryPerson =
     animationFrame = Maybe.withDefault 0 (List.head deliveryPerson.frames)
     frame = direction deliveryPerson * 3 + animationFrame
     boxes =
-      [ Box.textured
+      [ Box.offsetTextured
+        (0, -2)
         Textures.DeliveryPersonBack
         deliveryPerson.position
         frame
@@ -49,7 +50,8 @@ render numberOfBoxes deliveryPerson =
         deliveryPerson.position
         ((4 - numberOfBoxes) * 6 + (direction deliveryPerson % 2) * 3 + animationFrame)
         (layers.obstacle, 2)
-      , Box.textured
+      , Box.offsetTextured
+        (0, -2)
         Textures.DeliveryPersonFront
         deliveryPerson.position
         (if frame >= 9 && frame <= 17 then frame - 6 else 0)
@@ -60,7 +62,8 @@ render numberOfBoxes deliveryPerson =
       DeliveryPerson.OnTheWayTo _ ->
         boxes
       _ ->
-        [ Box.textured
+        [ Box.offsetTextured
+            (0, -2)
             Textures.DeliveryPersonBack
             deliveryPerson.position
             (24 + numberOfBoxes)

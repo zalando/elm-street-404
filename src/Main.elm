@@ -1,6 +1,6 @@
 port module Main exposing (..)
 
-import Actions exposing (..)
+import Actions exposing (Action(..))
 import Model exposing (Model)
 import Html.App as Html
 import Update
@@ -11,6 +11,7 @@ import AnimationFrame
 import Task
 import Process
 import Json.Decode as Json exposing ((:=))
+import Time
 
 
 port suspend : (Bool -> msg) -> Sub msg
@@ -27,11 +28,14 @@ subscriptions model =
     _ ->
       Sub.batch
         [ if model.state == Model.Playing then
-            AnimationFrame.diffs Actions.Tick
+            AnimationFrame.diffs Tick
           else
             Sub.none
         , Window.resizes Dimensions
-        , suspend (\_ -> Actions.Suspend)
+        , suspend (\_ -> Suspend)
+        , model.events
+            |> List.map (\(time, action) -> Time.every time (\_ -> Event action))
+            |> Sub.batch
         ]
 
 
@@ -50,8 +54,11 @@ main =
             embed = flags
               |> Json.decodeValue ("embed" := Json.bool)
               |> Result.withDefault False
+            devicePixelRatio = flags
+              |> Json.decodeValue ("devicePixelRatio" := Json.float)
+              |> Result.withDefault 1
           in
-            ( Model.initial randomSeed imagesUrl embed
+            ( Model.initial randomSeed imagesUrl embed devicePixelRatio
             , Cmd.batch
                 [ Update.loadImage imagesUrl Textures.Score
                 , Task.perform

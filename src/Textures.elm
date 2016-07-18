@@ -72,31 +72,31 @@ textures : Textures
 textures =
   AllDict.fromList
     filename
-    [ (Categories, initData (1, 1) (0, 0) 14)
-    , (ClickToStart, initData (10, 2) (0, 0) 1)
-    , (Customers, initData (2, 3) (0, 0) 18)
-    , (DeliveryPersonFront, initData (2, 4) (0, -2) 29)
-    , (DeliveryPersonBack, initData (2, 4) (0, -2) 29)
-    , (Boxes, initData (2, 4) (0, -2) 29)
-    , (ElmStreet404, initData (13, 2) (0, 0) 1)
-    , (Fountain, initData (3, 2) (0, 0) 1)
-    , (FountainShadow, initData (4, 2) (0, 1) 1)
-    , (FountainSpring, initData (1, 2) (1, -1) 4)
-    , (House, initData (2, 3) (0, -1) 1)
-    , (HouseBubble 1, initData (3, 3) (-2, -1) 1)
-    , (HouseBubble 2, initData (3, 4) (-2, -2) 1)
-    , (HouseBubble 3, initData (3, 5) (-2, -3) 1)
-    , (HouseShadow, initData (3, 2) (0, 1) 1)
-    , (InventoryBubble, initData (7, 3) (0, 0) 1)
-    , (Scarves, initData (2, 3) (0, 0) 3)
-    , (Score, initData (1, 1) (0, 0) 13)
-    , (Shirts, initData (2, 3) (0, 0) 12)
-    , (Shoes, initData (2, 3) (0, 0) 4)
-    , (Tree, initData (3, 5) (0, -3) 1)
-    , (Trousers, initData (2, 3) (0, 0) 3)
-    , (Warehouse, initData (4, 4) (0, -1) 1)
-    , (WarehouseBubble, initData (4, 5) (-2, -3) 1)
-    , (WarehouseShadow, initData (5, 4) (0, 0) 1)
+    [ (Categories, TextureData (1, 1) 14 Nothing)
+    , (ClickToStart, TextureData (10, 2) 1 Nothing)
+    , (Customers, TextureData (2, 3) 18 Nothing)
+    , (DeliveryPersonFront, TextureData (2, 4) 29 Nothing)
+    , (DeliveryPersonBack, TextureData (2, 4) 29 Nothing)
+    , (Boxes, TextureData (2, 4) 29 Nothing)
+    , (ElmStreet404, TextureData (13, 2) 1 Nothing)
+    , (Fountain, TextureData (3, 2) 1 Nothing)
+    , (FountainShadow, TextureData (4, 2) 1 Nothing)
+    , (FountainSpring, TextureData (1, 2) 4 Nothing)
+    , (House, TextureData (2, 3) 1 Nothing)
+    , (HouseBubble 1, TextureData (3, 3) 1 Nothing)
+    , (HouseBubble 2, TextureData (3, 4) 1 Nothing)
+    , (HouseBubble 3, TextureData (3, 5) 1 Nothing)
+    , (HouseShadow, TextureData (3, 2) 1 Nothing)
+    , (InventoryBubble, TextureData (7, 3) 1 Nothing)
+    , (Scarves, TextureData (2, 3) 3 Nothing)
+    , (Score, TextureData (1, 1) 13 Nothing)
+    , (Shirts, TextureData (2, 3) 12 Nothing)
+    , (Shoes, TextureData (2, 3) 4 Nothing)
+    , (Tree, TextureData (3, 5) 1 Nothing)
+    , (Trousers, TextureData (2, 3) 3 Nothing)
+    , (Warehouse, TextureData (4, 4) 1 Nothing)
+    , (WarehouseBubble, TextureData (4, 5) 1 Nothing)
+    , (WarehouseShadow, TextureData (5, 4) 1 Nothing)
     ]
 
 
@@ -115,18 +115,14 @@ loadTextures textures =
   |> List.map fst
 
 
-type alias TextureData =
+type alias TextureWithSize =
   { size : (Float, Float)
-  , offset : (Float, Float)
-  , frames : Int
-  , texture : Maybe WebGL.Texture
+  , texture : WebGL.Texture
   }
 
 
-initData : (Float, Float) -> (Float, Float) -> Int -> TextureData
-initData size offset frames =
-  { size = size
-  , offset = offset
-  , frames = frames
-  , texture = Nothing
+type alias TextureData =
+  { size : (Float, Float)
+  , frames : Int
+  , texture : Maybe TextureWithSize
   }

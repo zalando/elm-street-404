@@ -32,10 +32,10 @@ render articles capacity ({position} as warehouse) =
         , toFloat ((numberOfArticles + number) // 2) + y - 2
         )
   in
-    [ Box.textured Textures.Warehouse position 0 (layers.obstacle, 0)
+    [ Box.offsetTextured (0, -1) Textures.Warehouse position 0 (layers.obstacle, 0)
     , Box.textured Textures.WarehouseShadow position 0 (layers.shadow, 0)
     , Box.clickable (4, 4) (0, -1) position (layers.click, 0) (Actions.ClickMapObject warehouse)
-    , Box.textured Textures.WarehouseBubble warehouse.position 0 (layers.bubble, 0)
+    , Box.offsetTextured (-2, -3) Textures.WarehouseBubble warehouse.position 0 (layers.bubble, 0)
     ]
     ++ List.concat (List.indexedMap renderArticle articlesInWarehouse)
     ++ List.indexedMap renderCategory placeholders
