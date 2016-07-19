@@ -11,7 +11,7 @@ module Customer exposing
 import MapObject exposing (MapObject)
 import Random
 import Time exposing (Time)
-import AnimationState exposing (AnimatedObject, animateObject, rotateFrames)
+import AnimationState exposing (AnimatedObject, animateFrame)
 
 
 type Location
@@ -24,7 +24,6 @@ type alias Customer =
     { typ : Int
     , location : Location
     , happiness : Int
-    , frames : List (Int)
     }
 
 
@@ -35,14 +34,14 @@ initial house typ =
   , location = AtHome house
   , elapsed = 0
   , timeout = 150
-  , frames = [0, 1]
+  , frame = 0
   }
 
 
 animate : Time -> Customer -> Customer
 animate time customer =
   if customer.happiness == 0 then
-    animateObject time rotateFrames customer
+    animateFrame 2 time customer
   else
     customer
 
@@ -63,13 +62,12 @@ rodnams houses =
 
 livesHere : MapObject -> Customer -> Bool
 livesHere house {location} =
-  case location of
-    AtHome home -> home == house
-    Lost -> False
+  location == AtHome house
 
 
 isLost : Customer -> Bool
-isLost {location} = location == Lost
+isLost {location} =
+  location == Lost
 
 
 modHappiness : Int -> Customer -> Customer
@@ -85,8 +83,10 @@ modHappiness d ({happiness, location} as customer) =
 
 
 incHappiness : Customer -> Customer
-incHappiness = modHappiness 1
+incHappiness =
+  modHappiness 1
 
 
 decHappiness : Customer -> Customer
-decHappiness = modHappiness -1
+decHappiness =
+  modHappiness -1

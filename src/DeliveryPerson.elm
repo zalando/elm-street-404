@@ -7,7 +7,7 @@ module DeliveryPerson exposing
   )
 
 import Time exposing (Time)
-import AnimationState exposing (AnimatedObject, animateObject, rotateFrames)
+import AnimationState exposing (AnimatedObject, animateFrame)
 import MapObject exposing (MapObject)
 import Astar
 
@@ -22,7 +22,6 @@ type alias DeliveryPerson =
   AnimatedObject
     { location : Location
     , route : List (Int, Int)
-    , frames : List Int
     , position : (Float, Float)
     , capacity : Int
     , size : (Float, Float)
@@ -32,7 +31,8 @@ type alias DeliveryPerson =
 pushThePedals : Time -> DeliveryPerson -> DeliveryPerson
 pushThePedals time deliveryPerson =
   case deliveryPerson.location of
-    OnTheWayTo _ -> animateObject time rotateFrames deliveryPerson
+    OnTheWayTo _ ->
+      animateFrame 3 time deliveryPerson
     _ -> deliveryPerson
 
 
@@ -133,7 +133,7 @@ initial position =
   , route = []
   , elapsed = 0
   , timeout = 96
-  , frames = [0, 1, 2]
+  , frame = 0
   , capacity = 4
   }
 

@@ -35,8 +35,7 @@ boxesOffset direction =
 render : Int -> DeliveryPerson -> List Box
 render numberOfBoxes deliveryPerson =
   let
-    animationFrame = Maybe.withDefault 0 (List.head deliveryPerson.frames)
-    frame = direction deliveryPerson * 3 + animationFrame
+    frame = direction deliveryPerson * 3 + deliveryPerson.frame
     boxes =
       [ Box.offsetTextured
         (0, -2)
@@ -48,7 +47,7 @@ render numberOfBoxes deliveryPerson =
         (boxesOffset (direction deliveryPerson))
         Textures.Boxes
         deliveryPerson.position
-        ((4 - numberOfBoxes) * 6 + (direction deliveryPerson % 2) * 3 + animationFrame)
+        ((4 - numberOfBoxes) * 6 + (direction deliveryPerson % 2) * 3 + deliveryPerson.frame)
         (layers.obstacle, 2)
       , Box.offsetTextured
         (0, -2)
