@@ -1,21 +1,21 @@
 module Fountain exposing (Fountain, animate, fountain)
 
 import Time exposing (Time)
-import AnimationState exposing (AnimatedObject, animateObject, rotateFrames)
+import AnimationState exposing (AnimatedObject, animateFrame)
 
 
 animate : Time -> Fountain -> Fountain
-animate time =
-  animateObject time rotateFrames
+animate =
+  animateFrame 3
 
 
 type alias Fountain =
-  AnimatedObject {frames : List Int}
+  AnimatedObject {}
 
 
 fountain : Fountain
 fountain =
   { elapsed = 0
   , timeout = 150
-  , frames = [0..3]
+  , frame = 0
   }

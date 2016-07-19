@@ -16,7 +16,6 @@ import Category exposing (Category)
 import Time exposing (Time)
 import IHopeItWorks
 import Random
-import AnimationState exposing (AnimatedObject)
 
 
 type RequestCategory
@@ -25,11 +24,12 @@ type RequestCategory
 
 
 type alias Request =
-  AnimatedObject
-    { house : MapObject
-    , category : RequestCategory
-    , blinkHidden : Bool
-    }
+  { timeout : Time
+  , elapsed : Time
+  , house : MapObject
+  , category : RequestCategory
+  , blinkHidden : Bool
+  }
 
 
 request : RequestCategory -> MapObject -> Request
