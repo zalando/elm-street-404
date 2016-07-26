@@ -52,6 +52,10 @@ view model =
               , "position" => "relative"
               , "width" => (toString screenWidth ++ "px")
               , "height" => (toString screenHeight ++ "px")
+              , "-ms-user-select" => "none"
+              , "-moz-user-select" => "none"
+              , "-webkit-user-select" => "none"
+              , "user-select" => "none"
               ]
           ]
           ( div
