@@ -12,7 +12,7 @@
         "elm-community/elm-linear-algebra": "2.0.1 <= v < 3.0.0",
         "elm-community/elm-webgl": "3.0.0 <= v < 4.0.0",
         "elm-lang/animation-frame": "1.0.0 <= v < 2.0.0",
-        "elm-lang/core": "4.0.0 <= v < 5.0.0",
+        "elm-lang/core": "4.0.4 <= v < 5.0.0",
         "elm-lang/dom": "1.0.0 <= v < 2.0.0",
         "elm-lang/html": "1.0.0 <= v < 2.0.0",
         "elm-lang/svg": "1.0.0 <= v < 2.0.0",
