@@ -29,13 +29,3 @@ Unhappy customers: **you lose**.
 2. Start `elm reactor`
 3. Open `http://localhost:8000/index.html`
 4. Alternatively there is `http://localhost:8000/embed.html` that demonstrates how the game may be toggled by a button
-
-## Gotchas
-
-In order to be able to correctly suspend/restore the game for embeded mode, [this fix has to be applied to the compiled elm.js](https://github.com/elm-lang/core/issues/628#issuecomment-225719492).
-
-```diff
-- numSteps = step(numSteps, process);
-+ if (process.root) { numSteps = step(numSteps, process); } 
-```
-
