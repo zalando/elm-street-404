@@ -12,6 +12,7 @@ import Task
 import Process
 import Json.Decode as Json exposing ((:=))
 import Time
+import Keyboard
 
 
 port suspend : (Bool -> msg) -> Sub msg
@@ -32,6 +33,10 @@ subscriptions model =
           else
             Sub.none
         , Window.resizes Dimensions
+        , if model.embed then
+            Keyboard.downs escapeToSuspend
+          else
+            Sub.none
         , suspend (\_ -> Suspend)
         , model.events
             |> List.map (\(time, action) -> Time.every time (\_ -> Event action))
@@ -72,3 +77,10 @@ main =
     , view = View.view
     , subscriptions = subscriptions
     }
+
+
+escapeToSuspend : Int -> Action
+escapeToSuspend keyCode =
+  case keyCode of
+    27 -> Actions.Suspend
+    _ -> Actions.NoOp

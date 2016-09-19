@@ -106,7 +106,8 @@ update action model =
           model ! []
     Event eventAction ->
       Model.dispatch eventAction model ! []
-
+    NoOp ->
+        model ! []
 
 ifPlaying : (Model -> Model) -> Model -> (Model, Cmd Action)
 ifPlaying fun model =
