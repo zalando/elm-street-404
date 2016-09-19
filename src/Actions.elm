@@ -31,3 +31,4 @@ type Action
   | Dimensions Size
   | HoverCloseButton Bool
   | Event EventAction
+  | NoOp
