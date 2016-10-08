@@ -22,7 +22,7 @@ render requests articles customers ({position} as house) =
     hasArticles = List.length deliveredArticles > 0
 
     renderRequest number =
-      RequestView.render (fst position - 1, snd position - toFloat number)
+      RequestView.render (fst position - 1, snd position - toFloat number) house
 
     renderBubble =
       case List.length requestsFromHouse of
@@ -43,7 +43,7 @@ render requests articles customers ({position} as house) =
   in
     [ Box.offsetTextured (0, -1) Textures.House position 0 (layers.obstacle, 0)
     , Box.offsetTextured (0, 1) Textures.HouseShadow position 0 (layers.shadow, 0)
-    , Box.clickable (2, 3) (0, -1) position (layers.click, 0) (Actions.ClickMapObject house)
+    , Box.clickable (2, 3) (0, -1) position (layers.click, 0) (Actions.ClickMapObject house Nothing)
     ]
     ++ List.concat (List.indexedMap renderRequest requestsFromHouse)
     ++ renderBubble

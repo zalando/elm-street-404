@@ -6,16 +6,17 @@ import Request exposing (Request)
 import Box exposing (Box)
 import Category
 import Layers exposing (layers)
+import MapObject exposing (MapObject)
 
 
-render : (Float, Float) -> Request -> List Box
-render position request =
+render : (Float, Float) -> MapObject -> Request -> List Box
+render position house request =
   let
     renderClickable = Box.clickable (1, 1) (0, 0) position (layers.clickAbove, 0)
   in
     case request.category of
       Request.Return article ->
-        renderClickable (Actions.ClickArticle article) ::
+        renderClickable (Actions.ClickMapObject house (Just <| Actions.ClickArticle article)) ::
         if request.blinkHidden then
           []
         else
@@ -24,7 +25,7 @@ render position request =
           ]
 
       Request.Order category ->
-        renderClickable (Actions.ClickCategory category) ::
+        renderClickable (Actions.ClickMapObject house (Just <| Actions.ClickCategory category)) ::
         if request.blinkHidden then
           []
         else

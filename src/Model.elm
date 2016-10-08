@@ -205,20 +205,25 @@ start model =
   |> dispatchOrders 3
 
 
-animate : Time -> Model -> Model
+animate : Time -> Model -> (Model, Maybe Action)
 animate time =
   animationLoop (min time 25)
 
 
-animationLoop : Time -> Model -> Model
+animationLoop : Time -> Model -> (Model, Maybe Action)
 animationLoop elapsed model =
-  { model
-  | mapObjects = List.map (MapObject.animate elapsed) model.mapObjects
-  , deliveryPerson = DeliveryPerson.animate elapsed model.deliveryPerson
-  , requests = List.map (Request.animate elapsed) model.requests
-  , customers = List.map (Customer.animate elapsed) model.customers
-  }
-  |> render
+  let
+    (deliveryPerson, maybeAction) = DeliveryPerson.animate elapsed model.deliveryPerson
+  in
+    ( render
+        { model
+        | mapObjects = List.map (MapObject.animate elapsed) model.mapObjects
+        , deliveryPerson = deliveryPerson
+        , requests = List.map (Request.animate elapsed) model.requests
+        , customers = List.map (Customer.animate elapsed) model.customers
+        }
+    , maybeAction
+    )
 
 
 dispatch : EventAction -> Model -> Model
@@ -295,13 +300,13 @@ placeToLocation {position, size} =
   )
 
 
-navigateToMapObject : MapObject -> Model -> Model
-navigateToMapObject mapObject model =
+navigateToMapObject : MapObject -> Maybe Action -> Model -> Model
+navigateToMapObject mapObject maybeAction model =
   { model
   | deliveryPerson = DeliveryPerson.navigateTo
       model.gridSize
       (obstacleTiles model.mapObjects)
-      (DeliveryPerson.OnTheWayTo mapObject)
+      (DeliveryPerson.OnTheWayTo mapObject maybeAction)
       (placeToLocation mapObject)
       model.deliveryPerson
   }

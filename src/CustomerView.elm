@@ -54,5 +54,5 @@ render requests articles ({position} as house) customer =
       renderColor shoesColor 3 Textures.Shoes ++
       renderColor shirtColor 2 Textures.Shirts ++
       [ Box.textured Textures.Customers position (customerFrameOffset customer) (layers.obstacle, 1)
-      , Box.clickable (2, 3) (0, 0) position (layers.click, 0) (Actions.ClickMapObject house)
+      , Box.clickable (2, 3) (0, 0) position (layers.click, 0) (Actions.ClickMapObject house Nothing)
       ]

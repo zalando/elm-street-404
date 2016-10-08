@@ -9,12 +9,13 @@ module DeliveryPerson exposing
 import Time exposing (Time)
 import AnimationState exposing (AnimatedObject, animateFrame)
 import MapObject exposing (MapObject)
+import Actions exposing (Action(..))
 import Astar
 
 
 type Location
-  = At MapObject
-  | OnTheWayTo MapObject
+  = At MapObject (Maybe Action)
+  | OnTheWayTo MapObject (Maybe Action)
   | Initial
 
 
@@ -31,7 +32,7 @@ type alias DeliveryPerson =
 pushThePedals : Time -> DeliveryPerson -> DeliveryPerson
 pushThePedals time deliveryPerson =
   case deliveryPerson.location of
-    OnTheWayTo _ ->
+    OnTheWayTo _ _ ->
       animateFrame 3 time deliveryPerson
     _ -> deliveryPerson
 
@@ -68,7 +69,7 @@ nextLocation route location =
   case route of
     [] ->
       case location of
-        OnTheWayTo mapObject -> At mapObject
+        OnTheWayTo mapObject maybeAction -> At mapObject maybeAction
         _ -> location
     _ -> location
 
@@ -118,11 +119,18 @@ moveOnPath time deliveryPerson =
     Just d -> moveToNext time d deliveryPerson
 
 
-animate: Time -> DeliveryPerson -> DeliveryPerson
+animate: Time -> DeliveryPerson -> (DeliveryPerson, Maybe Action)
 animate time deliveryPerson =
-  deliveryPerson
-  |> pushThePedals time
-  |> moveOnPath time
+  let
+    newDeliveryPerson = deliveryPerson
+      |> pushThePedals time
+      |> moveOnPath time
+  in
+    case newDeliveryPerson.location of
+      At location maybeAction ->
+        ({newDeliveryPerson | location = At location Nothing}, maybeAction)
+      _ ->
+        (newDeliveryPerson, Nothing)
 
 
 initial : (Float, Float) -> DeliveryPerson
