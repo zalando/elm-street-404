@@ -58,7 +58,7 @@ render numberOfBoxes deliveryPerson =
       ]
   in
     case deliveryPerson.location of
-      DeliveryPerson.OnTheWayTo _ ->
+      DeliveryPerson.OnTheWayTo _ _ ->
         boxes
       _ ->
         [ Box.offsetTextured

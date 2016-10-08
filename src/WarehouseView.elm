@@ -23,7 +23,7 @@ render articles capacity ({position} as warehouse) =
         pos = (toFloat (number % 2) + x - 1, toFloat (number // 2) + y - 2)
       in
         [ CategoryView.render pos article.category
-        , Box.clickable (1, 1) (0, 0) pos (layers.clickAbove, 0) (Actions.ClickArticle article)
+        , Box.clickable (1, 1) (0, 0) pos (layers.clickAbove, 0) (Actions.ClickMapObject warehouse (Just <| Actions.ClickArticle article))
         ]
 
     renderCategory number =
@@ -34,7 +34,7 @@ render articles capacity ({position} as warehouse) =
   in
     [ Box.offsetTextured (0, -1) Textures.Warehouse position 0 (layers.obstacle, 0)
     , Box.textured Textures.WarehouseShadow position 0 (layers.shadow, 0)
-    , Box.clickable (4, 4) (0, -1) position (layers.click, 0) (Actions.ClickMapObject warehouse)
+    , Box.clickable (4, 4) (0, -1) position (layers.click, 0) (Actions.ClickMapObject warehouse Nothing)
     , Box.offsetTextured (-2, -3) Textures.WarehouseBubble warehouse.position 0 (layers.bubble, 0)
     ]
     ++ List.concat (List.indexedMap renderArticle articlesInWarehouse)

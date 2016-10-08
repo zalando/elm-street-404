@@ -26,7 +26,7 @@ type Action
   | Click Position
   | ClickArticle Article
   | ClickCategory Category
-  | ClickMapObject MapObject
+  | ClickMapObject MapObject (Maybe Action)
   | TextureLoaded TextureId (Maybe Texture)
   | Dimensions Size
   | HoverCloseButton Bool

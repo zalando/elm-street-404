@@ -73,7 +73,17 @@ update action model =
       Model.start model ! []
     Tick time ->
       if model.state == Playing then
-        Model.animate time model ! []
+        let
+          (model, maybeAction) = Model.animate time model
+        in
+          ( model
+          , case maybeAction of
+              Just action ->
+                Task.succeed action
+                  |> Task.perform identity identity
+              Nothing ->
+                Cmd.none
+          )
       else
         model ! []
     Click {x, y} ->
@@ -90,8 +100,8 @@ update action model =
       ifPlaying (onArticleClick article) model
     ClickCategory category ->
       ifPlaying (onCategoryClick category) model
-    ClickMapObject mapObject ->
-      ifPlaying (Model.navigateToMapObject mapObject) model
+    ClickMapObject mapObject maybeAction ->
+      ifPlaying (Model.navigateToMapObject mapObject maybeAction) model
     Suspend ->
       case (model.embed, model.state) of
         (True, Suspended _) ->
@@ -140,7 +150,7 @@ onCategoryClick category model =
 onArticleClick : Article -> Model -> Model
 onArticleClick article model =
   case model.deliveryPerson.location of
-    At mapObject ->
+    At mapObject _ ->
       case (mapObject.category, article.state) of
         (HouseCategory _, AwaitingReturn house) ->
           Model.pickupReturn mapObject house article model
