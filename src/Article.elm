@@ -92,7 +92,6 @@ isVacant : Article -> Bool
 isVacant {state} =
   case state of
     InStock _ -> True
-    AwaitingReturn _ -> True
     Picked -> True
     _ -> False
 

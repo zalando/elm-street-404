@@ -264,11 +264,13 @@ dispatchOrders number model =
 dispatchReturns : Int -> Model -> Model
 dispatchReturns number model =
   let
-    housesWithArticles = List.filter
-      (\h -> List.any (Article.isDelivered h) model.articles)
+    -- if the only article in the house was returned,
+    -- then the customer would dissapear
+    housesWithMoreThanOneArticle = List.filter
+      (\h -> List.length (List.filter (Article.isDelivered h) model.articles) > 1)
       model.mapObjects
     slots = IHopeItWorks.exclude
-      (MapObject.houseSlots housesWithArticles)
+      (MapObject.houseSlots housesWithMoreThanOneArticle)
       (List.map .house model.requests)
     (articlesToReturn, seed) = Random.step (Article.return number slots model.articles) model.seed
     articles = Article.markInReturn model.articles articlesToReturn
