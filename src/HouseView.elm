@@ -8,8 +8,6 @@ import Customer exposing (Customer)
 import Request exposing (Request)
 import Article exposing (Article)
 import RequestView
-import CustomerView
-import IHopeItWorks
 import Textures
 
 
@@ -30,21 +28,11 @@ render requests articles customers ({position} as house) =
           []
         n ->
           [Box.offsetTextured (-2, toFloat -n) (Textures.HouseBubble n) house.position 0 (layers.bubble, 0)]
-
-    renderCustomer =
-      case IHopeItWorks.find (Customer.livesHere house) customers of
-        Nothing ->
-          []
-        Just customer ->
-          if customer.happiness == 2 && not hasRequests && not hasArticles then
-            []
-          else
-            CustomerView.render requestsFromHouse deliveredArticles house customer
   in
     [ Box.offsetTextured (0, -1) Textures.House position 0 (layers.obstacle, 0)
     , Box.offsetTextured (0, 1) Textures.HouseShadow position 0 (layers.shadow, 0)
     , Box.clickable (2, 3) (0, -1) position (layers.click, 0) (Actions.ClickMapObject house Nothing)
+    , Box.clickable (2, 3) (0, 0) position (layers.click, 0) (Actions.ClickMapObject house Nothing)
     ]
     ++ List.concat (List.indexedMap renderRequest requestsFromHouse)
     ++ renderBubble
-    ++ renderCustomer

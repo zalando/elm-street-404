@@ -20,7 +20,7 @@ import Time exposing (Time)
 import DeliveryPerson exposing (DeliveryPerson)
 import Article exposing (Article)
 import Request exposing (Request)
-import Customer exposing (Customer)
+import Customer exposing (Customer, Location(..))
 import IHopeItWorks
 import Article exposing (Article)
 import MapObject exposing (MapObject, MapObjectCategory(..))
@@ -31,6 +31,7 @@ import Actions exposing (Action, EventAction(..))
 import TreeView
 import FountainView
 import HouseView
+import CustomerView
 import WarehouseView
 import DeliveryPersonView
 import InventoryView
@@ -355,7 +356,9 @@ houseEmpty customers house =
 dispatchCustomers : Model -> Model
 dispatchCustomers model =
   let
-    emptyHouses = List.filter (houseEmpty model.customers) model.mapObjects
+    emptyHouses = model.mapObjects
+      |> List.filter MapObject.isHouse
+      |> List.filter (houseEmpty model.customers)
     (newCustomers, seed) = Random.step (Customer.rodnams emptyHouses) model.seed
   in
     { model
@@ -364,22 +367,10 @@ dispatchCustomers model =
     }
 
 
-articleInEmptyHouse : List Customer -> Article -> Bool
-articleInEmptyHouse customers {state} =
-  case state of
-    Article.Delivered house ->
-      houseEmpty customers house
-    _ -> False
-
-
 cleanup : Model -> Model
 cleanup model =
   { model
-  | articles =
-      List.filter
-        (\ article -> not (articleInEmptyHouse model.customers article))
-        model.articles
-  , requests =
+  | requests =
       List.filter
         (\ request -> not (houseEmpty model.customers request.house))
         model.requests
@@ -417,7 +408,13 @@ deliverArticle house article model =
         model.requests
     , articles = model.articles
       |> Article.removeDelivered house article.category
-      |> Article.updateState (Article.Delivered house) article
+      |> (
+        case IHopeItWorks.find (Customer.livesHere house) model.customers of
+          Just customer ->
+            Article.updateState (Article.Delivered customer) article
+          Nothing ->
+            identity
+      )
     , score = model.score + 1
     }
     |> incHappinessInTheHouse house
@@ -460,6 +457,15 @@ returnArticle warehouse article model =
         model
     _ ->
        model
+
+
+renderCustomer : Model -> Customer -> List Box
+renderCustomer model customer =
+  case customer.location of
+    Customer.AtHome {position} ->
+      CustomerView.render model.articles position customer
+    Customer.Lost ->
+      []
 
 
 renderMapObject : Model -> MapObject -> List Box
@@ -519,3 +525,4 @@ boxes model =
       ++ ScoreView.render model.gridSize model.score model.maxLives (countLives model)
       ++ if model.state == Stopped then StartGameView.render model.gridSize else []
       ++ List.concatMap (renderMapObject model) model.mapObjects
+      ++ List.concatMap (renderCustomer model) model.customers

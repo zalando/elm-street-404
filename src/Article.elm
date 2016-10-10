@@ -16,6 +16,7 @@ module Article exposing
 
 import Random
 import MapObject exposing (MapObject, MapObjectCategory(..))
+import Customer exposing (Customer, Location)
 import Category exposing (Category)
 import IHopeItWorks
 
@@ -23,8 +24,9 @@ import IHopeItWorks
 type State
   = InStock MapObject
   | AwaitingReturn MapObject
-  | Delivered MapObject
+  | Delivered Customer
   | Picked
+  | Lost
 
 
 type alias Article =
@@ -48,7 +50,10 @@ house : Article -> Maybe MapObject
 house {state} =
   case state of
     AwaitingReturn house -> Just house
-    Delivered house -> Just house
+    Delivered {location} ->
+      case location of
+        Customer.AtHome house -> Just house
+        Customer.Lost -> Nothing
     _ -> Nothing
 
 
@@ -59,7 +64,9 @@ availableCategories articles =
 
 removeDelivered : MapObject -> Category -> List Article -> List Article
 removeDelivered house category' =
-  IHopeItWorks.remove (\{state, category} -> state == Delivered house && Category.isSame category category')
+  IHopeItWorks.remove (\({state, category} as article) ->
+    isDelivered house article && Category.isSame category category'
+  )
 
 
 updateState : State -> Article -> List Article -> List Article
@@ -84,7 +91,15 @@ isPicked {state} = state == Picked
 
 isDelivered : MapObject -> Article -> Bool
 isDelivered house {state} =
-  state == Delivered house
+  case state of
+    Delivered {location} ->
+      case location of
+        Customer.AtHome house' ->
+          house == house'
+        Customer.Lost ->
+          False
+    _ ->
+      False
 
 
 {- returns true if the article can be ordered -}
@@ -150,7 +165,12 @@ markInReturn articles articlesToReturn =
       if List.member article articlesToReturn then
         let
           modifiedArticle = case article.state of
-            Delivered house -> {article | state = AwaitingReturn house}
+            Delivered {location} ->
+              case location of
+                Customer.AtHome house ->
+                  {article | state = AwaitingReturn house}
+                _ ->
+                  article
             _ -> article
         in
           modifiedArticle :: markInReturn restArticles (IHopeItWorks.remove ((==) article) articlesToReturn)

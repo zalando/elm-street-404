@@ -5,6 +5,7 @@ module Customer exposing
   , decHappiness
   , incHappiness
   , isLost
+  , Location(..)
   , rodnams
   )
 
