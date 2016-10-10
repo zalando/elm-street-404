@@ -1,6 +1,6 @@
 module CustomerView exposing (render)
 
-import Customer exposing (Customer, Location(..))
+import Customer exposing (Customer)
 import Box exposing (Box)
 import Textures
 import Layers exposing (layers)
@@ -31,7 +31,7 @@ render : List Article -> (Float, Float) -> Customer -> List Box
 render articles position customer =
   let
     categories = articles
-      |> List.filter (\{state} -> state == Article.Delivered customer)
+      |> List.filter (\{state} -> state == Article.DeliveredToCustomer customer.id)
       |> List.map .category
     shirtColor = Category.getColor Category.isShirt categories
       |> Maybe.map (shirtFrameOffset customer)

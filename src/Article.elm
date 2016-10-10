@@ -14,9 +14,10 @@ module Article exposing
   , markInReturn
   )
 
+import Dict exposing (Dict)
 import Random
 import MapObject exposing (MapObject, MapObjectCategory(..))
-import Customer exposing (Customer, Location)
+import Customer exposing (Customer)
 import Category exposing (Category)
 import IHopeItWorks
 
@@ -24,7 +25,7 @@ import IHopeItWorks
 type State
   = InStock MapObject
   | AwaitingReturn MapObject
-  | Delivered Customer
+  | DeliveredToCustomer Int
   | Picked
   | Lost
 
@@ -46,14 +47,16 @@ warehouses articles =
         _ -> warehouses rest
 
 
-house : Article -> Maybe MapObject
-house {state} =
+house : Dict Int Customer -> Article -> Maybe MapObject
+house customers {state} =
   case state of
     AwaitingReturn house -> Just house
-    Delivered {location} ->
-      case location of
-        Customer.AtHome house -> Just house
-        Customer.Lost -> Nothing
+    DeliveredToCustomer id ->
+      case Dict.get id customers of
+        Just {location} ->
+          location
+        Nothing ->
+          Nothing
     _ -> Nothing
 
 
@@ -62,10 +65,10 @@ availableCategories articles =
   IHopeItWorks.exclude (List.map .category (List.filter isVacant articles))
 
 
-removeDelivered : MapObject -> Category -> List Article -> List Article
-removeDelivered house category' =
+removeDelivered : Int -> Category -> List Article -> List Article
+removeDelivered customerId category' =
   IHopeItWorks.remove (\({state, category} as article) ->
-    isDelivered house article && Category.isSame category category'
+    state == DeliveredToCustomer customerId && Category.isSame category category'
   )
 
 
@@ -89,15 +92,15 @@ isPicked : Article -> Bool
 isPicked {state} = state == Picked
 
 
-isDelivered : MapObject -> Article -> Bool
-isDelivered house {state} =
+isDelivered : Dict Int Customer -> MapObject -> Article -> Bool
+isDelivered customers house {state} =
   case state of
-    Delivered {location} ->
-      case location of
-        Customer.AtHome house' ->
-          house == house'
-        Customer.Lost ->
-          False
+    DeliveredToCustomer id ->
+      case Dict.get id customers of
+      Just {location} ->
+        location == Just house
+      Nothing ->
+        False
     _ ->
       False
 
@@ -130,13 +133,13 @@ dispatch number warehouses =
     )
 
 
-return : Int -> List MapObject -> List Article -> Random.Generator (List Article)
-return number houses articles =
+return : Dict Int Customer -> Int -> List MapObject -> List Article -> Random.Generator (List Article)
+return customers number houses articles =
   if number <= 0 then
     Random.map (always []) (Random.int 0 0)
   else
     let
-      deliveredTo = flip isDelivered
+      deliveredTo = flip (isDelivered customers)
       -- keep articles from available slots
       availableArticles = List.filter (\a -> List.any (deliveredTo a) houses) articles
     in
@@ -148,6 +151,7 @@ return number houses articles =
             Random.map
               ((::) article)
               ( return
+                  customers
                   (number - 1)
                   (IHopeItWorks.remove (deliveredTo article) houses)
                   (IHopeItWorks.remove ((==) article) availableArticles)
@@ -157,22 +161,26 @@ return number houses articles =
       )
 
 
-markInReturn : List Article -> List Article -> List Article
-markInReturn articles articlesToReturn =
+markInReturn : Dict Int Customer -> List Article -> List Article -> List Article
+markInReturn customers articles articlesToReturn =
   case articles of
     [] -> []
     article :: restArticles ->
       if List.member article articlesToReturn then
         let
           modifiedArticle = case article.state of
-            Delivered {location} ->
-              case location of
-                Customer.AtHome house ->
-                  {article | state = AwaitingReturn house}
-                _ ->
+            DeliveredToCustomer id ->
+              case Dict.get id customers of
+                Just {location} ->
+                  case location of
+                    Just house ->
+                      {article | state = AwaitingReturn house}
+                    _ ->
+                      article
+                Nothing ->
                   article
             _ -> article
         in
-          modifiedArticle :: markInReturn restArticles (IHopeItWorks.remove ((==) article) articlesToReturn)
+          modifiedArticle :: markInReturn customers restArticles (IHopeItWorks.remove ((==) article) articlesToReturn)
       else
-        article :: markInReturn restArticles articlesToReturn
+        article :: markInReturn customers restArticles articlesToReturn

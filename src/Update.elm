@@ -119,6 +119,7 @@ update action model =
     NoOp ->
         model ! []
 
+
 ifPlaying : (Model -> Model) -> Model -> (Model, Cmd Action)
 ifPlaying fun model =
   if model.state == Playing then

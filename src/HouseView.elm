@@ -4,20 +4,16 @@ import Actions exposing (Action)
 import Layers exposing (layers)
 import Box exposing (Box)
 import MapObject exposing (MapObject)
-import Customer exposing (Customer)
 import Request exposing (Request)
 import Article exposing (Article)
 import RequestView
 import Textures
 
 
-render : List Request -> List Article -> List Customer -> MapObject -> List Box
-render requests articles customers ({position} as house) =
+render : List Request -> List Article -> MapObject -> List Box
+render requests articles ({position} as house) =
   let
     requestsFromHouse = List.filter (\r -> r.house == house) requests
-    deliveredArticles = List.filter (Article.isDelivered house) articles
-    hasRequests = List.length requestsFromHouse > 0
-    hasArticles = List.length deliveredArticles > 0
 
     renderRequest number =
       RequestView.render (fst position - 1, snd position - toFloat number) house
