@@ -38,6 +38,9 @@ type TextureId
   | ElmStreet404
   | Score
   | Boxes
+  | EndGame
+  | Heart
+  | Spotlight
 
 
 filename : TextureId -> String
@@ -66,6 +69,9 @@ filename textureId =
     ElmStreet404 -> "404-elm-street.png"
     Score -> "score.png"
     Boxes -> "boxes.png"
+    EndGame -> "end-game.png"
+    Heart -> "heart.png"
+    Spotlight -> "spotlight.png"
 
 
 textures : Textures
@@ -97,6 +103,9 @@ textures =
     , (Warehouse, TextureData (4, 4) 1 Nothing)
     , (WarehouseBubble, TextureData (4, 5) 1 Nothing)
     , (WarehouseShadow, TextureData (5, 4) 1 Nothing)
+    , (EndGame, TextureData (10, 7) 3 Nothing)
+    , (Heart, TextureData (2, 1) 2 Nothing)
+    , (Spotlight, TextureData (4, 2) 1 Nothing)
     ]
 
 

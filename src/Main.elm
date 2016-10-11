@@ -28,7 +28,7 @@ subscriptions model =
       restore (\_ -> Actions.Restore)
     _ ->
       Sub.batch
-        [ if model.state == Model.Playing then
+        [ if model.state == Model.Playing || model.state == Model.Lost  || model.state == Model.Won then
             AnimationFrame.diffs Tick
           else
             Sub.none

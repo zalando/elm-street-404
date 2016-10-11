@@ -39,11 +39,8 @@ initial id house typ =
 
 
 animate : Time -> Customer -> Customer
-animate time customer =
-  if customer.happiness == 0 then
-    animateFrame 2 time customer
-  else
-    customer
+animate =
+  animateFrame 2
 
 
 rodnam : Int -> MapObject -> Random.Generator Customer
@@ -73,11 +70,11 @@ isLost {location} =
 modHappiness : Int -> Customer -> Customer
 modHappiness d ({happiness, location} as customer) =
   let
-    newHappiness = if customer.isDressed then happiness else happiness + d |> min 2
+    newHappiness = if customer.isDressed then happiness else happiness + d
     newLocation = if newHappiness < 0 then Nothing else location
   in
     { customer
-    | happiness = newHappiness
+    | happiness = clamp 0 2 newHappiness
     , location = newLocation
     }
 

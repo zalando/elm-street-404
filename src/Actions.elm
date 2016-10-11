@@ -21,6 +21,7 @@ type EventAction
 type Action
   = Tick Time
   | Start
+  | BackToStart
   | Suspend
   | Restore
   | Click Position

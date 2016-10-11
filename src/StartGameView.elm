@@ -21,7 +21,7 @@ render (width, height) =
       Actions.Start
   , Box.textured
       Textures.ElmStreet404
-      (toFloat width / 2 - 6.5, toFloat height / 4 - 1)
+      (toFloat width / 2 - 6.5, toFloat height / 4 - 2)
       0
       (layers.shadow, 0)
   ]

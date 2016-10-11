@@ -34,6 +34,7 @@ import TreeView
 import FountainView
 import HouseView
 import CustomerView
+import EndGameView
 import WarehouseView
 import DeliveryPersonView
 import InventoryView
@@ -48,6 +49,8 @@ type State
   | Loading
   | Playing
   | Stopped
+  | Lost
+  | Won
   | Suspended State -- to store the prev state
 
 
@@ -132,29 +135,24 @@ initial randomSeed imagesUrl embed devicePixelRatio =
 
 resize : (Int, Int) -> Model -> Model
 resize dimensions model =
-  if model.state == Playing then
-    {model | dimensions = dimensions}
-  else
-    let
-      newTileSize = min (fst dimensions // minMapWidth) 40
-      newGridSize = gridSize newTileSize dimensions
-    in
-      { model
-      | dimensions = dimensions
-      , gridSize = newGridSize
-      , tileSize = newTileSize
-      , deliveryPerson =
-          DeliveryPerson.initial
-            ( toFloat (fst newGridSize // 2 - 1)
-            , toFloat (snd newGridSize // 4 * 3)
-            )
-      , articles = []
-      , requests = []
-      , mapObjects = []
-      , customers = Dict.empty
-      , id = 0
-      , events = []
-      }
+  case model.state of
+    Playing ->
+      { model | dimensions = dimensions}
+    _ ->
+      let
+        newTileSize = min (fst dimensions // minMapWidth) 40
+        newGridSize = gridSize newTileSize dimensions
+      in
+        { model
+        | dimensions = dimensions
+        , gridSize = newGridSize
+        , tileSize = newTileSize
+        , deliveryPerson =
+            DeliveryPerson.initial
+              ( toFloat (fst newGridSize // 2 - 1)
+              , toFloat (snd newGridSize // 4 * 3 + 1)
+              )
+        }
 
 
 positionObstacles : Model -> Model
@@ -171,8 +169,8 @@ positionObstacles ({gridSize, deliveryPerson} as model) =
     (mapObjects, seed) =
       Random.step
         ( MapObject.placeRandom
-            ( List.repeat 1 MapObject.warehouse ++
-              List.repeat 2 MapObject.house ++
+            ( List.repeat 2 MapObject.warehouse ++
+              List.repeat 4 MapObject.house ++
               MapObject.fountain ::
               List.repeat 4 MapObject.tree
             )
@@ -193,6 +191,7 @@ start model =
   , articles = []
   , requests = []
   , customers = Dict.empty
+  , id = 0
   , events =
       [ (11000, DispatchOrders 1)
       , (13000, DispatchArticles 1)
@@ -362,6 +361,7 @@ dispatchCustomers model =
     emptyHouses = model.mapObjects
       |> List.filter MapObject.isHouse
       |> List.filter (houseEmpty (Dict.values model.customers))
+
     (newCustomers, seed) = Random.step (Customer.rodnams (model.id + 1) emptyHouses) model.seed
     id = newCustomers |> Dict.keys |> List.maximum |> Maybe.withDefault model.id
   in
@@ -384,17 +384,22 @@ cleanup model =
 
 updateGameState : Model -> Model
 updateGameState model =
-  if countLives model <= 0 || hasWon model then
-    render
-      { model
-      | state = Stopped
-      , deliveryPerson = DeliveryPerson.initial
-          ( toFloat (fst model.gridSize // 2 - 1)
-          , toFloat (snd model.gridSize // 4 * 3)
-          )
-      }
-  else
-    model
+  let
+    lives = countLives model
+  in
+    if lives <= 0 || hasWon model then
+      render
+        { model
+        | state = if lives <= 0 then Lost else Won
+        , events = []
+        , requests = []
+        , deliveryPerson = DeliveryPerson.initial
+            ( toFloat (fst model.gridSize // 2 - 1)
+            , toFloat (snd model.gridSize // 4 * 3 + 1)
+            )
+        }
+    else
+      model
 
 
 hasWon : Model -> Bool
@@ -559,10 +564,14 @@ boxes model =
         (toFloat (fst model.gridSize) / 2 + 1, toFloat (snd model.gridSize) / 2)
         (Textures.loadedTextures model.textures)
     Stopped ->
-      InventoryView.render model.gridSize model.articles
-      ++ DeliveryPersonView.render (List.length (List.filter Article.isPicked model.articles)) model.deliveryPerson
-      ++ ScoreView.render model.gridSize model.score model.maxLives (countLives model)
+      DeliveryPersonView.render 0 model.deliveryPerson
       ++ StartGameView.render model.gridSize
+    Lost ->
+      ScoreView.render model.gridSize model.score model.maxLives (countLives model)
+      ++ EndGameView.render model.gridSize True model.articles model.customers
+    Won ->
+      ScoreView.render model.gridSize model.score model.maxLives (countLives model)
+      ++ EndGameView.render model.gridSize False model.articles model.customers
     Playing ->
       InventoryView.render model.gridSize model.articles
       ++ DeliveryPersonView.render (List.length (List.filter Article.isPicked model.articles)) model.deliveryPerson

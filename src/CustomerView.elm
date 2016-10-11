@@ -44,10 +44,16 @@ render articles position customer =
           [Box.textured sprite position color (layers.obstacle, layer)]
         Nothing ->
           []
+    renderHeart =
+      if customer.isDressed then
+        [ Box.textured Textures.Heart position customer.frame (layers.obstacle, 6) ]
+      else
+        []
   in
     renderColor scarfColor 5 Textures.Scarves ++
     renderColor pantsColor 4 Textures.Trousers ++
     renderColor shoesColor 3 Textures.Shoes ++
     renderColor shirtColor 2 Textures.Shirts ++
+    renderHeart ++
     [ Box.textured Textures.Customers position (customerFrameOffset customer) (layers.obstacle, 1)
     ]

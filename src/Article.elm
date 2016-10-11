@@ -27,7 +27,6 @@ type State
   | AwaitingReturn MapObject
   | DeliveredToCustomer Int
   | Picked
-  | Lost
 
 
 type alias Article =
