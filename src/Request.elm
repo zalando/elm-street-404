@@ -16,6 +16,8 @@ import Category exposing (Category)
 import Time exposing (Time)
 import IHopeItWorks
 import Random
+import Dict exposing (Dict)
+import Customer exposing (Customer)
 
 
 type RequestCategory
@@ -54,16 +56,16 @@ orderedCategories requests =
           orderedCategories rest
 
 
-returnArticles : List Article -> List Request
-returnArticles articles =
+returnArticles : Dict Int Customer -> List Article -> List Request
+returnArticles customers articles =
   case articles of
     [] -> []
     article :: restArticles ->
-      case Article.house article of
+      case Article.house customers article of
         Just house ->
-          request (Return article) house :: returnArticles restArticles
+          request (Return article) house :: returnArticles customers restArticles
         Nothing ->
-          returnArticles restArticles
+          returnArticles customers restArticles
 
 
 orders : Int -> List MapObject -> List Category -> Random.Generator (List Request)

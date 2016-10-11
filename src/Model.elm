@@ -16,9 +16,11 @@ module Model exposing
   )
 
 import Random
+import Dict exposing (Dict)
 import Time exposing (Time)
 import DeliveryPerson exposing (DeliveryPerson)
 import Article exposing (Article)
+import Category
 import Request exposing (Request)
 import Customer exposing (Customer)
 import IHopeItWorks
@@ -31,6 +33,8 @@ import Actions exposing (Action, EventAction(..))
 import TreeView
 import FountainView
 import HouseView
+import CustomerView
+import EndGameView
 import WarehouseView
 import DeliveryPersonView
 import InventoryView
@@ -43,9 +47,10 @@ import DigitsView
 type State
   = Initialising
   | Loading
-  | Paused
   | Playing
   | Stopped
+  | Lost
+  | Won
   | Suspended State -- to store the prev state
 
 
@@ -67,8 +72,8 @@ maxMapHeight = 24
 
 limitSize : (Int, Int) -> (Int, Int)
 limitSize (width, height) =
-  ( width |> max minMapWidth |> min maxMapWidth
-  , height |> max minMapHeight |> min maxMapHeight
+  ( clamp minMapWidth maxMapWidth width
+  , clamp minMapHeight maxMapHeight height
   )
 
 
@@ -90,7 +95,8 @@ type alias Model =
   , deliveryPerson : DeliveryPerson
   , articles : List Article
   , requests : List Request
-  , customers : List Customer
+  , customers : Dict Int Customer
+  , id : Int
   , mapObjects : List MapObject
   , events : List (Time, EventAction)
   , score : Int
@@ -116,7 +122,8 @@ initial randomSeed imagesUrl embed devicePixelRatio =
   , articles = []
   , requests = []
   , mapObjects = []
-  , customers = []
+  , customers = Dict.empty
+  , id = 0
   , events = []
   , score = 0
   , maxLives = 3
@@ -128,28 +135,24 @@ initial randomSeed imagesUrl embed devicePixelRatio =
 
 resize : (Int, Int) -> Model -> Model
 resize dimensions model =
-  if model.state == Playing then
-    {model | dimensions = dimensions}
-  else
-    let
-      newTileSize = min (fst dimensions // minMapWidth) 40
-      newGridSize = gridSize newTileSize dimensions
-    in
-      { model
-      | dimensions = dimensions
-      , gridSize = newGridSize
-      , tileSize = newTileSize
-      , deliveryPerson =
-          DeliveryPerson.initial
-            ( toFloat (fst newGridSize // 2 - 1)
-            , toFloat (snd newGridSize // 4 * 3)
-            )
-      , articles = []
-      , requests = []
-      , mapObjects = []
-      , customers = []
-      , events = []
-      }
+  case model.state of
+    Playing ->
+      { model | dimensions = dimensions}
+    _ ->
+      let
+        newTileSize = min (fst dimensions // minMapWidth) 40
+        newGridSize = gridSize newTileSize dimensions
+      in
+        { model
+        | dimensions = dimensions
+        , gridSize = newGridSize
+        , tileSize = newTileSize
+        , deliveryPerson =
+            DeliveryPerson.initial
+              ( toFloat (fst newGridSize // 2 - 1)
+              , toFloat (snd newGridSize // 4 * 3 + 1)
+              )
+        }
 
 
 positionObstacles : Model -> Model
@@ -187,7 +190,8 @@ start model =
   | state = Playing
   , articles = []
   , requests = []
-  , customers = []
+  , customers = Dict.empty
+  , id = 0
   , events =
       [ (11000, DispatchOrders 1)
       , (13000, DispatchArticles 1)
@@ -220,7 +224,7 @@ animationLoop elapsed model =
         | mapObjects = List.map (MapObject.animate elapsed) model.mapObjects
         , deliveryPerson = deliveryPerson
         , requests = List.map (Request.animate elapsed) model.requests
-        , customers = List.map (Customer.animate elapsed) model.customers
+        , customers = Dict.map (always (Customer.animate elapsed)) model.customers
         }
     , maybeAction
     )
@@ -253,8 +257,10 @@ dispatchOrders number model =
     categories = Article.availableCategories
       model.articles
       (Request.orderedCategories model.requests)
+    houses = List.filterMap .location
+        (List.filter (.isDressed >> not) (Dict.values model.customers))
     slots = IHopeItWorks.exclude
-      (MapObject.houseSlots model.mapObjects)
+      (MapObject.houseSlots houses)
       (List.map .house model.requests)
     (orders, seed) = Random.step (Request.orders number slots categories) model.seed
   in
@@ -264,18 +270,15 @@ dispatchOrders number model =
 dispatchReturns : Int -> Model -> Model
 dispatchReturns number model =
   let
-    -- if the only article in the house was returned,
-    -- then the customer would dissapear
-    housesWithMoreThanOneArticle = List.filter
-      (\h -> List.length (List.filter (Article.isDelivered h) model.articles) > 1)
-      model.mapObjects
+    houses = List.filterMap .location
+        (List.filter (.isDressed >> not) (Dict.values model.customers))
     slots = IHopeItWorks.exclude
-      (MapObject.houseSlots housesWithMoreThanOneArticle)
+      (MapObject.houseSlots houses)
       (List.map .house model.requests)
-    (articlesToReturn, seed) = Random.step (Article.return number slots model.articles) model.seed
-    articles = Article.markInReturn model.articles articlesToReturn
-    returnedArticles = Article.markInReturn articlesToReturn articlesToReturn
-    returns = Request.returnArticles returnedArticles
+    (articlesToReturn, seed) = Random.step (Article.return model.customers number slots model.articles) model.seed
+    articles = Article.markInReturn model.customers model.articles articlesToReturn
+    returnedArticles = Article.markInReturn model.customers articlesToReturn articlesToReturn
+    returns = Request.returnArticles model.customers returnedArticles
   in
     { model
     | articles = articles
@@ -327,7 +330,7 @@ decHappinessIfHome requests customer =
 
 countLives : Model -> Int
 countLives {maxLives, customers} =
-  maxLives - List.length (List.filter Customer.isLost customers)
+  maxLives - List.length (List.filter Customer.isLost (Dict.values customers))
 
 
 timeoutRequests : Model -> Model
@@ -337,7 +340,7 @@ timeoutRequests model =
   in
     { model
     | requests = inTime
-    , customers = List.map (decHappinessIfHome timeouted) model.customers
+    , customers = Dict.map (always (decHappinessIfHome timeouted)) model.customers
     }
 
 
@@ -355,90 +358,128 @@ houseEmpty customers house =
 dispatchCustomers : Model -> Model
 dispatchCustomers model =
   let
-    emptyHouses = List.filter (houseEmpty model.customers) model.mapObjects
-    (newCustomers, seed) = Random.step (Customer.rodnams emptyHouses) model.seed
+    emptyHouses = model.mapObjects
+      |> List.filter MapObject.isHouse
+      |> List.filter (houseEmpty (Dict.values model.customers))
+
+    (newCustomers, seed) = Random.step (Customer.rodnams (model.id + 1) emptyHouses) model.seed
+    id = newCustomers |> Dict.keys |> List.maximum |> Maybe.withDefault model.id
   in
     { model
-    | customers = model.customers ++ newCustomers
+    | customers = Dict.union model.customers newCustomers
+    , id = id
     , seed = seed
     }
-
-
-articleInEmptyHouse : List Customer -> Article -> Bool
-articleInEmptyHouse customers {state} =
-  case state of
-    Article.Delivered house ->
-      houseEmpty customers house
-    _ -> False
 
 
 cleanup : Model -> Model
 cleanup model =
   { model
-  | articles =
+  | requests =
       List.filter
-        (\ article -> not (articleInEmptyHouse model.customers article))
-        model.articles
-  , requests =
-      List.filter
-        (\ request -> not (houseEmpty model.customers request.house))
+        (\request -> not (houseEmpty (Dict.values model.customers) request.house))
         model.requests
   }
 
 
 updateGameState : Model -> Model
 updateGameState model =
-  if countLives model <= 0 then
-    render { model | state = Stopped }
-  else
-    model
+  let
+    lives = countLives model
+  in
+    if lives <= 0 || hasWon model then
+      render
+        { model
+        | state = if lives <= 0 then Lost else Won
+        , events = []
+        , requests = []
+        , deliveryPerson = DeliveryPerson.initial
+            ( toFloat (fst model.gridSize // 2 - 1)
+            , toFloat (snd model.gridSize // 4 * 3 + 1)
+            )
+        }
+    else
+      model
 
 
-incHappinessInTheHouse : MapObject -> Model -> Model
-incHappinessInTheHouse house model =
-  { model
-  | customers = List.map
-      (\ customer ->
-        if Customer.livesHere house customer then
-          Customer.incHappiness customer
-        else
-          customer
-      )
-      model.customers
-  }
+hasWon : Model -> Bool
+hasWon {customers, mapObjects} =
+  List.length (List.filter .isDressed (Dict.values customers)) ==
+  List.length (List.filter MapObject.isHouse mapObjects)
+
+
+updateDressedState : List Article -> Customer -> Customer
+updateDressedState articles customer =
+  let
+    categories = articles
+      |> List.filter (.state >> (==) (Article.DeliveredToCustomer customer.id))
+      |> List.map .category
+  in
+    if List.all (\fn -> List.any fn categories) [Category.isScarf, Category.isPants, Category.isShirt,  Category.isShoes] then
+      {customer | isDressed = True, happiness = 2}
+    else
+      customer
+
+
+incHappiness : Maybe Customer -> Model -> Model
+incHappiness maybeCustomer model =
+  case maybeCustomer of
+    Just customer ->
+      { model
+      | customers = Dict.insert
+          customer.id
+          ( customer
+              |> Customer.incHappiness
+              |> updateDressedState model.articles
+          )
+          model.customers
+      }
+    Nothing ->
+      model
 
 
 deliverArticle : MapObject -> Article -> Model -> Model
 deliverArticle house article model =
-  if List.any (Request.isOrdered house article.category) model.requests then
-    { model
-    | requests = IHopeItWorks.remove
-        (Request.isOrdered house article.category)
-        model.requests
-    , articles = model.articles
-      |> Article.removeDelivered house article.category
-      |> Article.updateState (Article.Delivered house) article
-    , score = model.score + 1
-    }
-    |> incHappinessInTheHouse house
-  else
-    model
+  let
+    maybeCustomer = IHopeItWorks.find (Customer.livesHere house) (Dict.values model.customers)
+  in
+    if List.any (Request.isOrdered house article.category) model.requests then
+      { model
+      | requests = IHopeItWorks.remove
+          (Request.isOrdered house article.category)
+          model.requests
+      , articles =
+          case maybeCustomer of
+            Just {id} ->
+              model.articles
+                |> Article.removeDelivered id article.category
+                |> Article.updateState (Article.DeliveredToCustomer id) article
+            Nothing ->
+              model.articles
+      , score = model.score + 1
+      }
+      |> incHappiness maybeCustomer
+    else
+      model
 
 
 pickupReturn : MapObject -> MapObject -> Article -> Model -> Model
 pickupReturn house articleHouse article model =
-  if
-    articleHouse == house &&
-    List.length (List.filter Article.isPicked model.articles) < model.deliveryPerson.capacity
-  then
-    { model
-    | requests = IHopeItWorks.remove (Request.isInReturn house article) model.requests
-    , articles = Article.updateState Article.Picked article model.articles
-    , score = model.score + 1
-    }
-    |> incHappinessInTheHouse house
-  else
-    model
+  let
+    maybeCustomer = IHopeItWorks.find (Customer.livesHere house) (Dict.values model.customers)
+  in
+    if
+      articleHouse == house &&
+      List.length (List.filter Article.isPicked model.articles) < model.deliveryPerson.capacity
+    then
+      { model
+      | requests = IHopeItWorks.remove (Request.isInReturn house article) model.requests
+      , articles = Article.updateState Article.Picked article model.articles
+      , score = model.score + 1
+      }
+      |> incHappiness maybeCustomer
+    else
+      model
 
 
 pickupArticle : MapObject -> MapObject -> Article -> Model -> Model
@@ -462,6 +503,15 @@ returnArticle warehouse article model =
        model
 
 
+renderCustomer : Model -> Customer -> List Box
+renderCustomer model customer =
+  case customer.location of
+    Just {position} ->
+      CustomerView.render model.articles position customer
+    Nothing ->
+      []
+
+
 renderMapObject : Model -> MapObject -> List Box
 renderMapObject model mapObject =
   case mapObject.category of
@@ -470,7 +520,7 @@ renderMapObject model mapObject =
     FountainCategory fountain ->
       FountainView.render fountain mapObject
     HouseCategory _ ->
-      HouseView.render model.requests model.articles model.customers mapObject
+      HouseView.render model.requests model.articles mapObject
     WarehouseCategory capacity ->
       WarehouseView.render model.articles capacity mapObject
 
@@ -513,9 +563,18 @@ boxes model =
       DigitsView.render
         (toFloat (fst model.gridSize) / 2 + 1, toFloat (snd model.gridSize) / 2)
         (Textures.loadedTextures model.textures)
-    _ ->
+    Stopped ->
+      DeliveryPersonView.render 0 model.deliveryPerson
+      ++ StartGameView.render model.gridSize
+    Lost ->
+      ScoreView.render model.gridSize model.score model.maxLives (countLives model)
+      ++ EndGameView.render model.gridSize True model.articles model.customers
+    Won ->
+      ScoreView.render model.gridSize model.score model.maxLives (countLives model)
+      ++ EndGameView.render model.gridSize False model.articles model.customers
+    Playing ->
       InventoryView.render model.gridSize model.articles
       ++ DeliveryPersonView.render (List.length (List.filter Article.isPicked model.articles)) model.deliveryPerson
       ++ ScoreView.render model.gridSize model.score model.maxLives (countLives model)
-      ++ if model.state == Stopped then StartGameView.render model.gridSize else []
       ++ List.concatMap (renderMapObject model) model.mapObjects
+      ++ List.concatMap (renderCustomer model) (Dict.values model.customers)

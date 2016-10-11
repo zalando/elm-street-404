@@ -69,23 +69,22 @@ update action model =
                 Model.render {newModel | state = Stopped} ! []
           else
             Model.render newModel ! []
+    BackToStart ->
+      Model.render {model | state = Stopped} ! []
     Start ->
       Model.start model ! []
     Tick time ->
-      if model.state == Playing then
-        let
-          (model, maybeAction) = Model.animate time model
-        in
-          ( model
-          , case maybeAction of
-              Just action ->
-                Task.succeed action
-                  |> Task.perform identity identity
-              Nothing ->
-                Cmd.none
-          )
-      else
-        model ! []
+      let
+        (model, maybeAction) = Model.animate time model
+      in
+        ( model
+        , case maybeAction of
+            Just action ->
+              Task.succeed action
+                |> Task.perform identity identity
+            Nothing ->
+              Cmd.none
+        )
     Click {x, y} ->
       let
         effect = case Model.click (x, y) model of
@@ -115,9 +114,10 @@ update action model =
         _ ->
           model ! []
     Event eventAction ->
-      Model.dispatch eventAction model ! []
+      ifPlaying (Model.dispatch eventAction) model
     NoOp ->
-        model ! []
+      model ! []
+
 
 ifPlaying : (Model -> Model) -> Model -> (Model, Cmd Action)
 ifPlaying fun model =
