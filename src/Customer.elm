@@ -13,6 +13,7 @@ import Random
 import Time exposing (Time)
 import Dict exposing (Dict)
 import AnimationState exposing (AnimatedObject, animateFrame)
+import IHopeItWorks
 
 
 type alias Customer =
@@ -45,7 +46,9 @@ animate =
 
 rodnam : Int -> MapObject -> Random.Generator Customer
 rodnam id house =
-  Random.map (initial id house) (Random.int 0 6)
+  Random.map
+    (Maybe.withDefault 0 >> initial id house)
+    (IHopeItWorks.pickRandom ([0..6] ++ [1, 4, 5] ++ [1, 4, 5]))
 
 
 rodnams : Int -> List MapObject -> Random.Generator (Dict Int Customer)
