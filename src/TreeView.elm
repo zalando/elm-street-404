@@ -7,5 +7,5 @@ import MapObject exposing (MapObject)
 
 
 render : MapObject -> List Box
-render {position} =
-  [ Box.offsetTextured (0, -3) Textures.Tree position 0 (layers.obstacle, 0) ]
+render { position } =
+    [ Box.offsetTextured ( 0, -3 ) Textures.Tree position 0 ( layers.obstacle, 0 ) ]

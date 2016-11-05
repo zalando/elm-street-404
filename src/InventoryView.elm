@@ -3,34 +3,46 @@ module InventoryView exposing (render)
 import Article exposing (Article)
 import Box exposing (Box)
 import Textures
-import Category
 import CategoryView
+import PlaceholderView
 import Layers exposing (layers)
 import Actions
 
 
-render : (Int, Int) -> List Article -> List Box
-render (width, height) articles =
-  let
-    x = toFloat (width - 7) / 2
-    y = toFloat height - 3
+render : ( Int, Int ) -> List Article -> List Box
+render ( width, height ) articles =
+    let
+        x =
+            toFloat (width - 7) / 2
 
-    articlesInDelivery = List.filter Article.isPicked articles
-    articlesNumber = List.length articlesInDelivery
-    placeholders = List.repeat (4 - articlesNumber) Category.Placeholder
+        y =
+            toFloat height - 3
 
-    renderArticle number article =
-      let
-        pos = (toFloat number + x + 2, y + 1)
-      in
-        [ CategoryView.render pos article.category
-        , Box.clickable (1, 1) (0, 0) pos (layers.clickAbove, 0) (Actions.ClickArticle article)
-        ]
+        articlesInDelivery =
+            List.filter Article.isPicked articles
 
-    renderCategory number =
-      CategoryView.render (toFloat (number + articlesNumber) + x + 2, y + 1)
+        articlesNumber =
+            List.length articlesInDelivery
 
-  in
-    Box.textured Textures.InventoryBubble (x, y) 0 (layers.bubble, 0)
-    :: List.concat (List.indexedMap renderArticle articlesInDelivery)
-    ++ List.indexedMap renderCategory placeholders
+        placeholders =
+            [0..3 - articlesNumber]
+
+        renderArticle number article =
+            let
+                pos =
+                    ( toFloat number + x + 2, y + 1 )
+            in
+                [ CategoryView.render pos article.category
+                , Box.clickable ( 1, 1 ) ( 0, 0 ) pos ( layers.clickAbove, 0 ) (Actions.ClickArticle article)
+                ]
+
+        renderPlaceholder number =
+            PlaceholderView.render
+                ( toFloat (number + articlesNumber) + x + 2, y + 1 )
+
+        renderCategory number =
+            CategoryView.render ( toFloat (number + articlesNumber) + x + 2, y + 1 )
+    in
+        Box.textured Textures.InventoryBubble ( x, y ) 0 ( layers.bubble, 0 )
+            :: List.concat (List.indexedMap renderArticle articlesInDelivery)
+            ++ List.map renderPlaceholder placeholders

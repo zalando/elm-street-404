@@ -6,16 +6,16 @@ import AnimationState exposing (AnimatedObject, animateFrame)
 
 animate : Time -> Fountain -> Fountain
 animate =
-  animateFrame 3
+    animateFrame 3
 
 
 type alias Fountain =
-  AnimatedObject {}
+    AnimatedObject {}
 
 
 fountain : Fountain
 fountain =
-  { elapsed = 0
-  , timeout = 150
-  , frame = 0
-  }
+    { elapsed = 0
+    , timeout = 150
+    , frame = 0
+    }

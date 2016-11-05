@@ -11,25 +11,25 @@ import Window exposing (Size)
 
 
 type EventAction
-  = DispatchArticles Int
-  | DispatchOrders Int
-  | DispatchReturns Int
-  | DispatchCustomers
-  | TimeoutRequestsAndCleanup
+    = DispatchArticles Int
+    | DispatchOrders Int
+    | DispatchReturns Int
+    | DispatchCustomers
+    | TimeoutRequestsAndCleanup
 
 
 type Action
-  = Tick Time
-  | Start
-  | BackToStart
-  | Suspend
-  | Restore
-  | Click Position
-  | ClickArticle Article
-  | ClickCategory Category
-  | ClickMapObject MapObject (Maybe Action)
-  | TextureLoaded TextureId (Maybe Texture)
-  | Dimensions Size
-  | HoverCloseButton Bool
-  | Event EventAction
-  | NoOp
+    = Tick Time
+    | Start
+    | BackToStart
+    | Suspend
+    | Restore
+    | Click Position
+    | ClickArticle Article
+    | ClickCategory Category
+    | ClickMapObject MapObject (Maybe Action)
+    | TextureLoaded TextureId (Maybe Texture)
+    | Dimensions Size
+    | HoverCloseButton Bool
+    | Event EventAction
+    | NoOp
