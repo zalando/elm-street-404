@@ -1,4 +1,4 @@
-module CustomerView exposing (render)
+module View.Customer exposing (render)
 
 import Customer exposing (Customer)
 import Box exposing (Box)

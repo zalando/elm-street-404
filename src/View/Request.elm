@@ -1,6 +1,6 @@
-module RequestView exposing (render)
+module View.Request exposing (render)
 
-import CategoryView
+import View.Category
 import Actions exposing (Action)
 import Request exposing (Request)
 import Box exposing (Box)
@@ -33,7 +33,7 @@ render position house request =
                         []
                        else
                         [ renderReturn position
-                        , CategoryView.render position article.category
+                        , View.Category.render position article.category
                         ]
 
             Request.Order category ->
@@ -41,4 +41,4 @@ render position house request =
                     :: if request.blinkHidden then
                         []
                        else
-                        [ CategoryView.render position category ]
+                        [ View.Category.render position category ]

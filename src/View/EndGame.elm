@@ -1,10 +1,10 @@
-module EndGameView exposing (render)
+module View.EndGame exposing (render)
 
 import Dict exposing (Dict)
 import Box exposing (Box)
 import Article exposing (Article)
 import Customer exposing (Customer)
-import CustomerView exposing (render)
+import View.Customer
 import Textures
 import Layers exposing (layers)
 import Actions
@@ -12,7 +12,7 @@ import Actions
 
 renderCustomer : ( Float, Float ) -> List Article -> Int -> Customer -> List Box
 renderCustomer ( x, y ) articles i customer =
-    CustomerView.render articles ( x + toFloat i * 2, y + toFloat (i % 2) ) customer
+    View.Customer.render articles ( x + toFloat i * 2, y + toFloat (i % 2) ) customer
         ++ [ Box.textured
                 Textures.Spotlight
                 ( x + toFloat i * 2 - 1, y + 2 + toFloat (i % 2) )

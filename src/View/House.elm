@@ -1,4 +1,4 @@
-module HouseView exposing (render)
+module View.House exposing (render)
 
 import Actions exposing (Action)
 import Layers exposing (layers)
@@ -6,7 +6,7 @@ import Box exposing (Box)
 import MapObject exposing (MapObject)
 import Request exposing (Request)
 import Article exposing (Article)
-import RequestView
+import View.Request
 import Textures
 
 
@@ -17,7 +17,7 @@ render requests articles ({ position } as house) =
             List.filter (\r -> r.house == house) requests
 
         renderRequest number =
-            RequestView.render ( fst position - 1, snd position - toFloat number ) house
+            View.Request.render ( fst position - 1, snd position - toFloat number ) house
 
         renderBubble =
             case List.length requestsFromHouse of

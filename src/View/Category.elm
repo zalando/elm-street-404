@@ -1,4 +1,4 @@
-module CategoryView exposing (render)
+module View.Category exposing (render)
 
 import Category exposing (Category, Kind(..))
 import Layers exposing (layers)

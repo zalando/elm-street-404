@@ -1,4 +1,4 @@
-module TreeView exposing (render)
+module View.Tree exposing (render)
 
 import Textures
 import Box exposing (Box)

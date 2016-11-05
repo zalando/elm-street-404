@@ -1,4 +1,4 @@
-module DigitsView exposing (render)
+module View.Digits exposing (render)
 
 import Box exposing (Box)
 import Textures

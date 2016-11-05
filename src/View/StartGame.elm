@@ -1,4 +1,4 @@
-module StartGameView exposing (render)
+module View.StartGame exposing (render)
 
 import Box exposing (Box)
 import Textures

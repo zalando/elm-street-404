@@ -1,6 +1,7 @@
 port module Update exposing (update, loadImage)
 
 import Model exposing (..)
+import View.Model
 import Actions exposing (..)
 import DeliveryPerson exposing (Location(..))
 import Article exposing (State(..), Article)
@@ -24,7 +25,7 @@ update action model =
             { model | closeButtonActive = active } ! []
 
         Dimensions { width, height } ->
-            ( Model.resize ( width, height ) model |> Model.render, Cmd.none )
+            ( Model.resize ( width, height ) model |> View.Model.render, Cmd.none )
 
         TextureLoaded textureId maybeTexture ->
             let
@@ -71,15 +72,15 @@ update action model =
                 else if List.length texturesToLoad == 0 then
                     case model.state of
                         Suspended _ ->
-                            Model.render { newModel | state = Suspended Stopped } ! []
+                            View.Model.render { newModel | state = Suspended Stopped } ! []
 
                         _ ->
-                            Model.render { newModel | state = Stopped } ! []
+                            View.Model.render { newModel | state = Stopped } ! []
                 else
-                    Model.render newModel ! []
+                    View.Model.render newModel ! []
 
         BackToStart ->
-            Model.render { model | state = Stopped } ! []
+            View.Model.render { model | state = Stopped } ! []
 
         Start ->
             Model.start model ! []
@@ -89,7 +90,7 @@ update action model =
                 ( model, maybeAction ) =
                     Model.animate time model
             in
-                ( model
+                ( View.Model.render model
                 , case maybeAction of
                     Just action ->
                         Task.succeed action

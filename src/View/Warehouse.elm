@@ -1,10 +1,10 @@
-module WarehouseView exposing (render)
+module View.Warehouse exposing (render)
 
 import MapObject exposing (MapObject)
 import Box exposing (Box)
 import Article exposing (Article)
-import CategoryView
-import PlaceholderView
+import View.Category
+import View.Placeholder
 import Actions exposing (Action)
 import Layers exposing (layers)
 import Textures
@@ -30,18 +30,18 @@ render articles capacity ({ position } as warehouse) =
                 pos =
                     ( toFloat (number % 2) + x - 1, toFloat (number // 2) + y - 2 )
             in
-                [ CategoryView.render pos article.category
+                [ View.Category.render pos article.category
                 , Box.clickable ( 1, 1 ) ( 0, 0 ) pos ( layers.clickAbove, 0 ) (Actions.ClickMapObject warehouse (Just <| Actions.ClickArticle article))
                 ]
 
         renderPlaceholder number =
-            PlaceholderView.render
+            View.Placeholder.render
                 ( toFloat ((numberOfArticles + number) % 2) + x - 1
                 , toFloat ((numberOfArticles + number) // 2) + y - 2
                 )
 
         renderCategory number =
-            CategoryView.render
+            View.Category.render
                 ( toFloat ((numberOfArticles + number) % 2) + x - 1
                 , toFloat ((numberOfArticles + number) // 2) + y - 2
                 )

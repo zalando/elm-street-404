@@ -1,4 +1,4 @@
-module DeliveryPersonView exposing (render)
+module View.DeliveryPerson exposing (render)
 
 import DeliveryPerson exposing (DeliveryPerson)
 import Box exposing (Box)

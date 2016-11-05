@@ -11,8 +11,8 @@ module Model
         , pickupReturn
         , pickupArticle
         , resize
-        , render
         , click
+        , countLives
         , dispatch
         )
 
@@ -30,22 +30,6 @@ import MapObject exposing (MapObject, MapObjectCategory(..))
 import Textures exposing (TextureId, Textures)
 import Box exposing (Box, ClickableBoxData, TexturedBoxData)
 import Actions exposing (Action, EventAction(..))
-
-
--- Views:
-
-import TreeView
-import FountainView
-import HouseView
-import CustomerView
-import EndGameView
-import WarehouseView
-import DeliveryPersonView
-import InventoryView
-import Article
-import ScoreView
-import StartGameView
-import DigitsView
 
 
 type State
@@ -240,13 +224,12 @@ animationLoop elapsed model =
         ( deliveryPerson, maybeAction ) =
             DeliveryPerson.animate elapsed model.deliveryPerson
     in
-        ( render
-            { model
-                | mapObjects = List.map (MapObject.animate elapsed) model.mapObjects
-                , deliveryPerson = deliveryPerson
-                , requests = List.map (Request.animate elapsed) model.requests
-                , customers = Dict.map (always (Customer.animate elapsed)) model.customers
-            }
+        ( { model
+            | mapObjects = List.map (MapObject.animate elapsed) model.mapObjects
+            , deliveryPerson = deliveryPerson
+            , requests = List.map (Request.animate elapsed) model.requests
+            , customers = Dict.map (always (Customer.animate elapsed)) model.customers
+          }
         , maybeAction
         )
 
@@ -455,21 +438,20 @@ updateGameState model =
             countLives model
     in
         if lives <= 0 || hasWon model then
-            render
-                { model
-                    | state =
-                        if lives <= 0 then
-                            Lost
-                        else
-                            Won
-                    , events = []
-                    , requests = []
-                    , deliveryPerson =
-                        DeliveryPerson.initial
-                            ( toFloat (fst model.gridSize // 2 - 1)
-                            , toFloat (snd model.gridSize // 4 * 3 + 1)
-                            )
-                }
+            { model
+                | state =
+                    if lives <= 0 then
+                        Lost
+                    else
+                        Won
+                , events = []
+                , requests = []
+                , deliveryPerson =
+                    DeliveryPerson.initial
+                        ( toFloat (fst model.gridSize // 2 - 1)
+                        , toFloat (snd model.gridSize // 4 * 3 + 1)
+                        )
+            }
         else
             model
 
@@ -589,32 +571,6 @@ returnArticle warehouse article model =
             model
 
 
-renderCustomer : Model -> Customer -> List Box
-renderCustomer model customer =
-    case customer.location of
-        Just { position } ->
-            CustomerView.render model.articles position customer
-
-        Nothing ->
-            []
-
-
-renderMapObject : Model -> MapObject -> List Box
-renderMapObject model mapObject =
-    case mapObject.category of
-        TreeCategory ->
-            TreeView.render mapObject
-
-        FountainCategory fountain ->
-            FountainView.render fountain mapObject
-
-        HouseCategory _ ->
-            HouseView.render model.requests model.articles mapObject
-
-        WarehouseCategory capacity ->
-            WarehouseView.render model.articles capacity mapObject
-
-
 click : ( Int, Int ) -> Model -> Maybe Action
 click coordinates model =
     model.clickableBoxes
@@ -629,49 +585,3 @@ clickToTile { tileSize } ( x, y ) =
     ( toFloat x / toFloat tileSize
     , toFloat y / toFloat tileSize
     )
-
-
-render : Model -> Model
-render model =
-    let
-        ( texturedBoxes, clickableBoxes ) =
-            Box.split (boxes model)
-    in
-        { model
-            | texturedBoxes = List.sortBy .layer texturedBoxes
-            , clickableBoxes = clickableBoxes
-        }
-
-
-boxes : Model -> List Box
-boxes model =
-    case model.state of
-        Initialising ->
-            []
-
-        Suspended _ ->
-            []
-
-        Loading ->
-            DigitsView.render
-                ( toFloat (fst model.gridSize) / 2 + 1, toFloat (snd model.gridSize) / 2 )
-                (Textures.loadedTextures model.textures)
-
-        Stopped ->
-            DeliveryPersonView.render 0 model.deliveryPerson
-                ++ StartGameView.render model.gridSize
-
-        Lost ->
-            ScoreView.render model.gridSize model.score model.maxLives (countLives model)
-                ++ EndGameView.render model.gridSize True model.articles model.customers
-
-        Won ->
-            ScoreView.render model.gridSize model.score model.maxLives (countLives model)
-                ++ EndGameView.render model.gridSize False model.articles model.customers
-
-        Playing ->
-            InventoryView.render model.gridSize model.articles
-                ++ DeliveryPersonView.render (List.length (List.filter Article.isPicked model.articles)) model.deliveryPerson
-                ++ ScoreView.render model.gridSize model.score model.maxLives (countLives model)
-                ++ List.concatMap (renderMapObject model) model.mapObjects
-                ++ List.concatMap (renderCustomer model) (Dict.values model.customers)

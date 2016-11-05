@@ -1,4 +1,4 @@
-module FountainView exposing (render)
+module View.Fountain exposing (render)
 
 import Box exposing (Box)
 import Textures

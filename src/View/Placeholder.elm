@@ -1,4 +1,4 @@
-module PlaceholderView exposing (render)
+module View.Placeholder exposing (render)
 
 import Layers exposing (layers)
 import Box exposing (Box)

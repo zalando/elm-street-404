@@ -1,9 +1,9 @@
-module ScoreView exposing (render)
+module View.Score exposing (render)
 
 import Box exposing (Box)
 import Textures
 import Layers exposing (layers)
-import DigitsView
+import View.Digits
 
 
 render : ( Int, Int ) -> Int -> Int -> Int -> List Box
@@ -24,5 +24,5 @@ render ( width, _ ) score maxLives lives =
                 ( layers.bubble, 0 )
     in
         Box.textured Textures.Score ( x, 1 ) 10 ( layers.bubble, 0 )
-            :: DigitsView.render ( x, 1 ) (score * 10)
+            :: View.Digits.render ( x, 1 ) (score * 10)
             ++ List.map renderLife [0..maxLives - 1]
