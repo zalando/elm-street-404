@@ -17,7 +17,7 @@ render requests articles ({ position } as house) =
             List.filter (\r -> r.house == house) requests
 
         renderRequest number =
-            View.Request.render ( fst position - 1, snd position - toFloat number ) house
+            View.Request.render ( Tuple.first position - 1, Tuple.second position - toFloat number ) house
 
         renderBubble =
             case List.length requestsFromHouse of

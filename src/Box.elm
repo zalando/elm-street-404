@@ -68,23 +68,23 @@ clicked : ( Float, Float ) -> ClickableBoxData -> Bool
 clicked ( x, y ) ({ position, offset, size, onClickAction } as box) =
     let
         left =
-            fst position + fst offset
+            Tuple.first position + Tuple.first offset
 
         top =
-            snd position + snd offset
+            Tuple.second position + Tuple.second offset
 
         right =
-            left + fst size
+            left + Tuple.first size
 
         bottom =
-            top + snd size
+            top + Tuple.second size
     in
         x >= left && x < right && y >= top && y < bottom
 
 
 boxLayer : ( Float, Float ) -> ( Float, Float ) -> Float
 boxLayer layer position =
-    fst layer * 1000 + snd position * 100 + snd layer
+    Tuple.first layer * 1000 + Tuple.second position * 100 + Tuple.second layer
 
 
 split : List Box -> ( List TexturedBoxData, List ClickableBoxData )

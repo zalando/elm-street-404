@@ -37,16 +37,16 @@ view : Model -> Html Action
 view model =
     let
         mapWidth =
-            fst model.gridSize * model.tileSize
+            Tuple.first model.gridSize * model.tileSize
 
         mapHeight =
-            snd model.gridSize * model.tileSize
+            Tuple.second model.gridSize * model.tileSize
 
         screenWidth =
-            max (fst model.dimensions) mapWidth
+            max (Tuple.first model.dimensions) mapWidth
 
         screenHeight =
-            max (snd model.dimensions) mapHeight
+            max (Tuple.second model.dimensions) mapHeight
     in
         case model.state of
             Model.Suspended _ ->

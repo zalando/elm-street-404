@@ -176,7 +176,7 @@ loadTextures : Textures -> List TextureId
 loadTextures textures =
     AllDict.toList textures
         |> List.filter (\( id, data ) -> data.texture == Nothing)
-        |> List.map fst
+        |> List.map Tuple.first
 
 
 type alias TextureWithSize =

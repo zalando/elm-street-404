@@ -17,8 +17,8 @@ direction { route, position } =
     case route of
         ( x, y ) :: rest ->
             calculateDirection
-                ( toFloat x - fst position
-                , toFloat y - snd position
+                ( toFloat x - Tuple.first position
+                , toFloat y - Tuple.second position
                 )
 
         [] ->

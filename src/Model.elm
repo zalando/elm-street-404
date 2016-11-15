@@ -138,7 +138,7 @@ resize dimensions model =
         _ ->
             let
                 newTileSize =
-                    min (fst dimensions // minMapWidth) 40
+                    min (Tuple.first dimensions // minMapWidth) 40
 
                 newGridSize =
                     gridSize newTileSize dimensions
@@ -149,8 +149,8 @@ resize dimensions model =
                     , tileSize = newTileSize
                     , deliveryPerson =
                         DeliveryPerson.initial
-                            ( toFloat (fst newGridSize // 2 - 1)
-                            , toFloat (snd newGridSize // 4 * 3 + 1)
+                            ( toFloat (Tuple.first newGridSize // 2 - 1)
+                            , toFloat (Tuple.second newGridSize // 4 * 3 + 1)
                             )
                 }
 
@@ -325,11 +325,11 @@ obstacleTiles : List MapObject -> List ( Int, Int )
 obstacleTiles =
     let
         col y h x =
-            (++) (List.map ((,) x) [y..y + h - 1])
+            (++) (List.map ((,) x) (List.range y (y + h - 1)))
 
         -- add an additional col of tiles at x - 1, because delivery person's width = 2 tiles
         cols ( x, y ) ( w, h ) =
-            (++) (List.foldl (col y h) [] [x - 1..x + w - 1])
+            (++) (List.foldl (col y h) [] (List.range (x - 1) (x + w - 1)))
 
         toIntTuple ( a, b ) =
             ( round a, round b )
@@ -339,8 +339,8 @@ obstacleTiles =
 
 placeToLocation : MapObject -> ( Int, Int )
 placeToLocation { position, size } =
-    ( round (fst position + fst size / 2 - 1)
-    , round (snd position + snd size)
+    ( round (Tuple.first position + Tuple.first size / 2 - 1)
+    , round (Tuple.second position + Tuple.second size)
     )
 
 
@@ -448,8 +448,8 @@ updateGameState model =
                 , requests = []
                 , deliveryPerson =
                     DeliveryPerson.initial
-                        ( toFloat (fst model.gridSize // 2 - 1)
-                        , toFloat (snd model.gridSize // 4 * 3 + 1)
+                        ( toFloat (Tuple.first model.gridSize // 2 - 1)
+                        , toFloat (Tuple.second model.gridSize // 4 * 3 + 1)
                         )
             }
         else

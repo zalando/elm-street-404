@@ -94,7 +94,7 @@ closeNode current state =
 
 freeUnclosedNeighbors : Point -> State -> List Point
 freeUnclosedNeighbors ( px, py ) state =
-    List.foldl (\x -> (++) (List.map ((,) x) [py - 1..py + 1])) [] [px - 1..px + 1]
+    List.foldl (\x -> (++) (List.map ((,) x) (List.range (py - 1) (py + 1)))) [] (List.range (px - 1) (px + 1))
         |> List.filter ((/=) ( px, py ))
         |> List.filter (onGrid state.gridSize)
         |> List.filter (\n -> not (List.member n state.closedNodes))
@@ -195,7 +195,7 @@ astarIter state =
 
 unwindParents : Point -> State -> List Point
 unwindParents node state =
-    case nodeState node state `Maybe.andThen` .parent of
+    case nodeState node state |> Maybe.andThen .parent of
         Nothing ->
             [ node ]
 

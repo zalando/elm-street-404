@@ -39,8 +39,8 @@ update action model =
                                         Maybe.map
                                             (\texture ->
                                                 { size =
-                                                    ( toFloat (fst (WebGL.textureSize texture))
-                                                    , toFloat (snd (WebGL.textureSize texture))
+                                                    ( toFloat (Tuple.first (WebGL.textureSize texture))
+                                                    , toFloat (Tuple.second (WebGL.textureSize texture))
                                                     )
                                                 , texture = texture
                                                 }
@@ -87,14 +87,13 @@ update action model =
 
         Tick time ->
             let
-                ( model, maybeAction ) =
+                ( newModel, maybeAction ) =
                     Model.animate time model
             in
-                ( View.Model.render model
+                ( View.Model.render newModel
                 , case maybeAction of
                     Just action ->
-                        Task.succeed action
-                            |> Task.perform identity identity
+                        Task.perform identity (Task.succeed action)
 
                     Nothing ->
                         Cmd.none
@@ -105,8 +104,7 @@ update action model =
                 effect =
                     case Model.click ( x, y ) model of
                         Just action ->
-                            Task.succeed action
-                                |> Task.perform identity identity
+                            Task.perform identity (Task.succeed action)
 
                         Nothing ->
                             Cmd.none
@@ -133,7 +131,7 @@ update action model =
         Restore ->
             case ( model.embed, model.state ) of
                 ( True, Suspended prevState ) ->
-                    { model | state = prevState } ! [ Task.perform identity Dimensions Window.size ]
+                    { model | state = prevState } ! [ Task.perform Dimensions Window.size ]
 
                 _ ->
                     model ! []
@@ -156,9 +154,7 @@ ifPlaying fun model =
 loadImage : String -> TextureId -> Cmd Action
 loadImage imagesUrl textureId =
     WebGL.loadTexture (imagesUrl ++ "/" ++ Textures.filename textureId)
-        |> Task.perform
-            (\_ -> TextureLoaded textureId Nothing)
-            (\texture -> TextureLoaded textureId (Just texture))
+        |> Task.attempt (Result.toMaybe >> TextureLoaded textureId)
 
 
 

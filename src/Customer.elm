@@ -49,7 +49,7 @@ rodnam : Int -> MapObject -> Random.Generator Customer
 rodnam id house =
     Random.map
         (Maybe.withDefault 0 >> initial id house)
-        (IHopeItWorks.pickRandom ([0..6] ++ [ 1, 4, 5 ] ++ [ 1, 4, 5 ]))
+        (IHopeItWorks.pickRandom (List.range 0 6 ++ [ 1, 4, 5 ] ++ [ 1, 4, 5 ]))
 
 
 rodnams : Int -> List MapObject -> Random.Generator (Dict Int Customer)

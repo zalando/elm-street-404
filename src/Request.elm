@@ -81,7 +81,7 @@ orders number houses categories =
         Random.map (always []) (Random.int 0 0)
     else
         Random.pair (IHopeItWorks.pickRandom houses) (IHopeItWorks.pickRandom categories)
-            `Random.andThen`
+            |> Random.andThen
                 (\pair ->
                     case pair of
                         ( Just house, Just category ) ->
@@ -101,8 +101,8 @@ orders number houses categories =
 isInReturn : MapObject -> Article -> Request -> Bool
 isInReturn house article request =
     case request.category of
-        Return article' ->
-            house == request.house && article' == article
+        Return article_ ->
+            house == request.house && article_ == article
 
         _ ->
             False
@@ -111,8 +111,8 @@ isInReturn house article request =
 isOrdered : MapObject -> Category -> Request -> Bool
 isOrdered house category request =
     case request.category of
-        Order category' ->
-            house == request.house && category' == category
+        Order category_ ->
+            house == request.house && category_ == category
 
         _ ->
             False

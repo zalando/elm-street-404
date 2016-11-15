@@ -25,7 +25,7 @@ render ( width, height ) articles =
             List.length articlesInDelivery
 
         placeholders =
-            [0..3 - articlesNumber]
+            List.range 0 (3 - articlesNumber)
 
         renderArticle number article =
             let
