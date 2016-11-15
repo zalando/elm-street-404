@@ -73,7 +73,7 @@ boxes model =
 
         Loading ->
             View.Digits.render
-                ( toFloat (fst model.gridSize) / 2 + 1, toFloat (snd model.gridSize) / 2 )
+                ( toFloat (Tuple.first model.gridSize) / 2 + 1, toFloat (Tuple.second model.gridSize) / 2 )
                 (Textures.loadedTextures model.textures)
 
         Stopped ->

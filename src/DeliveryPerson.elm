@@ -47,7 +47,7 @@ currentDestination deliveryPerson =
             Nothing
 
         first :: _ ->
-            Just ( toFloat (fst first), toFloat (snd first) )
+            Just ( toFloat (Tuple.first first), toFloat (Tuple.second first) )
 
 
 absValue : ( Float, Float ) -> Float
@@ -195,8 +195,8 @@ initial position =
 navigationStart : DeliveryPerson -> ( Int, Int )
 navigationStart { position, route } =
     Maybe.withDefault
-        ( round (fst position)
-        , round (snd position)
+        ( round (Tuple.first position)
+        , round (Tuple.second position)
         )
         (List.head route)
 

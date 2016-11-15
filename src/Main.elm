@@ -2,7 +2,7 @@ port module Main exposing (..)
 
 import Actions exposing (Action(..))
 import Model exposing (Model)
-import Html.App as Html
+import Html
 import Update
 import View
 import Window
@@ -10,7 +10,7 @@ import Textures
 import AnimationFrame
 import Task
 import Process
-import Json.Decode as Json exposing ((:=))
+import Json.Decode as Json
 import Time
 import Keyboard
 
@@ -45,7 +45,7 @@ subscriptions model =
                 ]
 
 
-main : Program Json.Value
+main : Program Json.Value Model Action
 main =
     Html.programWithFlags
         { init =
@@ -53,31 +53,30 @@ main =
                 let
                     imagesUrl =
                         flags
-                            |> Json.decodeValue ("imagesUrl" := Json.string)
+                            |> Json.decodeValue (Json.field "imagesUrl" Json.string)
                             |> Result.withDefault "../img"
 
                     randomSeed =
                         flags
-                            |> Json.decodeValue ("randomSeed" := Json.int)
+                            |> Json.decodeValue (Json.field "randomSeed" Json.int)
                             |> Result.withDefault 0
 
                     embed =
                         flags
-                            |> Json.decodeValue ("embed" := Json.bool)
+                            |> Json.decodeValue (Json.field "embed" Json.bool)
                             |> Result.withDefault False
 
                     devicePixelRatio =
                         flags
-                            |> Json.decodeValue ("devicePixelRatio" := Json.float)
+                            |> Json.decodeValue (Json.field "devicePixelRatio" Json.float)
                             |> Result.withDefault 1
                 in
                     ( Model.initial randomSeed imagesUrl embed devicePixelRatio
                     , Cmd.batch
                         [ Update.loadImage imagesUrl Textures.Score
                         , Task.perform
-                            identity
                             Dimensions
-                            (Process.sleep 100 `Task.andThen` \_ -> Window.size)
+                            (Process.sleep 100 |> Task.andThen (\_ -> Window.size))
                         ]
                     )
             )

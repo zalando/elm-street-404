@@ -18,8 +18,8 @@ find fn list =
                 find fn rest
 
 
-remove' : (a -> Bool) -> List a -> ( Bool, List a )
-remove' fn list =
+remove_ : (a -> Bool) -> List a -> ( Bool, List a )
+remove_ fn list =
     case list of
         [] ->
             ( False, [] )
@@ -30,7 +30,7 @@ remove' fn list =
             else
                 let
                     ( found, remainder ) =
-                        remove' fn rest
+                        remove_ fn rest
                 in
                     ( found, first :: remainder )
 
@@ -39,7 +39,7 @@ remove' fn list =
 -}
 remove : (a -> Bool) -> List a -> List a
 remove fn =
-    remove' fn >> snd
+    remove_ fn >> Tuple.second
 
 
 {-| exlude right list items from the given left list
@@ -53,7 +53,7 @@ exclude left right =
         first :: rest ->
             let
                 ( found, nextRight ) =
-                    remove' ((==) first) right
+                    remove_ ((==) first) right
 
                 nextLeft =
                     exclude rest nextRight

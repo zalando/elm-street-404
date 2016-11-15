@@ -75,10 +75,10 @@ availableCategories articles =
 
 
 removeDelivered : Int -> Category -> List Article -> List Article
-removeDelivered customerId category' =
+removeDelivered customerId category_ =
     IHopeItWorks.remove
         (\({ state, category } as article) ->
-            state == DeliveredToCustomer customerId && category.kind == category'.kind
+            state == DeliveredToCustomer customerId && category.kind == category_.kind
         )
 
 
@@ -141,7 +141,7 @@ dispatch number warehouses =
         Random.map (always []) (Random.int 0 0)
     else
         IHopeItWorks.pickRandom warehouses
-            `Random.andThen`
+            |> Random.andThen
                 (\maybeWarehouse ->
                     case maybeWarehouse of
                         Just warehouse ->
@@ -169,7 +169,7 @@ return customers number houses articles =
                 List.filter (\a -> List.any (deliveredTo a) houses) articles
         in
             IHopeItWorks.pickRandom availableArticles
-                `Random.andThen`
+                |> Random.andThen
                     (\maybeArticle ->
                         case maybeArticle of
                             Just article ->

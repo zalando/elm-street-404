@@ -4,7 +4,7 @@ module OffsetClick
         , onClick
         )
 
-import Json.Decode as Json exposing (Decoder, (:=))
+import Json.Decode as Json exposing (Decoder)
 import Html.Events as Events
 import Html
 import Result exposing (Result)
@@ -24,9 +24,19 @@ onClick tagger =
 
 relativePosition : Decoder Position
 relativePosition =
-    Json.object2
+    Json.map2
         offsetBy
-        (Json.customDecoder ("target" := Json.value) Native.Offset.offset)
+        (Json.field "target" Json.value
+            |> Json.andThen
+                (\value ->
+                    case Native.Offset.offset value of
+                        Ok val ->
+                            Json.succeed val
+
+                        Err err ->
+                            Json.fail err
+                )
+        )
         position
 
 
@@ -44,7 +54,7 @@ offset =
 
 position : Json.Decoder Position
 position =
-    Json.object2
+    Json.map2
         Position
-        ("pageX" := Json.int)
-        ("pageY" := Json.int)
+        (Json.field "pageX" Json.int)
+        (Json.field "pageY" Json.int)

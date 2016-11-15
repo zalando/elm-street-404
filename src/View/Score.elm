@@ -25,4 +25,4 @@ render ( width, _ ) score maxLives lives =
     in
         Box.textured Textures.Score ( x, 1 ) 10 ( layers.bubble, 0 )
             :: View.Digits.render ( x, 1 ) (score * 10)
-            ++ List.map renderLife [0..maxLives - 1]
+            ++ List.map renderLife (List.range 0 (maxLives - 1))

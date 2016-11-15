@@ -33,12 +33,12 @@ type MapObjectCategory
     | TreeCategory
 
 
-type alias MapObject' a b =
+type alias MapObject_ a b =
     { a | category : b }
 
 
 type alias MapObject =
-    MapObject' Box MapObjectCategory
+    MapObject_ Box MapObjectCategory
 
 
 animate : Time -> MapObject -> MapObject
@@ -141,7 +141,7 @@ placeRandom objects boxes =
 
                 box :: restBoxes ->
                     fitRandom box (size object)
-                        `Random.andThen`
+                        |> Random.andThen
                             (\position ->
                                 Random.map
                                     (\objects -> { object | position = position } :: objects)
@@ -168,7 +168,7 @@ splitBy box1 box2 =
             box2.size
     in
         List.filter
-            (\{ size } -> fst size > 0 && snd size > 0)
+            (\{ size } -> Tuple.first size > 0 && Tuple.second size > 0)
             [ { position = ( x2, y2 ), size = ( x1 - x2, h1 + y1 - y2 ) }
             , { position = ( x1, y2 ), size = ( x2 + w2 - x1, y1 - y2 ) }
             , { position = ( x1 + w1, y1 ), size = ( x2 + w2 - (x1 + w1), y2 + h2 - y1 ) }
@@ -181,16 +181,16 @@ fitRandom { size, position } ( w, h ) =
     Random.map
         (\( x, y ) -> ( toFloat x, toFloat y ))
         (Random.pair
-            (Random.int (floor (fst position)) (floor (fst position + fst size - w)))
-            (Random.int (floor (snd position)) (floor (snd position + snd size - h)))
+            (Random.int (floor (Tuple.first position)) (floor (Tuple.first position + Tuple.first size - w)))
+            (Random.int (floor (Tuple.second position)) (floor (Tuple.second position + Tuple.second size - h)))
         )
 
 
 filterSize : ( Float, Float ) -> List Box -> List Box
 filterSize ( w, h ) =
-    List.filter (\{ size } -> fst size >= w && snd size >= h)
+    List.filter (\{ size } -> Tuple.first size >= w && Tuple.second size >= h)
 
 
 sortBySize : List Box -> List Box
 sortBySize =
-    List.sortBy (\{ size } -> fst size * snd size) >> List.reverse
+    List.sortBy (\{ size } -> Tuple.first size * Tuple.second size) >> List.reverse

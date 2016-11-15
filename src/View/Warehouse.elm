@@ -23,7 +23,7 @@ render articles capacity ({ position } as warehouse) =
             List.length articlesInWarehouse
 
         placeholders =
-            [0..capacity - numberOfArticles - 1]
+            List.range 0 (capacity - numberOfArticles - 1)
 
         renderArticle number article =
             let
