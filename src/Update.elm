@@ -9,7 +9,7 @@ import MapObject exposing (MapObject, MapObjectCategory(..))
 import Category exposing (Category)
 import IHopeItWorks
 import Task exposing (Task)
-import WebGL
+import WebGL.Texture as Texture
 import Textures exposing (TextureId)
 import AllDict
 import Window
@@ -39,8 +39,8 @@ update action model =
                                         Maybe.map
                                             (\texture ->
                                                 { size =
-                                                    ( toFloat (Tuple.first (WebGL.textureSize texture))
-                                                    , toFloat (Tuple.second (WebGL.textureSize texture))
+                                                    ( toFloat (Tuple.first (Texture.size texture))
+                                                    , toFloat (Tuple.second (Texture.size texture))
                                                     )
                                                 , texture = texture
                                                 }
@@ -153,7 +153,7 @@ ifPlaying fun model =
 
 loadImage : String -> TextureId -> Cmd Action
 loadImage imagesUrl textureId =
-    WebGL.loadTexture (imagesUrl ++ "/" ++ Textures.filename textureId)
+    Texture.load (imagesUrl ++ "/" ++ Textures.filename textureId)
         |> Task.attempt (Result.toMaybe >> TextureLoaded textureId)
 
 

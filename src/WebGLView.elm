@@ -2,7 +2,8 @@ module WebGLView exposing (render)
 
 import Html exposing (Html)
 import Html.Attributes exposing (width, height, style)
-import WebGL as GL
+import WebGL exposing (Shader, Entity, Mesh, Texture)
+import WebGL.Settings.Blend as Blend
 import Math.Vector2 exposing (Vec2, vec2, fromTuple)
 import Box
 import Textures exposing (Textures)
@@ -18,7 +19,7 @@ type alias Uniform =
     { frameSize : Vec2
     , screenSize : Vec2
     , offset : Vec2
-    , texture : GL.Texture
+    , texture : Texture
     , textureSize : Vec2
     , frame : Int
     }
@@ -28,9 +29,9 @@ type alias Varying =
     { texturePos : Vec2 }
 
 
-mesh : GL.Drawable Vertex
+mesh : Mesh Vertex
 mesh =
-    GL.Triangle
+    WebGL.triangles
         [ ( Vertex (vec2 0 0)
           , Vertex (vec2 1 1)
           , Vertex (vec2 1 0)
@@ -44,10 +45,7 @@ mesh =
 
 render : Float -> ( Int, Int ) -> Int -> Textures -> List Box.TexturedBoxData -> Html Action
 render devicePixelRatio (( w, h ) as dimensions) tileSize textures boxes =
-    GL.toHtmlWith
-        [ GL.Enable GL.Blend
-        , GL.BlendFunc ( GL.One, GL.OneMinusSrcAlpha )
-        ]
+    WebGL.toHtml
         [ width (toFloat w * toFloat tileSize * devicePixelRatio |> round)
         , height (toFloat h * toFloat tileSize * devicePixelRatio |> round)
         , style
@@ -61,14 +59,15 @@ render devicePixelRatio (( w, h ) as dimensions) tileSize textures boxes =
         (List.filterMap (renderTextured dimensions textures) (List.reverse boxes))
 
 
-renderTextured : ( Int, Int ) -> Textures -> Box.TexturedBoxData -> Maybe GL.Renderable
+renderTextured : ( Int, Int ) -> Textures -> Box.TexturedBoxData -> Maybe Entity
 renderTextured ( w, h ) textures ({ textureId, position, frame, offset } as box) =
     AllDict.get textureId textures
         |> Maybe.andThen
             (\{ size, texture } ->
                 Maybe.map
                     (\textureValue ->
-                        GL.render
+                        WebGL.entityWith
+                            [ Blend.add Blend.one Blend.oneMinusSrcAlpha ]
                             vertexShader
                             fragmentShader
                             mesh
@@ -84,7 +83,7 @@ renderTextured ( w, h ) textures ({ textureId, position, frame, offset } as box)
             )
 
 
-vertexShader : GL.Shader Vertex Uniform Varying
+vertexShader : Shader Vertex Uniform Varying
 vertexShader =
     [glsl|
 
@@ -104,7 +103,7 @@ vertexShader =
     |]
 
 
-fragmentShader : GL.Shader {} Uniform Varying
+fragmentShader : Shader {} Uniform Varying
 fragmentShader =
     [glsl|
 
