@@ -1,0 +1,38 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Elm Street 404</title>
+  <style>html, body {padding: 0; margin: 0;}</style>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+  <script src="elm.js"></script>
+  <button onclick="play();">Click To Play</button>
+  <script>
+    var app;
+    function play () {
+      if (app) {
+        // restore the app if its there
+        app.ports.restore.send(true);
+      } else {
+        // create the new app
+        var container = document.createElement('div');
+        container.style.position = 'absolute';
+        container.style.left = '0';
+        container.style.top = '0';
+        document.body.appendChild(container);
+        app = Elm.Main.embed(container, {
+          randomSeed: Date.now(),
+          imagesUrl: 'img',
+          embed: true,
+          devicePixelRatio: window.devicePixelRatio
+        });
+        app.ports.suspended.subscribe(function() {
+          console.log('the game was suspended');
+        });
+      }
+    }
+  </script>
+</body>
+</html>
