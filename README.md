@@ -1,8 +1,10 @@
 # 404 Elm Street
 
-Work in progress, current demo can be [seen here](http://zalando.github.io/elm-street-404/).
+You can find a demo [here](http://zalando.github.io/elm-street-404/).
 
-Read more about the game on [our blog](https://tech.zalando.com/blog/using-elm-to-create-a-fun-game-in-just-five-days/).
+This project is not under consistent development, so if you file an issue or PR it might be a while before we get back to you. If you have an idea (and can be patient with us!), please make sure you hear back from a maintainer before starting any development. We will help you ensure that your ideas maintain a consistent game flow.
+
+Read more about the game on the [Zalando Tech blog](https://tech.zalando.com/blog/using-elm-to-create-a-fun-game-in-just-five-days/).
 
 ![Screencast](screen.gif)
 
