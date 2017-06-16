@@ -50,10 +50,8 @@ render devicePixelRatio (( w, h ) as dimensions) tileSize textures boxes =
         , height (toFloat h * toFloat tileSize * devicePixelRatio |> round)
         , style
             [ ( "position", "absolute" )
-            , ( "-webkit-transform-origin", "0 0" )
-            , ( "-webkit-transform", "scale(" ++ toString (1 / devicePixelRatio) ++ ")" )
-            , ( "transform-origin", "0 0" )
-            , ( "transform", "scale(" ++ toString (1 / devicePixelRatio) ++ ")" )
+            , ( "width", toString (w * tileSize) ++ "px" )
+            , ( "height", toString (h * tileSize) ++ "px" )
             ]
         ]
         (List.filterMap (renderTextured dimensions textures) (List.reverse boxes))
